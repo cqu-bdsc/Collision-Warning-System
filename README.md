@@ -20,17 +20,31 @@ Collision Warning System，DSRC
 
 ----
 ### 详细设计说明
+
+#### 项目架构
+Github 协作开发
+
+Branch 分支
+
+ * master 
+ 	---README.md        本文件
+ 	---DOC 			说明文档
+ * android
+ 	---APP 			安卓项目
+ * pc
+
+
 #### 数据说明
 ***
 #### Android
 **APP Featus**
 
 > Application name : collision-warning-system
-
+> 
 > Company domain: cqu-bdsc.github.com
-
+> 
 > **Package name**: com.github.cqu_bdsc.collision_warning_system
-
+> 
 > Taget Api : **API 21: Android 5.0 Lollipop**
 
 ***
