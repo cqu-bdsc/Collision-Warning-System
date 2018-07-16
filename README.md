@@ -1,23 +1,18 @@
-# Collision-Warning-System
-Collision Warning System，DSRC 
+## QT-Server开发 
 
-* * *
+### 负责人
+[周易](https://github.com/Eva-zhouyi)、[许新操](https://github.com/neardws)
 
-## 进度更新
-2018-7-13
-概要设计说明书更新，版本V2.0
+### Feature
 
-### 模块设计任务
-#### 周易
+* QT版本：5.11.1
 
-* [ ] UDP通信模块
-* [ ] 信息处理模块
-* [ ] 信息显示模块
+### Debug
 
-#### 张浪
+### 模块化开发
 
-* [ ] 信息采集模块
-* [ ] UDP通信模块
-* [ ] 显示界面模块
+#### UDP通信模块
 
+#### 信息处理模块
 
+#### 信息显示模块
