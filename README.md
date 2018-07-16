@@ -36,19 +36,7 @@ Branch 分支
 
 #### 数据说明
 ***
-#### Android
-**APP Featus**
 
-> Application name : collision-warning-system
-> 
-> Company domain: cqu-bdsc.github.com
-> 
-> **Package name**: com.github.cqu_bdsc.collision_warning_system
-> 
-> Taget Api : **API 21: Android 5.0 Lollipop**
-
-***
-#### PC
 
 
 
