@@ -143,10 +143,10 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QLineEdit" name="lineEdit_3"/>
+        <widget class="QLineEdit" name="editMessage"/>
        </item>
        <item>
-        <widget class="QPushButton" name="sendButton">
+        <widget class="QPushButton" name="but_send">
          <property name="text">
           <string>发送</string>
          </property>

@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QSettings>
+#include <QTextTable>
+#include <QScrollBar>
 #include <QNetworkInterface>
 #include "myudp.h"
 
@@ -28,14 +29,16 @@ private slots:
      * onUdpAppendMessage      UDP接收到消息的槽函数
      *
      ******************************/
-   // void on_sendButton_clicked();
-   // void onUdpSendMessage();
-   // void onUdpAppendMessage(const QString &from, const QString &message);
+    void on_but_start_clicked();
+    void onUdpStopButtonClicked();
+    void onUdpSendMessage();
+    void onUdpAppendMessage(const QString &from, const QString &message);
 
     //获取本机IP地址
     void on_but_getIP_clicked();
 
     void on_NetInterface_currentIndexChanged(int index);
+
 
 signals:
 
@@ -51,13 +54,15 @@ private:
     void findLocalIP();
 
     QList<QNetworkInterface> interfaceList; //保存网卡接口的链表
-    MyUDP *myudp = nullptr;   //MyUDP 对象
 
     QHostAddress localAddr;     //本地IP地址
     quint16 udpListenPort;      //本地接收端的监听端口
     QHostAddress udpTargetAddr; //目标接收端的IP地址
     quint16 udpTargetPort;      //目标接收端的监听端口
 
+    MyUDP *myudp = nullptr;   //MyUDP 对象
+
     QString messageUDP = "[UDP] ";
+    QTextFormat tableFormat;
 };
 #endif // MAINWINDOW_H

@@ -47,8 +47,8 @@ public:
     QLineEdit *editSendPort;
     QWidget *horizontalLayoutWidget_2;
     QHBoxLayout *horizontalLayout_2;
-    QLineEdit *lineEdit_3;
-    QPushButton *sendButton;
+    QLineEdit *editMessage;
+    QPushButton *but_send;
     QGroupBox *groupReceive;
     QGroupBox *groupListen;
     QWidget *horizontalLayoutWidget_3;
@@ -152,15 +152,15 @@ public:
         horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
-        lineEdit_3 = new QLineEdit(horizontalLayoutWidget_2);
-        lineEdit_3->setObjectName(QStringLiteral("lineEdit_3"));
+        editMessage = new QLineEdit(horizontalLayoutWidget_2);
+        editMessage->setObjectName(QStringLiteral("editMessage"));
 
-        horizontalLayout_2->addWidget(lineEdit_3);
+        horizontalLayout_2->addWidget(editMessage);
 
-        sendButton = new QPushButton(horizontalLayoutWidget_2);
-        sendButton->setObjectName(QStringLiteral("sendButton"));
+        but_send = new QPushButton(horizontalLayoutWidget_2);
+        but_send->setObjectName(QStringLiteral("but_send"));
 
-        horizontalLayout_2->addWidget(sendButton);
+        horizontalLayout_2->addWidget(but_send);
 
         groupReceive = new QGroupBox(UDP);
         groupReceive->setObjectName(QStringLiteral("groupReceive"));
@@ -250,7 +250,7 @@ public:
         groupSend->setTitle(QApplication::translate("MainWindow", "\345\217\221\351\200\201\346\266\210\346\201\257", nullptr));
         label_ip->setText(QApplication::translate("MainWindow", "IP", nullptr));
         label_port->setText(QApplication::translate("MainWindow", "\347\253\257\345\217\243", nullptr));
-        sendButton->setText(QApplication::translate("MainWindow", "\345\217\221\351\200\201", nullptr));
+        but_send->setText(QApplication::translate("MainWindow", "\345\217\221\351\200\201", nullptr));
         groupReceive->setTitle(QApplication::translate("MainWindow", "\346\216\245\346\224\266\346\266\210\346\201\257", nullptr));
         groupListen->setTitle(QApplication::translate("MainWindow", "\347\233\221\345\220\254", nullptr));
         labelPort->setText(QApplication::translate("MainWindow", "\347\253\257\345\217\243", nullptr));
