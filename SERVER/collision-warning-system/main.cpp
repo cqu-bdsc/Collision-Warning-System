@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     //窗口类
     MainWindow w;
     //显示窗口
+    w.setWindowTitle("碰撞预警系统");
     w.show();
 
     return a.exec();

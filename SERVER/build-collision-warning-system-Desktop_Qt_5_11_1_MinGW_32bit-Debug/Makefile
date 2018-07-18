@@ -216,6 +216,7 @@ Makefile: ../collision-warning-system/collision-warning-system.pro ../../../Qt/Q
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/qt_config.prf \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/win32-g++/qmake.conf \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/exclusive_builds.prf \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/toolchain.prf \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/default_pre.prf \
@@ -242,6 +243,7 @@ Makefile: ../collision-warning-system/collision-warning-system.pro ../../../Qt/Q
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/qtmaind.prl \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Widgets.prl \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Gui.prl \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Network.prl \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Core.prl
 	$(QMAKE) -o Makefile ..\collision-warning-system\collision-warning-system.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/spec_pre.prf:
@@ -399,6 +401,7 @@ Makefile: ../collision-warning-system/collision-warning-system.pro ../../../Qt/Q
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/qt_config.prf:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/win32-g++/qmake.conf:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/exclusive_builds.prf:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/toolchain.prf:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/mkspecs/features/default_pre.prf:
@@ -425,6 +428,7 @@ Makefile: ../collision-warning-system/collision-warning-system.pro ../../../Qt/Q
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/qtmaind.prl:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Widgets.prl:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Gui.prl:
+../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Network.prl:
 ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/lib/Qt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ..\collision-warning-system\collision-warning-system.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"

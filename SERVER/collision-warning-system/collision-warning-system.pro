@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui
+# 添加网络功能
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,10 +27,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    myudp.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    myudp.h
 
 FORMS += \
         mainwindow.ui
+
+RESOURCES += \
+    image.qrc
