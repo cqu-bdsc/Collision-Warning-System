@@ -1,4 +1,3 @@
-
 # Collision-Warning-System
 
 Collision Warning System，DSRC 
@@ -54,11 +53,21 @@ Android端采集车辆信息后，将其打包成JSON数据包发送给PC，其�
 | 信息   | Item        |  Type  | 备注 |
 | ---   | --------    | ----- | ---- |
 | ID    | “id”        |  int   | 以本机的MAC地址进行Hash得到|
-| 时间戳 | “time”      |  int   | 单位：秒（s）,以发送事件到1970年第一秒的秒数 |
+| 时间戳 | “timeStamp” |  int   | 单位：秒（s）,以发送事件到1970年第一秒的秒数 |
 | 速度   | “speed”     | double | 单位：m/s, 保留3位小数，车辆车头方向的速度信息   |
 | 方向   | “direction” | int    | 车辆车头方向的朝向，0为正北，90正东，-90正西，180或-180正南|
 | 纬度   | “lat”       | double |使用百度SDK获得GPS定位信息，保留3位   |
 | 经度   | “lon”       | double |同上 |
 |加速度  | “ace”       | double | 单位：m/s^2, 保留1位小数   |
 
+PC端接收到Android端发送的JSON数据后，对其进行解析并进行处理，同时处理完成后将结果返回给Android端，其返回的信息格式定义如下。
+
+| 信息    | Item        |  Type  | 备注 |
+| ---     | --------    | -----  | ---- |
+| ID      | “id”        |  int   | 以发送过来的车辆ID为准|
+| 碰撞时间 | “time”      |  int   | 单位：秒（s） |
+| 碰撞距离 | “distant”   | double | 单位：m，保留3位小数  |
+| 警报     | “direction” | boolean| True: 碰撞， False: 不碰撞|
+| 地图     |             |        |   |
+| 碰撞轨迹 |             |        |    |
 
