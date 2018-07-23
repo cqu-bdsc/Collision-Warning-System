@@ -1,4 +1,4 @@
-package com.github.cqu_bdsc.collision_warning_system;
+package com.github.cqu_bdsc.collision_warning_system.udp;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +14,7 @@ public class Message implements Serializable {
     double lon;
     double ace;
 
-    Message(){
+   public   Message(){
         id = 0;
         timeStamp = 0;
         speed = 0;

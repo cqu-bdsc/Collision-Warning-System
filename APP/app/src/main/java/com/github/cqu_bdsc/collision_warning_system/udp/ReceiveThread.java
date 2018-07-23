@@ -2,6 +2,10 @@ package com.github.cqu_bdsc.collision_warning_system.udp;
 
 import android.content.Context;
 import android.content.Intent;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -13,6 +17,10 @@ public class ReceiveThread extends Thread {
     private Context context;
 
     public static final String ACTION_STRING = "ACTION_STRING";
+    public static final String ACTION_JSON     = "ACTION_JSON";
+
+    public static final String  JSON_CONTEXT = "JSON_CONTEXT";
+
     public static final String STRING_CONTEXT = "STRING_CONTEXT";
 
     private static final String SERVER_IP = "192.168.1.80";
@@ -55,25 +63,31 @@ public class ReceiveThread extends Thread {
                 }
 
                 String msg = new String(reveivePacket.getData(),0,reveivePacket.getLength());
-
-
-                if (msg.startsWith(TYPE_STRING)){
-                    dataType = TYPE_STRING;
-
-                } else if (msg.startsWith(TYPE_PICTURE)){
-                    dataType = TYPE_PICTURE;
-
-                } else if (msg.startsWith(TYPE_END)){//如输入结束，就需要清空数据流中的信息
-                    // 处理BAOS 数据
-                    ByteArrayOutputStream byteArrayOutputStream = baos;
-
-                    HandleData(dataType, byteArrayOutputStream);
-
-                    baos.reset();//重置baos
-                } else {
-
-                    baos.write(reveivePacket.getData(),0,reveivePacket.getLength());//将新数据加入到数据流中，并把它打印出来
+                try {
+                    JSONObject jsonObject = new JSONObject(msg);
+                    HandleData(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+
+
+//                if (msg.startsWith(TYPE_STRING)){
+//                    dataType = TYPE_STRING;
+//
+//                } else if (msg.startsWith(TYPE_PICTURE)){
+//                    dataType = TYPE_PICTURE;
+//
+//                } else if (msg.startsWith(TYPE_END)){//如输入结束，就需要清空数据流中的信息
+//                    // 处理BAOS 数据
+//                    ByteArrayOutputStream byteArrayOutputStream = baos;
+//
+//                    HandleData(dataType, byteArrayOutputStream);
+//
+//                    baos.reset();//重置baos
+//                } else {
+//
+//                    baos.write(reveivePacket.getData(),0,reveivePacket.getLength());//将新数据加入到数据流中，并把它打印出来
+//                }
 
             }
 
@@ -85,25 +99,41 @@ public class ReceiveThread extends Thread {
 
     }
 
-    private void HandleData(String dataType, ByteArrayOutputStream byteArrayOutputStream){//处理数据函数
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-
-        if (dataType.equals(TYPE_STRING)){
-            String message = new String(bytes);
-            System.out.print(message);
-            SendIntent(ReceiveThread.ACTION_STRING, message);
-
-        } else {
-
-        }
+    private void HandleData(JSONObject jsonObject){//处理数据函数
+        Result result = new Result();
+        result.fromJSON(jsonObject);
+        SendIntent(ReceiveThread.ACTION_JSON, result);
+//        byte[] bytes = byteArrayOutputStream.toByteArray();
+//
+//        if (dataType.equals(TYPE_STRING)){
+//            String message = new String(bytes);
+//            System.out.print(message);
+//            SendIntent(ReceiveThread.ACTION_STRING, message);
+//
+//        } else {
+//
+//        }
     }
 
+//    private void HandleData(String dataType, ByteArrayOutputStream byteArrayOutputStream){//处理数据函数
+//        byte[] bytes = byteArrayOutputStream.toByteArray();
+//
+//        if (dataType.equals(TYPE_STRING)){
+//            String message = new String(bytes);
+//            System.out.print(message);
+//            SendIntent(ReceiveThread.ACTION_STRING, message);
+//
+//        } else {
+//
+//        }
+//    }
 
-    private void SendIntent(String action, String something){
+
+    private void SendIntent(String action, Result something){
         Intent intent = new Intent();
-        if (action.equals(ReceiveThread.ACTION_STRING)){
-            intent.setAction(ReceiveThread.ACTION_STRING);
-            intent.putExtra(ReceiveThread.STRING_CONTEXT, something);
+        if (action.equals(ReceiveThread.ACTION_JSON)){
+            intent.setAction(ReceiveThread.ACTION_JSON);
+            intent.putExtra(ReceiveThread.JSON_CONTEXT, something);
             context.sendBroadcast(intent);
         }  else {
 

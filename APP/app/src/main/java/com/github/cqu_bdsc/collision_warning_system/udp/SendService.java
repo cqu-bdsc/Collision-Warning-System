@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.github.cqu_bdsc.collision_warning_system.Message;
-
 import org.json.JSONObject;
 
 import java.io.IOException;

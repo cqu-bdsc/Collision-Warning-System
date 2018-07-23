@@ -11,10 +11,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.github.cqu_bdsc.collision_warning_system.udp.Message;
 import com.github.cqu_bdsc.collision_warning_system.udp.ReceiveThread;
+import com.github.cqu_bdsc.collision_warning_system.udp.Result;
 import com.github.cqu_bdsc.collision_warning_system.udp.SendService;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText    etIp;
     private TextView    tvPingResult;
+    private TextView    tv_showid;
+    private TextView    tv_warning;
+    private TextView    tv_time;
+    private TextView    tv_distance;
 
     private EditText    et_id;
     private EditText    et_timeStamp;
@@ -63,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         intentFilter.addAction(ReceiveThread.ACTION_STRING);
+        intentFilter.addAction(ReceiveThread.ACTION_JSON);
 
         etIp        = (EditText) findViewById(R.id.et_ipAdd);
         btnPing     = (Button)   findViewById(R.id.btn_testPing);
@@ -79,7 +84,10 @@ public class MainActivity extends AppCompatActivity {
         et_lon        = (EditText) findViewById(R.id.et_lon);
         et_ace        = (EditText) findViewById(R.id.et_ace);
 
-
+        tv_showid = (TextView) findViewById(R.id.tv_showid);
+        tv_distance = (TextView)  findViewById(R.id.tv_distance);
+        tv_time    = (TextView) findViewById(R.id.tv_time);
+        tv_warning = (TextView) findViewById(R.id.tv_warning);
 
         btnSend     = (Button)   findViewById(R.id.btn_send);
 
@@ -200,6 +208,19 @@ public class MainActivity extends AppCompatActivity {
                     String message = intent.getExtras().getString(ReceiveThread.STRING_CONTEXT);
                     //tvReceive.setText(message);
                     break;
+                case ReceiveThread.ACTION_JSON:
+                    Result result = (Result) intent.getExtras().get(ReceiveThread.JSON_CONTEXT);
+                    if (result != null){
+                      //  tv_showid.setText(result.getId());
+                        tv_warning.setText(String.valueOf(result.isWarning()));
+                        tv_distance.setText(String.valueOf(result.getDistance()));
+                        tv_time.setText(result.getTime());
+                    } else {
+                        tv_showid.setText("0");
+                        tv_warning.setText("0");
+                        tv_distance.setText("0");
+                        tv_time.setText("0");
+                    }
 
                 default:
                     break;
