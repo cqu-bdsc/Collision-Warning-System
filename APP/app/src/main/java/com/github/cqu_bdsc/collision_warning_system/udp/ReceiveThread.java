@@ -22,7 +22,7 @@ public class ReceiveThread extends Thread {
     public static final String TYPE_PICTURE = "TYPE_PICTURE";
     public static final String TYPE_END = "!end;";
 
-    private String serverIp = null;
+    private String serverIp = null;//流，可以装东西
 
     public ReceiveThread(){
         this.serverIp = SERVER_IP;
@@ -35,23 +35,23 @@ public class ReceiveThread extends Thread {
     private ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
     @Override
-    public void run() {
+    public void run() {//线程的main函数
 
         try {
             DatagramPacket reveivePacket;
             DatagramSocket reveiveSocket;
 
-            reveiveSocket = new DatagramSocket(Integer.valueOf(RECEIVE_PORT));
-            byte[] buff = new byte[SendService.BUFF_SIZE];
+            reveiveSocket = new DatagramSocket(Integer.valueOf(RECEIVE_PORT));//把接收端口号的字符串变成整数
+            byte[] buff = new byte[SendService.BUFF_SIZE];//发送过来的数据的长度范围
 
-            String dataType = null;
+            String dataType = null;//先不限定数据的类型
             while (true){
                 reveivePacket = new DatagramPacket(buff, buff.length);
 
-                try {
+                try {//try和catch合作，如果出错可以马上看到是哪个地方的错误
                     reveiveSocket.receive(reveivePacket);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    e.printStackTrace();//IO即输入输出错误，错误地方用e来表示，在哪里出错就在哪里打印出e
                 }
 
                 String msg = new String(reveivePacket.getData(),0,reveivePacket.getLength());
@@ -63,16 +63,16 @@ public class ReceiveThread extends Thread {
                 } else if (msg.startsWith(TYPE_PICTURE)){
                     dataType = TYPE_PICTURE;
 
-                } else if (msg.startsWith(TYPE_END)){
+                } else if (msg.startsWith(TYPE_END)){//如输入结束，就需要清空数据流中的信息
                     // 处理BAOS 数据
                     ByteArrayOutputStream byteArrayOutputStream = baos;
 
                     HandleData(dataType, byteArrayOutputStream);
 
-                    baos.reset();
+                    baos.reset();//重置baos
                 } else {
 
-                    baos.write(reveivePacket.getData(),0,reveivePacket.getLength());
+                    baos.write(reveivePacket.getData(),0,reveivePacket.getLength());//将新数据加入到数据流中，并把它打印出来
                 }
 
             }
@@ -85,7 +85,7 @@ public class ReceiveThread extends Thread {
 
     }
 
-    private void HandleData(String dataType, ByteArrayOutputStream byteArrayOutputStream){
+    private void HandleData(String dataType, ByteArrayOutputStream byteArrayOutputStream){//处理数据函数
         byte[] bytes = byteArrayOutputStream.toByteArray();
 
         if (dataType.equals(TYPE_STRING)){

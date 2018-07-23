@@ -16,14 +16,18 @@
             android:hint="默认192.168.1.80"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
         <Button
-            android:id="@+id/btn_testPing"
+        android:id="@+id/btn_testPing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/et_ipAdd"
+        android:text="Ping" />
+        <Button
+            android:id="@+id/btn_sendlist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/et_ipAdd"
             android:text="Ping" />
-
         <TextView
             android:id="@+id/tvPingResult"
             android:layout_width="wrap_content"

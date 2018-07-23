@@ -12,15 +12,15 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class SendService extends IntentService {
+public class SendService extends IntentService {//继承父类IntentService
 
-    public static final int BUFF_SIZE = 8192;
+    public static final int BUFF_SIZE = 8192;//最大数据长度
 
     public static final String ACTION_SEND_STRING = "SEND_STRING";
 
-    public static final String EXTRAS_HOST      = "EXTRAS_HOST";
-    public static final String EXTRAS_PORT      = "EXTRAS_PORT";
-    public static final String EXTRAS_STRING    = "EXTRAS_STRING";
+    public static final String EXTRAS_HOST      = "EXTRAS_HOST";//逐渐
+    public static final String EXTRAS_PORT      = "EXTRAS_PORT";//端口
+    public static final String EXTRAS_STRING    = "EXTRAS_STRING";//在子类中定义常量
 
     public SendService(String name){
         super(name);
@@ -49,23 +49,26 @@ public class SendService extends IntentService {
              *  发送字符串
              */
             if (action.equals(ACTION_SEND_STRING)){
-                udpSocket = new DatagramSocket(Integer.valueOf(port));
-                //发送UDP报文类型
-                try {
-                    String sendType = ReceiveThread.TYPE_STRING;
-                    packet = new DatagramPacket(sendType.getBytes(),sendType.getBytes().length,serverAddr,Integer.valueOf(port));
-                    udpSocket.send(packet);
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                }finally {
-                    if (udpSocket != null){
-                        udpSocket.close();
-                    }
-                }
+
+//                //发送UDP报文类型
+//                try {
+//                    udpSocket = new DatagramSocket(Integer.valueOf(port));
+//                    String sendType = ReceiveThread.TYPE_STRING;
+//                    packet = new DatagramPacket(sendType.getBytes(),sendType.getBytes().length,serverAddr,Integer.valueOf(port));
+//                    udpSocket.send(packet);
+//                } catch (SocketException e) {
+//                    e.printStackTrace();
+//                }finally {
+//                    if (udpSocket != null){
+//                        udpSocket.close();
+//                    }
+//                }
 
                 String extras_string = intent.getExtras().getString(EXTRAS_STRING);
                 try {
-                    udpSocket = new DatagramSocket(Integer.valueOf(port));
+                    if (udpSocket == null){
+                        udpSocket = new DatagramSocket();
+                    }
                     byte[] buff = (byte[]) extras_string.getBytes();
 
                     packet = new DatagramPacket(buff, buff.length,serverAddr,Integer.valueOf(port));
@@ -79,21 +82,21 @@ public class SendService extends IntentService {
                 }
 
 
-                /**
-                 * 发送终止符
-                 */
-                try {
-                    String end = ReceiveThread.TYPE_END;
-                    udpSocket = new DatagramSocket(Integer.valueOf(port));
-                    packet = new DatagramPacket(end.getBytes(),end.getBytes().length,serverAddr,Integer.valueOf(port));
-                    udpSocket.send(packet);
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                }finally {
-                    if (udpSocket != null){
-                        udpSocket.close();
-                    }
-                }
+//                /**
+//                 * 发送终止符
+//                 */
+//                try {
+//                    String end = ReceiveThread.TYPE_END;
+//                    udpSocket = new DatagramSocket(Integer.valueOf(port));
+//                    packet = new DatagramPacket(end.getBytes(),end.getBytes().length,serverAddr,Integer.valueOf(port));
+//                    udpSocket.send(packet);
+//                } catch (SocketException e) {
+//                    e.printStackTrace();
+//                }finally {
+//                    if (udpSocket != null){
+//                        udpSocket.close();
+//                    }
+//                }
 
 
 

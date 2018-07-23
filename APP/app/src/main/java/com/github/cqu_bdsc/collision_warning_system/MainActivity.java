@@ -25,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     private String Server_Add = "192.168.1.80";
 
     private BroadcastReceiver broadcastReceiver = null;
-    private final IntentFilter intentFilter = new IntentFilter();
+    private final IntentFilter intentFilter = new IntentFilter();//这里有问题1
 
-    private Button      btnPing;
+    private Button      btnPing;//以下是可视化程序里面的常量
     private Button      btnSend;
     private EditText    etIp;
     private EditText    textSend;
