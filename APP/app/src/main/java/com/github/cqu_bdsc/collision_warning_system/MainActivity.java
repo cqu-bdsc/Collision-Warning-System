@@ -14,9 +14,12 @@ import android.widget.TextView;
 import com.github.cqu_bdsc.collision_warning_system.udp.ReceiveThread;
 import com.github.cqu_bdsc.collision_warning_system.udp.SendService;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,14 +28,21 @@ public class MainActivity extends AppCompatActivity {
     private String Server_Add = "192.168.1.80";
 
     private BroadcastReceiver broadcastReceiver = null;
-    private final IntentFilter intentFilter = new IntentFilter();//这里有问题1
-
+    private final IntentFilter intentFilter = new IntentFilter();
     private Button      btnPing;//以下是可视化程序里面的常量
-    private Button      btnSend;
+    private Button        btnSend;
+
     private EditText    etIp;
-    private EditText    textSend;
     private TextView    tvPingResult;
-    private TextView    tvReceive;
+
+    private EditText    et_id;
+    private EditText    et_timeStamp;
+    private EditText    et_speed;
+    private EditText    et_direction;
+    private EditText    et_lat;
+    private EditText    et_lon;
+    private EditText    et_ace;
+
 
     @Override
     protected void onResume() {
@@ -58,9 +68,20 @@ public class MainActivity extends AppCompatActivity {
         btnPing     = (Button)   findViewById(R.id.btn_testPing);
         tvPingResult= (TextView) findViewById(R.id.tvPingResult);
 
-        textSend    = (EditText) findViewById(R.id.textSend);
+        tvPingResult= (TextView) findViewById(R.id.tvPingResult);
+
+
+        et_id        = (EditText) findViewById(R.id.et_id);
+        et_timeStamp        = (EditText) findViewById(R.id.et_timeStamp);
+        et_speed        = (EditText) findViewById(R.id.et_speed);
+        et_direction        = (EditText) findViewById(R.id.et_direction);
+        et_lat        = (EditText) findViewById(R.id.et_lat);
+        et_lon        = (EditText) findViewById(R.id.et_lon);
+        et_ace        = (EditText) findViewById(R.id.et_ace);
+
+
+
         btnSend     = (Button)   findViewById(R.id.btn_send);
-        tvReceive = (TextView) findViewById(R.id.tv_receive);
 
         btnPing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,12 +113,32 @@ public class MainActivity extends AppCompatActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String strSend = (String) textSend.getEditableText().toString();
+
+                String id = et_id.getEditableText().toString();
+                String timeStamp = et_timeStamp.getEditableText().toString();
+                String speed = et_speed.getEditableText().toString();
+                String direction = et_direction.getEditableText().toString();
+                String lat = et_lat.getEditableText().toString();
+                String lon = et_lon.getEditableText().toString();
+                String ace = et_ace.getEditableText().toString();
+
+                Message message = new Message();
+                message.setId(Integer.valueOf(id));
+                message.setTimeStamp(Integer.valueOf(timeStamp));
+                message.setSpeed(Double.valueOf(speed));
+                message.setDirection(Integer.valueOf(direction));
+                message.setLat(Double.valueOf(lat));
+                message.setLon(Double.valueOf(lon));
+                message.setAce(Double.valueOf(ace));
+
+
+
+
                 Intent intent = new Intent(MainActivity.this, SendService.class);
-                intent.setAction(SendService.ACTION_SEND_STRING);
+                intent.setAction(SendService.ACTION_SEND_JSON);
                 intent.putExtra(SendService.EXTRAS_HOST,getServer_Add());
                 intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
-                intent.putExtra(SendService.EXTRAS_STRING,strSend);
+                intent.putExtra(SendService.EXTRAS_JSON,message);
                 startService(intent);
 
             }
@@ -157,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             switch (action){
                 case ReceiveThread.ACTION_STRING:
                     String message = intent.getExtras().getString(ReceiveThread.STRING_CONTEXT);
-                    tvReceive.setText(message);
+                    //tvReceive.setText(message);
                     break;
 
                 default:
