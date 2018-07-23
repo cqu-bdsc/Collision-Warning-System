@@ -66,7 +66,7 @@ PC端接收到Android端发送的JSON数据后，对其进行解析并进行处�
 | ---     | --------    | -----  | ---- |
 | ID      | “id”        |  int   | 以发送过来的车辆ID为准|
 | 碰撞时间 | “time”      |  int   | 单位：秒（s） |
-| 碰撞距离 | “distant”   | double | 单位：m，保留3位小数  |
+| 碰撞距离 | “distance”   | double | 单位：m，保留3位小数  |
 | 警报     | “warning” | boolean| True: 碰撞， False: 不碰撞|
 | 地图     |             |        |   |
 | 碰撞轨迹 |             |        |    |
