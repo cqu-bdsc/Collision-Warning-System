@@ -3,6 +3,8 @@
 
 
 #include <QUdpSocket>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 /**
  * UDP通信模块的头文件，函数实现在myudp.cpp文件中
@@ -22,7 +24,7 @@ class MyUDP : public QUdpSocket
   //信号
   signals:
     //收到到新消息，参数为IP地址，与消息内容
-    void newMessage(const QString &from, const QString &message);
+    void newMessage(const QString &from, const QJsonObject &message);
 
   //槽函数
   public slots:
@@ -30,7 +32,7 @@ class MyUDP : public QUdpSocket
     void readyRead();
     //发送信息的槽函数
     //sender是Host地址，senderPort是接收端的端口号，string是发送的内容
-    void sendMessage(QHostAddress sender, quint16 senderPort, QString string);
+    void sendMessage(QHostAddress sender, quint16 senderPort, QJsonObject result);
 
   private:
     //使用QUdpSocket 进行发送接收

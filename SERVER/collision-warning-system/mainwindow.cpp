@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     //绑定发送UDP报文事件
     connect(ui->but_send, SIGNAL(clicked()), this, SLOT(onUdpSendMessage()));
-    connect(ui->editMessage, SIGNAL(returnPressed()), this, SLOT(onUdpSendMessage()));
+    //connect(ui->editMessage, SIGNAL(returnPressed()), this, SLOT(onUdpSendMessage()));
 
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
     connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
@@ -74,7 +74,7 @@ void MainWindow::on_but_getIP_clicked()
  * 网络接口下拉框位置更改事件响应槽函数
  * @brief MainWindow::on_NetInterface_currentIndexChanged
  * @param index
- */
+*/
 void MainWindow::on_NetInterface_currentIndexChanged(int index)
 {
     for (int i = 0; i < interfaceList.at(index).addressEntries().size(); ++i)
@@ -137,7 +137,7 @@ void MainWindow::on_but_start_clicked()
         ui->but_start->setText("停止");
 
         //绑定接收到消息的槽函数
-        connect(myudp, SIGNAL(newMessage(QString,QString)), this, SLOT(onUdpAppendMessage(QString,QString)));
+        connect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
     } else{
         ui->textLog->append(messageUDP + "Failed to listen to:"
                             + localAddr.toString()+ ":"+ QString::number(udpListenPort));
@@ -170,7 +170,7 @@ void MainWindow::onUdpStopButtonClicked(){
 
     ui->textLog->append(messageUDP + "Stoped.");
     //解除槽函数绑定
-    disconnect(myudp, SIGNAL(newMessage(QString,QString)), this, SLOT(onUdpAppendMessage(QString,QString)));
+    disconnect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
 
     ui->but_start->setText("开始");
     myudp->unbindPort();
@@ -184,18 +184,35 @@ void MainWindow::onUdpStopButtonClicked(){
  * @param $from
  * @param message
  */
-void MainWindow::onUdpAppendMessage(const QString &from, const QString &message){
+void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &message){
 
-    if(from == "System"){
-        QColor color = ui->textReceive->textColor();
-        ui->textReceive->setTextColor(Qt::gray);
-        ui->textReceive->append(message);
-        ui->textReceive->setTextColor(color);
-    } else{
-        ui->textReceive->append("<"+ from + ">   "+ message);
-    }
-    QScrollBar *bar = ui->textReceive->verticalScrollBar();
-    bar->setValue(bar->maximum());
+//    if(from == "System"){
+//        QColor color = ui->textReceive->textColor();
+//        ui->textReceive->setTextColor(Qt::gray);
+//        ui->textReceive->append(message);
+//        ui->textReceive->setTextColor(color);
+//    } else{
+//        ui->textReceive->append("<"+ from + ">   "+ message);
+//    }
+//    QScrollBar *bar = ui->textReceive->verticalScrollBar();
+//    bar->setValue(bar->maximum());
+
+    int    id           = message.find("id").value().toInt();
+    int    timeStamp    = message.find("timeStamp").value().toInt();
+    int    direction    = message.find("direction").value().toInt();
+    double    lat          = message.find("lat").value().toDouble();
+    double    lon          = message.find("lon").value().toDouble();
+    double    speed        = message.find("speed").value().toDouble();
+    double    acc          = message.find("acc").value().toDouble();
+
+    ui->label_from->setText(from);
+    ui->label_id->setText(QString::number(id));
+    ui->label_timeStamp->setText(QString::number(timeStamp));
+    ui->label_speed->setText(QString::number(speed));
+    ui->label_direction->setText(QString::number(direction));
+    ui->label_Lat->setText(QString::number(lat));
+    ui->label_lon->setText(QString::number(lon));
+    ui->label_acc->setText(QString::number(acc));
 }
 
 /**
@@ -203,15 +220,45 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QString &message)
  * @brief MainWindow::onUdpSendMessage
  */
 void MainWindow::onUdpSendMessage(){
-    QString text = ui->editMessage->text();
-    if(text.isEmpty()){
-        return;
+  //  QString text = ui->editMessage->text();
+  //  if(text.isEmpty()){
+  //      return;
+  //  }
+
+    QString id = ui->editID->text();
+    if(id.isEmpty()){
+        id = "22233";
     }
+    QString time = ui->editTime->text();
+    if(time.isEmpty()){
+        time = "22233";
+    }
+    QString distance = ui->editDistance->text();
+    if(distance.isEmpty()){
+        distance = "22233";
+    }
+    QString warning = ui->editWarning->text();
+    if(warning.isEmpty()){
+        warning = "22233";
+    }
+
+    QJsonObject message;
+    message.insert("id", id);
+    message.insert("time", time);
+    message.insert("distance", distance);
+    message.insert("warning", warning);
 
     udpTargetAddr.setAddress(ui->editSendIP->text());
     udpTargetPort = ui->editSendPort->text().toInt();
-    myudp->sendMessage(udpTargetAddr, udpTargetPort, text);
+    myudp->sendMessage(udpTargetAddr, udpTargetPort, message);
 
-    onUdpAppendMessage("ME", text);
-    ui->editMessage->clear();
+    //onUdpAppendMessage("ME", text);
+    //ui->editMessage->clear();
+
+    ui->textLog->append("ME send:" + QString(QJsonDocument(message).toJson()));
+    ui->editID->clear();
+    ui->editTime->clear();
+    ui->editDistance->clear();
+    ui->editWarning->clear();
+
 }

@@ -45,9 +45,21 @@ public:
     QLineEdit *editSendIP;
     QLabel *label_port;
     QLineEdit *editSendPort;
-    QWidget *horizontalLayoutWidget_2;
-    QHBoxLayout *horizontalLayout_2;
-    QLineEdit *editMessage;
+    QWidget *horizontalLayoutWidget_5;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *label_3;
+    QLineEdit *editID;
+    QLabel *label_4;
+    QLineEdit *editWarning;
+    QWidget *horizontalLayoutWidget_6;
+    QHBoxLayout *horizontalLayout_6;
+    QLabel *label_5;
+    QLineEdit *editTime;
+    QLabel *label_6;
+    QLineEdit *editDistance;
+    QWidget *horizontalLayoutWidget_8;
+    QHBoxLayout *horizontalLayout_8;
+    QSpacerItem *horizontalSpacer_3;
     QPushButton *but_send;
     QGroupBox *groupReceive;
     QGroupBox *groupListen;
@@ -58,7 +70,34 @@ public:
     QSpacerItem *horizontalSpacer;
     QPushButton *but_start;
     QGroupBox *groupShowMessage;
-    QTextBrowser *textReceive;
+    QWidget *horizontalLayoutWidget_2;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *label_textID;
+    QLabel *label_id;
+    QSpacerItem *horizontalSpacer_5;
+    QLabel *label_7;
+    QLabel *label_from;
+    QWidget *horizontalLayoutWidget_7;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *label_textSpeed;
+    QLabel *label_speed;
+    QSpacerItem *horizontalSpacer_6;
+    QLabel *label_textAcc;
+    QLabel *label_acc;
+    QWidget *horizontalLayoutWidget_9;
+    QHBoxLayout *horizontalLayout_9;
+    QLabel *label_textLon;
+    QLabel *label_lon;
+    QSpacerItem *horizontalSpacer_7;
+    QLabel *label_textLat;
+    QLabel *label_Lat;
+    QWidget *horizontalLayoutWidget_10;
+    QHBoxLayout *horizontalLayout_10;
+    QLabel *label_textDirection;
+    QLabel *label_direction;
+    QSpacerItem *horizontalSpacer_4;
+    QLabel *label_textTimeStamp;
+    QLabel *label_timeStamp;
     QGroupBox *Map;
     QGraphicsView *graphicsView;
     QGroupBox *Log;
@@ -112,10 +151,10 @@ public:
 
         UDP = new QGroupBox(centralWidget);
         UDP->setObjectName(QStringLiteral("UDP"));
-        UDP->setGeometry(QRect(10, 160, 321, 381));
+        UDP->setGeometry(QRect(10, 160, 321, 401));
         groupSend = new QGroupBox(UDP);
         groupSend->setObjectName(QStringLiteral("groupSend"));
-        groupSend->setGeometry(QRect(10, 280, 301, 91));
+        groupSend->setGeometry(QRect(10, 250, 301, 141));
         horizontalLayoutWidget = new QWidget(groupSend);
         horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
         horizontalLayoutWidget->setGeometry(QRect(10, 20, 281, 31));
@@ -144,27 +183,82 @@ public:
 
         horizontalLayout->addWidget(editSendPort);
 
-        horizontalLayoutWidget_2 = new QWidget(groupSend);
-        horizontalLayoutWidget_2->setObjectName(QStringLiteral("horizontalLayoutWidget_2"));
-        horizontalLayoutWidget_2->setGeometry(QRect(10, 50, 281, 31));
-        horizontalLayout_2 = new QHBoxLayout(horizontalLayoutWidget_2);
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
-        editMessage = new QLineEdit(horizontalLayoutWidget_2);
-        editMessage->setObjectName(QStringLiteral("editMessage"));
+        horizontalLayoutWidget_5 = new QWidget(groupSend);
+        horizontalLayoutWidget_5->setObjectName(QStringLiteral("horizontalLayoutWidget_5"));
+        horizontalLayoutWidget_5->setGeometry(QRect(10, 60, 281, 31));
+        horizontalLayout_5 = new QHBoxLayout(horizontalLayoutWidget_5);
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+        label_3 = new QLabel(horizontalLayoutWidget_5);
+        label_3->setObjectName(QStringLiteral("label_3"));
 
-        horizontalLayout_2->addWidget(editMessage);
+        horizontalLayout_5->addWidget(label_3);
 
-        but_send = new QPushButton(horizontalLayoutWidget_2);
+        editID = new QLineEdit(horizontalLayoutWidget_5);
+        editID->setObjectName(QStringLiteral("editID"));
+
+        horizontalLayout_5->addWidget(editID);
+
+        label_4 = new QLabel(horizontalLayoutWidget_5);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        horizontalLayout_5->addWidget(label_4);
+
+        editWarning = new QLineEdit(horizontalLayoutWidget_5);
+        editWarning->setObjectName(QStringLiteral("editWarning"));
+
+        horizontalLayout_5->addWidget(editWarning);
+
+        horizontalLayoutWidget_6 = new QWidget(groupSend);
+        horizontalLayoutWidget_6->setObjectName(QStringLiteral("horizontalLayoutWidget_6"));
+        horizontalLayoutWidget_6->setGeometry(QRect(10, 90, 281, 31));
+        horizontalLayout_6 = new QHBoxLayout(horizontalLayoutWidget_6);
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setContentsMargins(0, 0, 0, 0);
+        label_5 = new QLabel(horizontalLayoutWidget_6);
+        label_5->setObjectName(QStringLiteral("label_5"));
+
+        horizontalLayout_6->addWidget(label_5);
+
+        editTime = new QLineEdit(horizontalLayoutWidget_6);
+        editTime->setObjectName(QStringLiteral("editTime"));
+
+        horizontalLayout_6->addWidget(editTime);
+
+        label_6 = new QLabel(horizontalLayoutWidget_6);
+        label_6->setObjectName(QStringLiteral("label_6"));
+
+        horizontalLayout_6->addWidget(label_6);
+
+        editDistance = new QLineEdit(horizontalLayoutWidget_6);
+        editDistance->setObjectName(QStringLiteral("editDistance"));
+
+        horizontalLayout_6->addWidget(editDistance);
+
+        horizontalLayoutWidget_8 = new QWidget(groupSend);
+        horizontalLayoutWidget_8->setObjectName(QStringLiteral("horizontalLayoutWidget_8"));
+        horizontalLayoutWidget_8->setGeometry(QRect(10, 120, 281, 25));
+        horizontalLayout_8 = new QHBoxLayout(horizontalLayoutWidget_8);
+        horizontalLayout_8->setSpacing(6);
+        horizontalLayout_8->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
+        horizontalLayout_8->setContentsMargins(0, 0, 0, 0);
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_3);
+
+        but_send = new QPushButton(horizontalLayoutWidget_8);
         but_send->setObjectName(QStringLiteral("but_send"));
 
-        horizontalLayout_2->addWidget(but_send);
+        horizontalLayout_8->addWidget(but_send);
 
         groupReceive = new QGroupBox(UDP);
         groupReceive->setObjectName(QStringLiteral("groupReceive"));
-        groupReceive->setGeometry(QRect(10, 20, 301, 251));
+        groupReceive->setGeometry(QRect(10, 20, 301, 231));
         groupListen = new QGroupBox(groupReceive);
         groupListen->setObjectName(QStringLiteral("groupListen"));
         groupListen->setGeometry(QRect(10, 20, 281, 61));
@@ -197,11 +291,135 @@ public:
 
         groupShowMessage = new QGroupBox(groupReceive);
         groupShowMessage->setObjectName(QStringLiteral("groupShowMessage"));
-        groupShowMessage->setGeometry(QRect(9, 89, 281, 151));
-        textReceive = new QTextBrowser(groupShowMessage);
-        textReceive->setObjectName(QStringLiteral("textReceive"));
-        textReceive->setEnabled(true);
-        textReceive->setGeometry(QRect(10, 20, 261, 131));
+        groupShowMessage->setGeometry(QRect(9, 89, 281, 141));
+        horizontalLayoutWidget_2 = new QWidget(groupShowMessage);
+        horizontalLayoutWidget_2->setObjectName(QStringLiteral("horizontalLayoutWidget_2"));
+        horizontalLayoutWidget_2->setGeometry(QRect(10, 20, 261, 22));
+        horizontalLayout_2 = new QHBoxLayout(horizontalLayoutWidget_2);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
+        label_textID = new QLabel(horizontalLayoutWidget_2);
+        label_textID->setObjectName(QStringLiteral("label_textID"));
+
+        horizontalLayout_2->addWidget(label_textID);
+
+        label_id = new QLabel(horizontalLayoutWidget_2);
+        label_id->setObjectName(QStringLiteral("label_id"));
+
+        horizontalLayout_2->addWidget(label_id);
+
+        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_5);
+
+        label_7 = new QLabel(horizontalLayoutWidget_2);
+        label_7->setObjectName(QStringLiteral("label_7"));
+
+        horizontalLayout_2->addWidget(label_7);
+
+        label_from = new QLabel(horizontalLayoutWidget_2);
+        label_from->setObjectName(QStringLiteral("label_from"));
+
+        horizontalLayout_2->addWidget(label_from);
+
+        horizontalLayoutWidget_7 = new QWidget(groupShowMessage);
+        horizontalLayoutWidget_7->setObjectName(QStringLiteral("horizontalLayoutWidget_7"));
+        horizontalLayoutWidget_7->setGeometry(QRect(10, 50, 261, 22));
+        horizontalLayout_7 = new QHBoxLayout(horizontalLayoutWidget_7);
+        horizontalLayout_7->setSpacing(6);
+        horizontalLayout_7->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
+        horizontalLayout_7->setContentsMargins(0, 0, 0, 0);
+        label_textSpeed = new QLabel(horizontalLayoutWidget_7);
+        label_textSpeed->setObjectName(QStringLiteral("label_textSpeed"));
+
+        horizontalLayout_7->addWidget(label_textSpeed);
+
+        label_speed = new QLabel(horizontalLayoutWidget_7);
+        label_speed->setObjectName(QStringLiteral("label_speed"));
+
+        horizontalLayout_7->addWidget(label_speed);
+
+        horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_7->addItem(horizontalSpacer_6);
+
+        label_textAcc = new QLabel(horizontalLayoutWidget_7);
+        label_textAcc->setObjectName(QStringLiteral("label_textAcc"));
+
+        horizontalLayout_7->addWidget(label_textAcc);
+
+        label_acc = new QLabel(horizontalLayoutWidget_7);
+        label_acc->setObjectName(QStringLiteral("label_acc"));
+
+        horizontalLayout_7->addWidget(label_acc);
+
+        horizontalLayoutWidget_9 = new QWidget(groupShowMessage);
+        horizontalLayoutWidget_9->setObjectName(QStringLiteral("horizontalLayoutWidget_9"));
+        horizontalLayoutWidget_9->setGeometry(QRect(10, 80, 261, 22));
+        horizontalLayout_9 = new QHBoxLayout(horizontalLayoutWidget_9);
+        horizontalLayout_9->setSpacing(6);
+        horizontalLayout_9->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
+        horizontalLayout_9->setContentsMargins(0, 0, 0, 0);
+        label_textLon = new QLabel(horizontalLayoutWidget_9);
+        label_textLon->setObjectName(QStringLiteral("label_textLon"));
+
+        horizontalLayout_9->addWidget(label_textLon);
+
+        label_lon = new QLabel(horizontalLayoutWidget_9);
+        label_lon->setObjectName(QStringLiteral("label_lon"));
+
+        horizontalLayout_9->addWidget(label_lon);
+
+        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_9->addItem(horizontalSpacer_7);
+
+        label_textLat = new QLabel(horizontalLayoutWidget_9);
+        label_textLat->setObjectName(QStringLiteral("label_textLat"));
+
+        horizontalLayout_9->addWidget(label_textLat);
+
+        label_Lat = new QLabel(horizontalLayoutWidget_9);
+        label_Lat->setObjectName(QStringLiteral("label_Lat"));
+
+        horizontalLayout_9->addWidget(label_Lat);
+
+        horizontalLayoutWidget_10 = new QWidget(groupShowMessage);
+        horizontalLayoutWidget_10->setObjectName(QStringLiteral("horizontalLayoutWidget_10"));
+        horizontalLayoutWidget_10->setGeometry(QRect(10, 110, 261, 22));
+        horizontalLayout_10 = new QHBoxLayout(horizontalLayoutWidget_10);
+        horizontalLayout_10->setSpacing(6);
+        horizontalLayout_10->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
+        horizontalLayout_10->setContentsMargins(0, 0, 0, 0);
+        label_textDirection = new QLabel(horizontalLayoutWidget_10);
+        label_textDirection->setObjectName(QStringLiteral("label_textDirection"));
+
+        horizontalLayout_10->addWidget(label_textDirection);
+
+        label_direction = new QLabel(horizontalLayoutWidget_10);
+        label_direction->setObjectName(QStringLiteral("label_direction"));
+
+        horizontalLayout_10->addWidget(label_direction);
+
+        horizontalSpacer_4 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_10->addItem(horizontalSpacer_4);
+
+        label_textTimeStamp = new QLabel(horizontalLayoutWidget_10);
+        label_textTimeStamp->setObjectName(QStringLiteral("label_textTimeStamp"));
+
+        horizontalLayout_10->addWidget(label_textTimeStamp);
+
+        label_timeStamp = new QLabel(horizontalLayoutWidget_10);
+        label_timeStamp->setObjectName(QStringLiteral("label_timeStamp"));
+
+        horizontalLayout_10->addWidget(label_timeStamp);
+
         Map = new QGroupBox(centralWidget);
         Map->setObjectName(QStringLiteral("Map"));
         Map->setGeometry(QRect(340, 90, 691, 581));
@@ -210,10 +428,10 @@ public:
         graphicsView->setGeometry(QRect(15, 21, 671, 551));
         Log = new QGroupBox(centralWidget);
         Log->setObjectName(QStringLiteral("Log"));
-        Log->setGeometry(QRect(10, 550, 321, 121));
+        Log->setGeometry(QRect(10, 560, 321, 111));
         textLog = new QTextBrowser(Log);
         textLog->setObjectName(QStringLiteral("textLog"));
-        textLog->setGeometry(QRect(10, 20, 301, 91));
+        textLog->setGeometry(QRect(10, 20, 301, 81));
         groupInfo = new QGroupBox(centralWidget);
         groupInfo->setObjectName(QStringLiteral("groupInfo"));
         groupInfo->setGeometry(QRect(560, 10, 461, 81));
@@ -250,12 +468,32 @@ public:
         groupSend->setTitle(QApplication::translate("MainWindow", "\345\217\221\351\200\201\346\266\210\346\201\257", nullptr));
         label_ip->setText(QApplication::translate("MainWindow", "IP", nullptr));
         label_port->setText(QApplication::translate("MainWindow", "\347\253\257\345\217\243", nullptr));
+        label_3->setText(QApplication::translate("MainWindow", "ID", nullptr));
+        label_4->setText(QApplication::translate("MainWindow", "\350\255\246\346\212\245", nullptr));
+        label_5->setText(QApplication::translate("MainWindow", "\347\242\260\346\222\236\346\227\266\351\227\264", nullptr));
+        label_6->setText(QApplication::translate("MainWindow", "\347\242\260\346\222\236\350\267\235\347\246\273", nullptr));
         but_send->setText(QApplication::translate("MainWindow", "\345\217\221\351\200\201", nullptr));
         groupReceive->setTitle(QApplication::translate("MainWindow", "\346\216\245\346\224\266\346\266\210\346\201\257", nullptr));
         groupListen->setTitle(QApplication::translate("MainWindow", "\347\233\221\345\220\254", nullptr));
         labelPort->setText(QApplication::translate("MainWindow", "\347\253\257\345\217\243", nullptr));
         but_start->setText(QApplication::translate("MainWindow", "\345\274\200\345\247\213", nullptr));
         groupShowMessage->setTitle(QApplication::translate("MainWindow", "\346\230\276\347\244\272\346\266\210\346\201\257", nullptr));
+        label_textID->setText(QApplication::translate("MainWindow", "ID", nullptr));
+        label_id->setText(QApplication::translate("MainWindow", "MyID", nullptr));
+        label_7->setText(QApplication::translate("MainWindow", "From", nullptr));
+        label_from->setText(QApplication::translate("MainWindow", "255.255.255.255", nullptr));
+        label_textSpeed->setText(QApplication::translate("MainWindow", "\351\200\237\345\272\246", nullptr));
+        label_speed->setText(QApplication::translate("MainWindow", "MySpeed", nullptr));
+        label_textAcc->setText(QApplication::translate("MainWindow", "\345\212\240\351\200\237\345\272\246", nullptr));
+        label_acc->setText(QApplication::translate("MainWindow", "00000000000000", nullptr));
+        label_textLon->setText(QApplication::translate("MainWindow", "\347\273\217\345\272\246", nullptr));
+        label_lon->setText(QApplication::translate("MainWindow", "0000000000", nullptr));
+        label_textLat->setText(QApplication::translate("MainWindow", "\347\272\254\345\272\246", nullptr));
+        label_Lat->setText(QApplication::translate("MainWindow", "00000000000000", nullptr));
+        label_textDirection->setText(QApplication::translate("MainWindow", "\346\226\271\345\220\221", nullptr));
+        label_direction->setText(QApplication::translate("MainWindow", "00000", nullptr));
+        label_textTimeStamp->setText(QApplication::translate("MainWindow", "\346\227\266\351\227\264\346\210\263", nullptr));
+        label_timeStamp->setText(QApplication::translate("MainWindow", "00000000000000", nullptr));
         Map->setTitle(QApplication::translate("MainWindow", "Map", nullptr));
         Log->setTitle(QApplication::translate("MainWindow", "Log", nullptr));
         groupInfo->setTitle(QApplication::translate("MainWindow", "Info", nullptr));

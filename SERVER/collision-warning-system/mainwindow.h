@@ -5,6 +5,8 @@
 #include <QTextTable>
 #include <QScrollBar>
 #include <QNetworkInterface>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include "myudp.h"
 
 namespace Ui {
@@ -32,7 +34,7 @@ private slots:
     void on_but_start_clicked();
     void onUdpStopButtonClicked();
     void onUdpSendMessage();
-    void onUdpAppendMessage(const QString &from, const QString &message);
+    void onUdpAppendMessage(const QString &from, const QJsonObject &message);
 
     //获取本机IP地址
     void on_but_getIP_clicked();

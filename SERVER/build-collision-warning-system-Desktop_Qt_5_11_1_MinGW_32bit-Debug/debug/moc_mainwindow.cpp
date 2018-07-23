@@ -78,7 +78,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString, QMetaType::QString,    6,    7,
+    QMetaType::Void, QMetaType::QString, QMetaType::QJsonObject,    6,    7,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,   10,
 
@@ -94,7 +94,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->on_but_start_clicked(); break;
         case 1: _t->onUdpStopButtonClicked(); break;
         case 2: _t->onUdpSendMessage(); break;
-        case 3: _t->onUdpAppendMessage((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
+        case 3: _t->onUdpAppendMessage((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QJsonObject(*)>(_a[2]))); break;
         case 4: _t->on_but_getIP_clicked(); break;
         case 5: _t->on_NetInterface_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;

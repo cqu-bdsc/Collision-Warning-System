@@ -223,13 +223,32 @@ debug/moc_mainwindow.cpp: ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidge
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qicon.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/QTextTable \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtexttable.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextformat.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qpen.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextoption.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextlayout.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qglyphrun.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qrawfont.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qfontdatabase.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QScrollBar \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qscrollbar.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QNetworkInterface \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qnetworkinterface.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetwork-config.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/QJsonObject \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonvalue.h \
 		../collision-warning-system/myudp.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QUdpSocket \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qudpsocket.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetwork-config.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
 		../collision-warning-system/mainwindow.h \
 		debug/moc_predefs.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/bin/moc.exe
@@ -304,6 +323,9 @@ debug/moc_myudp.cpp: ../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QU
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qsharedpointer.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qsharedpointer_impl.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/QJsonObject \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonvalue.h \
 		../collision-warning-system/myudp.h \
 		debug/moc_predefs.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/bin/moc.exe
@@ -439,13 +461,32 @@ debug/main.o: ../collision-warning-system/main.cpp ../collision-warning-system/m
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qicon.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/QTextTable \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtexttable.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextformat.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qpen.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextoption.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextlayout.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qglyphrun.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qrawfont.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qfontdatabase.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QScrollBar \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qscrollbar.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QNetworkInterface \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qnetworkinterface.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetwork-config.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/QJsonObject \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonvalue.h \
 		../collision-warning-system/myudp.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QUdpSocket \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qudpsocket.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetwork-config.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QApplication \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qapplication.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qcoreapplication.h \
@@ -562,13 +603,32 @@ debug/mainwindow.o: ../collision-warning-system/mainwindow.cpp ../collision-warn
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtouchdevice.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qicon.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/QTextTable \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtexttable.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextformat.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qpen.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextoption.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextlayout.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qglyphrun.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qrawfont.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qfontdatabase.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QScrollBar \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qscrollbar.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QNetworkInterface \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qnetworkinterface.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetwork-config.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/QJsonObject \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonvalue.h \
 		../collision-warning-system/myudp.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/QUdpSocket \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qudpsocket.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetworkglobal.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qtnetwork-config.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qabstractsocket.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
 		ui_mainwindow.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/QVariant \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QApplication \
@@ -586,7 +646,6 @@ debug/mainwindow.o: ../collision-warning-system/mainwindow.cpp ../collision-warn
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qvalidator.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qregularexpression.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qslider.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qabstractslider.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qstyle.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qtabbar.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qrubberband.h \
@@ -595,8 +654,6 @@ debug/mainwindow.o: ../collision-warning-system/mainwindow.cpp ../collision-warn
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QGraphicsView \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qgraphicsview.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qpainter.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextoption.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qpen.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qscrollarea.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qgraphicsscene.h \
@@ -611,8 +668,6 @@ debug/mainwindow.o: ../collision-warning-system/mainwindow.cpp ../collision-warn
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qlabel.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QLineEdit \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qlineedit.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextcursor.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtGui/qtextformat.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/QPushButton \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qpushbutton.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtWidgets/qabstractbutton.h \
@@ -693,7 +748,10 @@ debug/myudp.o: ../collision-warning-system/myudp.cpp ../collision-warning-system
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qcontiguouscache.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qsharedpointer.h \
 		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qsharedpointer_impl.h \
-		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtNetwork/qhostaddress.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/QJsonObject \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonobject.h \
+		../../../Qt/Qt5.11.1/5.11.1/mingw53_32/include/QtCore/qjsonvalue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\myudp.o ..\collision-warning-system\myudp.cpp
 
 debug/qrc_image.o: debug/qrc_image.cpp 

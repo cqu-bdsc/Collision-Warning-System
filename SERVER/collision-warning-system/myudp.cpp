@@ -38,11 +38,9 @@ bool MyUDP::bindPort(QHostAddress addr, qint16 port)
  * @param senderPort   接收端的端口号
  * @param string       发送的消息内容
  */
-void MyUDP::sendMessage(QHostAddress sender, quint16 senderPort, QString string)
-{
-    QByteArray Data;
-    Data.append(string);
-
+void MyUDP::sendMessage(QHostAddress sender, quint16 senderPort, QJsonObject result)
+{  
+    QByteArray Data = QJsonDocument(result).toJson();
     // Sends the datagram datagram
     // to the host address and at port.
     socket->writeDatagram(Data, sender, senderPort);
@@ -68,8 +66,11 @@ void MyUDP::readyRead()
     //本机读取接收到的UDP报文
     socket->readDatagram(buffer.data(), buffer.size(),
                          &sender, &senderPort);
+
+    QJsonObject message = QJsonDocument::fromJson(buffer).object();
+
     //发送新消息信号
-    emit newMessage(sender.toString(), buffer);
+    emit newMessage(sender.toString(),  message);
 }
 /**
  * 解绑函数

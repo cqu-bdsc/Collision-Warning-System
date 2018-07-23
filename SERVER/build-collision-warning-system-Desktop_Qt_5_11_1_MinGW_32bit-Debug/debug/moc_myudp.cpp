@@ -41,12 +41,12 @@ QT_MOC_LITERAL(6, 41, 11), // "sendMessage"
 QT_MOC_LITERAL(7, 53, 12), // "QHostAddress"
 QT_MOC_LITERAL(8, 66, 6), // "sender"
 QT_MOC_LITERAL(9, 73, 10), // "senderPort"
-QT_MOC_LITERAL(10, 84, 6) // "string"
+QT_MOC_LITERAL(10, 84, 6) // "result"
 
     },
     "MyUDP\0newMessage\0\0from\0message\0readyRead\0"
     "sendMessage\0QHostAddress\0sender\0"
-    "senderPort\0string"
+    "senderPort\0result"
 };
 #undef QT_MOC_LITERAL
 
@@ -71,11 +71,11 @@ static const uint qt_meta_data_MyUDP[] = {
        6,    3,   35,    2, 0x0a /* Public */,
 
  // signals: parameters
-    QMetaType::Void, QMetaType::QString, QMetaType::QString,    3,    4,
+    QMetaType::Void, QMetaType::QString, QMetaType::QJsonObject,    3,    4,
 
  // slots: parameters
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 7, QMetaType::UShort, QMetaType::QString,    8,    9,   10,
+    QMetaType::Void, 0x80000000 | 7, QMetaType::UShort, QMetaType::QJsonObject,    8,    9,   10,
 
        0        // eod
 };
@@ -86,15 +86,15 @@ void MyUDP::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void 
         MyUDP *_t = static_cast<MyUDP *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->newMessage((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2]))); break;
+        case 0: _t->newMessage((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QJsonObject(*)>(_a[2]))); break;
         case 1: _t->readyRead(); break;
-        case 2: _t->sendMessage((*reinterpret_cast< QHostAddress(*)>(_a[1])),(*reinterpret_cast< quint16(*)>(_a[2])),(*reinterpret_cast< QString(*)>(_a[3]))); break;
+        case 2: _t->sendMessage((*reinterpret_cast< QHostAddress(*)>(_a[1])),(*reinterpret_cast< quint16(*)>(_a[2])),(*reinterpret_cast< QJsonObject(*)>(_a[3]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (MyUDP::*)(const QString & , const QString & );
+            using _t = void (MyUDP::*)(const QString & , const QJsonObject & );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&MyUDP::newMessage)) {
                 *result = 0;
                 return;
@@ -140,7 +140,7 @@ int MyUDP::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void MyUDP::newMessage(const QString & _t1, const QString & _t2)
+void MyUDP::newMessage(const QString & _t1, const QJsonObject & _t2)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
