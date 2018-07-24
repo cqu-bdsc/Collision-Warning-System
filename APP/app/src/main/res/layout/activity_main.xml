@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp">
+
+        <EditText
+            android:id="@+id/et_ipAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="默认192.168.1.80" />
+
+        <Button
+            android:id="@+id/btn_testPing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/et_ipAdd"
+            android:text="Ping" />
+
+        <TextView
+            android:id="@+id/tvPingResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/btn_testPing"
+            android:hint="测试结果" />
+
+        <TableLayout
+            android:id="@+id/table_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_ipAdd">
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写车辆id" />
+
+                <EditText
+                    android:id="@+id/et_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_id" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_timeStamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写时间戳" />
+
+                <EditText
+                    android:id="@+id/et_timeStamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_timeStamp" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写车辆速度" />
+
+                <EditText
+                    android:id="@+id/et_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_speed" />
+
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_direction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写车辆方向" />
+
+                <EditText
+                    android:id="@+id/et_direction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_direction" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_lat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写车辆纬度" />
+
+                <EditText
+                    android:id="@+id/et_lat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_lat" />
+
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_lon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写车辆经度" />
+
+                <EditText
+                    android:id="@+id/et_lon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_lon" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_ace"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="填写车辆加速度" />
+
+                <EditText
+                    android:id="@+id/et_ace"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="send_ace" />
+            </TableRow>
+        </TableLayout>
+
+
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/table_layout"
+            android:text="Send" />
+
+        <TableLayout
+            android:id="@+id/table_showtest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_send">
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_showid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="id" />
+
+                <TextView
+                    android:id="@+id/tv_warning"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="warning" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="time" />
+
+                <TextView
+                    android:id="@+id/tv_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="distance" />
+            </TableRow>
+
+        </TableLayout>
+
+        <TextView
+            android:id="@+id/textLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/table_showtest"
+            android:text="TextView" />
+
+
+    </RelativeLayout>
+
+
+</android.support.constraint.ConstraintLayout>
