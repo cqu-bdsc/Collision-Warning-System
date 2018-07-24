@@ -17,6 +17,7 @@ import com.github.cqu_bdsc.collision_warning_system.udp.Result;
 import com.github.cqu_bdsc.collision_warning_system.udp.SendService;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView    tv_warning;
     private TextView    tv_time;
     private TextView    tv_distance;
+    private TextView    tv_log;
 
     private EditText    et_id;
     private EditText    et_timeStamp;
@@ -88,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         tv_distance = (TextView)  findViewById(R.id.tv_distance);
         tv_time    = (TextView) findViewById(R.id.tv_time);
         tv_warning = (TextView) findViewById(R.id.tv_warning);
+
+        tv_log = (TextView) findViewById(R.id.textLog);
 
         btnSend     = (Button)   findViewById(R.id.btn_send);
 
@@ -207,14 +211,15 @@ public class MainActivity extends AppCompatActivity {
                 case ReceiveThread.ACTION_STRING:
                     String message = intent.getExtras().getString(ReceiveThread.STRING_CONTEXT);
                     //tvReceive.setText(message);
+                    tv_log.setText(message);
                     break;
                 case ReceiveThread.ACTION_JSON:
-                    Result result = (Result) intent.getExtras().get(ReceiveThread.JSON_CONTEXT);
+                    Result result = (Result) Objects.requireNonNull(intent.getExtras()).get(ReceiveThread.JSON_CONTEXT);
                     if (result != null){
-                      //  tv_showid.setText(result.getId());
+                        tv_showid.setText(String.valueOf(result.getId()));
                         tv_warning.setText(String.valueOf(result.isWarning()));
                         tv_distance.setText(String.valueOf(result.getDistance()));
-                        tv_time.setText(result.getTime());
+                        tv_time.setText(String.valueOf(result.getTime()));
                     } else {
                         tv_showid.setText("0");
                         tv_warning.setText("0");

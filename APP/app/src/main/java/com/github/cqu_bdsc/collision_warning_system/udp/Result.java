@@ -51,15 +51,14 @@ public class Result implements Serializable {
     }
 
     public void fromJSON(JSONObject jsonObject){
-        Result result = new Result();
         try {
-            result.setId(jsonObject.getInt("id"));
-            result.setTime(jsonObject.getInt("time"));
-            result.setDistance(jsonObject.getDouble("distance"));
-            result.setWarning(jsonObject.getBoolean("warning"));
+            this.setId(jsonObject.getInt("id"));
+            this.setTime(jsonObject.getInt("time"));
+            this.setDistance(jsonObject.getDouble("distance"));
+            this.setWarning(jsonObject.getBoolean("warning"));
         } catch (JSONException e) {
             e.printStackTrace();
-            return ;
+            return;
         }
 
     }

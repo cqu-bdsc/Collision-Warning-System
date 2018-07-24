@@ -55,19 +55,6 @@ public class SendService extends IntentService {//继承父类IntentService
              */
             if (action.equals(ACTION_SEND_STRING)){
 
-//                //发送UDP报文类型
-//                try {
-//                    udpSocket = new DatagramSocket(Integer.valueOf(port));
-//                    String sendType = ReceiveThread.TYPE_STRING;
-//                    packet = new DatagramPacket(sendType.getBytes(),sendType.getBytes().length,serverAddr,Integer.valueOf(port));
-//                    udpSocket.send(packet);
-//                } catch (SocketException e) {
-//                    e.printStackTrace();
-//                }finally {
-//                    if (udpSocket != null){
-//                        udpSocket.close();
-//                    }
-//                }
 
                 String extras_string = intent.getExtras().getString(EXTRAS_STRING);
                 try {
@@ -86,22 +73,6 @@ public class SendService extends IntentService {//继承父类IntentService
                     }
                 }
 
-
-//                /**
-//                 * 发送终止符
-//                 */
-//                try {
-//                    String end = ReceiveThread.TYPE_END;
-//                    udpSocket = new DatagramSocket(Integer.valueOf(port));
-//                    packet = new DatagramPacket(end.getBytes(),end.getBytes().length,serverAddr,Integer.valueOf(port));
-//                    udpSocket.send(packet);
-//                } catch (SocketException e) {
-//                    e.printStackTrace();
-//                }finally {
-//                    if (udpSocket != null){
-//                        udpSocket.close();
-//                    }
-//                }
 
 
 

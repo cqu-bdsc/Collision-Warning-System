@@ -13,9 +13,10 @@
 
         <EditText
             android:id="@+id/et_ipAdd"
-            android:hint="默认192.168.1.80"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="默认192.168.1.80" />
+
         <Button
             android:id="@+id/btn_testPing"
             android:layout_width="wrap_content"
@@ -31,12 +32,13 @@
             android:hint="测试结果" />
 
         <TableLayout
+            android:id="@+id/table_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/table_layout"
             android:layout_below="@+id/et_ipAdd">
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_id"
                     android:layout_width="wrap_content"
@@ -45,11 +47,13 @@
 
                 <EditText
                     android:id="@+id/et_id"
-                    android:hint="send_id"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="send_id" />
             </TableRow>
+
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_timeStamp"
                     android:layout_width="wrap_content"
@@ -58,13 +62,13 @@
 
                 <EditText
                     android:id="@+id/et_timeStamp"
-                    android:hint="send_timeStamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="send_timeStamp" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_speed"
                     android:layout_width="wrap_content"
@@ -73,14 +77,14 @@
 
                 <EditText
                     android:id="@+id/et_speed"
-                    android:hint="send_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="send_speed" />
 
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_direction"
                     android:layout_width="wrap_content"
@@ -89,13 +93,13 @@
 
                 <EditText
                     android:id="@+id/et_direction"
-                    android:hint="send_direction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="send_direction" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_lat"
                     android:layout_width="wrap_content"
@@ -104,14 +108,14 @@
 
                 <EditText
                     android:id="@+id/et_lat"
-                    android:hint="send_lat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="send_lat" />
 
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_lon"
                     android:layout_width="wrap_content"
@@ -120,13 +124,13 @@
 
                 <EditText
                     android:id="@+id/et_lon"
-                    android:hint="send_lon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="send_lon" />
             </TableRow>
 
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_ace"
                     android:layout_width="wrap_content"
@@ -135,9 +139,9 @@
 
                 <EditText
                     android:id="@+id/et_ace"
-                    android:hint="send_ace"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="send_ace" />
             </TableRow>
         </TableLayout>
 
@@ -148,43 +152,51 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/table_layout"
             android:text="Send" />
+
         <TableLayout
+            android:id="@+id/table_showtest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/table_showtest"
-            android:layout_below="@+id/btn_send"
-            >
+            android:layout_below="@+id/btn_send">
+
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_showid"
-                    android:hint="id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="id" />
+
                 <TextView
                     android:id="@+id/tv_warning"
-                    android:hint="warning"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:hint="warning" />
             </TableRow>
+
             <TableRow>
+
                 <TextView
                     android:id="@+id/tv_time"
-                    android:hint="time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="time" />
+
                 <TextView
                     android:id="@+id/tv_distance"
-                    android:hint="distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:hint="distance" />
             </TableRow>
 
         </TableLayout>
 
-
+        <TextView
+            android:id="@+id/textLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/table_showtest"
+            android:text="TextView" />
 
 
     </RelativeLayout>

@@ -26,10 +26,6 @@ public class ReceiveThread extends Thread {
     private static final String SERVER_IP = "192.168.1.80";
     private static final String RECEIVE_PORT = "4040";
 
-    public static final String TYPE_STRING = "TYPE_STRING";
-    public static final String TYPE_PICTURE = "TYPE_PICTURE";
-    public static final String TYPE_END = "!end;";
-
     private String serverIp = null;//流，可以装东西
 
     public ReceiveThread(){
@@ -66,28 +62,10 @@ public class ReceiveThread extends Thread {
                 try {
                     JSONObject jsonObject = new JSONObject(msg);
                     HandleData(jsonObject);
+                    HandleData(jsonObject.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-//                if (msg.startsWith(TYPE_STRING)){
-//                    dataType = TYPE_STRING;
-//
-//                } else if (msg.startsWith(TYPE_PICTURE)){
-//                    dataType = TYPE_PICTURE;
-//
-//                } else if (msg.startsWith(TYPE_END)){//如输入结束，就需要清空数据流中的信息
-//                    // 处理BAOS 数据
-//                    ByteArrayOutputStream byteArrayOutputStream = baos;
-//
-//                    HandleData(dataType, byteArrayOutputStream);
-//
-//                    baos.reset();//重置baos
-//                } else {
-//
-//                    baos.write(reveivePacket.getData(),0,reveivePacket.getLength());//将新数据加入到数据流中，并把它打印出来
-//                }
 
             }
 
@@ -102,42 +80,28 @@ public class ReceiveThread extends Thread {
     private void HandleData(JSONObject jsonObject){//处理数据函数
         Result result = new Result();
         result.fromJSON(jsonObject);
-        SendIntent(ReceiveThread.ACTION_JSON, result);
-//        byte[] bytes = byteArrayOutputStream.toByteArray();
-//
-//        if (dataType.equals(TYPE_STRING)){
-//            String message = new String(bytes);
-//            System.out.print(message);
-//            SendIntent(ReceiveThread.ACTION_STRING, message);
-//
-//        } else {
-//
-//        }
+        SendIntent( result);
     }
 
-//    private void HandleData(String dataType, ByteArrayOutputStream byteArrayOutputStream){//处理数据函数
-//        byte[] bytes = byteArrayOutputStream.toByteArray();
-//
-//        if (dataType.equals(TYPE_STRING)){
-//            String message = new String(bytes);
-//            System.out.print(message);
-//            SendIntent(ReceiveThread.ACTION_STRING, message);
-//
-//        } else {
-//
-//        }
-//    }
+    private void HandleData(String string){//处理数据函数
+
+        SendIntent(string);
+
+    }
 
 
-    private void SendIntent(String action, Result something){
+    private void SendIntent( String something){
         Intent intent = new Intent();
-        if (action.equals(ReceiveThread.ACTION_JSON)){
-            intent.setAction(ReceiveThread.ACTION_JSON);
-            intent.putExtra(ReceiveThread.JSON_CONTEXT, something);
-            context.sendBroadcast(intent);
-        }  else {
+        intent.setAction(ReceiveThread.ACTION_STRING);
+        intent.putExtra(ReceiveThread.STRING_CONTEXT, something);
+        context.sendBroadcast(intent);
+    }
 
-        }
+    private void SendIntent(Result something){
+        Intent intent = new Intent();
+        intent.setAction(ReceiveThread.ACTION_JSON);
+        intent.putExtra(ReceiveThread.JSON_CONTEXT,something);
+        context.sendBroadcast(intent);
     }
 }
 
