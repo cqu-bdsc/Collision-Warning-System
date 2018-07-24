@@ -239,14 +239,14 @@ void MainWindow::onUdpSendMessage(){
     }
     QString warning = ui->editWarning->text();
     if(warning.isEmpty()){
-        warning = "22233";
+        warning = "";
     }
 
     QJsonObject message;
     message.insert("id", id);
     message.insert("time", time);
     message.insert("distance", distance);
-    message.insert("warning", warning);
+    message.insert("warning", true);
 
     udpTargetAddr.setAddress(ui->editSendIP->text());
     udpTargetPort = ui->editSendPort->text().toInt();
@@ -256,9 +256,9 @@ void MainWindow::onUdpSendMessage(){
     //ui->editMessage->clear();
 
     ui->textLog->append("ME send:" + QString(QJsonDocument(message).toJson()));
-    ui->editID->clear();
-    ui->editTime->clear();
-    ui->editDistance->clear();
-    ui->editWarning->clear();
+//    ui->editID->clear();
+//    ui->editTime->clear();
+//    ui->editDistance->clear();
+//    ui->editWarning->clear();
 
 }
