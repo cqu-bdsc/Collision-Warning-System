@@ -10,6 +10,9 @@ Collision Warning System，DSRC
 2018-7-19\
 详细设计说明书更新
 
+2018-7-24\
+Android与PC通过UDP传输JSON完成
+
 ### 模块设计任务
 
 #### 周易
