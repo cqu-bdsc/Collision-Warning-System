@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "myudp.h"
+#include "dataprocessthread.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,6 +35,7 @@ private slots:
     void on_but_start_clicked();
     void onUdpStopButtonClicked();
     void onUdpSendMessage();
+    void onSendMessage(const QJsonObject &result);
     void onUdpAppendMessage(const QString &from, const QJsonObject &message);
 
     //获取本机IP地址
@@ -43,6 +45,7 @@ private slots:
 
 
 signals:
+
 
 private:
     Ui::MainWindow *ui;
@@ -65,6 +68,12 @@ private:
     MyUDP *myudp = nullptr;   //MyUDP 对象
 
     QString messageUDP = "[UDP] ";
-    QTextFormat tableFormat;
+
+    /****************************
+     * 处理数据模块
+     * *************************/
+
+    DataProcessThread *processThread = nullptr;
+
 };
 #endif // MAINWINDOW_H

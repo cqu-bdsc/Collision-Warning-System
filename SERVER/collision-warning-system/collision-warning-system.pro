@@ -28,11 +28,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    myudp.cpp
+    myudp.cpp \
+    dataprocessthread.cpp
 
 HEADERS += \
         mainwindow.h \
-    myudp.h
+    myudp.h \
+    dataprocessthread.h
 
 FORMS += \
         mainwindow.ui

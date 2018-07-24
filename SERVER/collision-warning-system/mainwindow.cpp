@@ -15,10 +15,16 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     //绑定发送UDP报文事件
     connect(ui->but_send, SIGNAL(clicked()), this, SLOT(onUdpSendMessage()));
-    //connect(ui->editMessage, SIGNAL(returnPressed()), this, SLOT(onUdpSendMessage()));
 
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
     connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
+
+    if(processThread == nullptr){
+        processThread = new DataProcessThread();
+        processThread->start();
+        connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(onSendMessage(QJsonObject)));
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -36,8 +42,6 @@ void MainWindow::initUI(){
     QPixmap logo(logoPath);
     ui->label_logo->setPixmap(logo);
     ui->label_logo->resize(logo.width(),logo.height());
-
-   //tableFormat.setBorder(0);
 
     /**
     * 使用正则表达式对IP地址和端口号做约束
@@ -179,23 +183,12 @@ void MainWindow::onUdpStopButtonClicked(){
 }
 
 /**
- * 将接收到的消息显示出来
+ * 将接收到的消息显示出来并将其发送到DataProcessThread
  * @brief MainWindow::onUdpAppendMessage
  * @param $from
  * @param message
  */
 void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &message){
-
-//    if(from == "System"){
-//        QColor color = ui->textReceive->textColor();
-//        ui->textReceive->setTextColor(Qt::gray);
-//        ui->textReceive->append(message);
-//        ui->textReceive->setTextColor(color);
-//    } else{
-//        ui->textReceive->append("<"+ from + ">   "+ message);
-//    }
-//    QScrollBar *bar = ui->textReceive->verticalScrollBar();
-//    bar->setValue(bar->maximum());
 
     int    id           = message.find("id").value().toInt();
     int    timeStamp    = message.find("timeStamp").value().toInt();
@@ -213,6 +206,9 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
     ui->label_Lat->setText(QString::number(lat));
     ui->label_lon->setText(QString::number(lon));
     ui->label_acc->setText(QString::number(acc));
+
+    processThread->addMessage(message);
+
 }
 
 /**
@@ -220,10 +216,6 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
  * @brief MainWindow::onUdpSendMessage
  */
 void MainWindow::onUdpSendMessage(){
-  //  QString text = ui->editMessage->text();
-  //  if(text.isEmpty()){
-  //      return;
-  //  }
 
     QString id = ui->editID->text();
     if(id.isEmpty()){
@@ -252,13 +244,21 @@ void MainWindow::onUdpSendMessage(){
     udpTargetPort = ui->editSendPort->text().toInt();
     myudp->sendMessage(udpTargetAddr, udpTargetPort, message);
 
-    //onUdpAppendMessage("ME", text);
-    //ui->editMessage->clear();
-
     ui->textLog->append("ME send:" + QString(QJsonDocument(message).toJson()));
-//    ui->editID->clear();
-//    ui->editTime->clear();
-//    ui->editDistance->clear();
-//    ui->editWarning->clear();
+    ui->editID->clear();
+    ui->editTime->clear();
+    ui->editDistance->clear();
+    ui->editWarning->clear();
 
+}
+
+/**
+ * 通过UDP发送QJsonObject result
+ * @brief MainWindow::onUdpSendMessage
+ * @param result
+ */
+void MainWindow::onSendMessage(const QJsonObject &result){
+    udpTargetAddr.setAddress(ui->editSendIP->text());
+    udpTargetPort = ui->editSendPort->text().toInt();
+    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 }
