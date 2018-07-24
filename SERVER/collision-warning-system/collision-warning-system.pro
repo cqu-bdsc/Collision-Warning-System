@@ -8,6 +8,7 @@ QT       += core gui
 # 添加网络功能
 QT       += network
 
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = collision-warning-system
