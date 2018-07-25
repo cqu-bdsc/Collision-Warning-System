@@ -7,6 +7,7 @@
 ### Feature
 
 - QT版本：5.11.1
+- [QT Documentation](http://doc.qt.io/qt-5/)
 
 ![ui_v0.1](image/ui_v0.1.png)
 
@@ -23,12 +24,29 @@
 #### 3、信息显示模块
 
 1. ~~方案一：直接调用百度地图SDK（Pass）~~
-    由于框架限制，本系统无法同时使用互联网资源调用百度地图的SDK，故采用方案二。
-    
+   由于框架限制，本系统无法同时使用互联网资源调用百度地图的SDK，故采用方案二。
+
 2. 方案二：加载百度离线地图
 
    地图由网页方式载入，本地存储地图的瓦片图片，QT与JavaScript进行交互。
-   参考： [地图开发——离线地图技术选型](http://lixuanqi.me/2018/02/27/%E5%9C%B0%E5%9B%BE%E5%BC%80%E5%8F%91%E2%80%94%E2%80%94%E7%A6%BB%E7%BA%BF%E5%9C%B0%E5%9B%BE%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B/) and [Qt与百度地图交互(javascript)](http://kevinlq.com/2017/05/16/Qt_and_baiduMap_interaction/)
+   参考： [地图开发——离线地图技术选型](http://lixuanqi.me/2018/02/27/%E5%9C%B0%E5%9B%BE%E5%BC%80%E5%8F%91%E2%80%94%E2%80%94%E7%A6%BB%E7%BA%BF%E5%9C%B0%E5%9B%BE%E6%8A%80%E6%9C%AF%E9%80%89%E5%9E%8B/) and [Qt与百度地图交互(javascript)](http://kevinlq.com/2017/05/16/Qt_and_baiduMap_interaction/) and [QT实现加载百度离线地图](https://blog.csdn.net/john_kai/article/details/80290072)
+
+   **采取此方案开发必要的前期准备：**
+
+   - [百度离线地图API V2.1](http://www.xiaoguo123.com/p/baidumap_offline_v21/)
+   - 瓦片地图，使用[万能地图下载器](https://www.cnblogs.com/i-gps/archive/2012/06/09/2543332.html)
+   - [百度地图JavaScript Document](http://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html#a0b0)
+   - [百度地图API示例](http://developer.baidu.com/map/jsdemo.htm#a1_2)
+     
+     ![map_download](image/map_download.png)  
+
+
+3. ~~方案三：使用QT Location Open Street Map Plugin~~  \
+   文档不全，且使用OpenStreetMap下载的OSM文件生成的地图文件只有点、线信息，不是很好看。
+   ![cq](image/cq.png)
+
+4. ~~方案四：使用高像素图片？~~\
+   不太现实。
 
 ### 接口说明
 
@@ -90,4 +108,3 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     QJsonObject result;
 }
 ```
-

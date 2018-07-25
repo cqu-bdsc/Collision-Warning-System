@@ -257,7 +257,7 @@ void MainWindow::onUdpSendMessage(){
  * @brief MainWindow::onUdpSendMessage
  * @param result
  */
-void MainWindow::onSendMessage(const QJsonObject &result){
+void MainWindow::onSendMessageq(const QJsonObject &result){
     udpTargetAddr.setAddress(ui->editSendIP->text());
     udpTargetPort = ui->editSendPort->text().toInt();
     myudp->sendMessage(udpTargetAddr, udpTargetPort, result);

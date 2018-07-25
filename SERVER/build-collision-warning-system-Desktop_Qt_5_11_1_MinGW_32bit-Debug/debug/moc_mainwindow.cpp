@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[13];
-    char stringdata0[189];
+    char stringdata0[190];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -36,19 +36,19 @@ QT_MOC_LITERAL(1, 11, 20), // "on_but_start_clicked"
 QT_MOC_LITERAL(2, 32, 0), // ""
 QT_MOC_LITERAL(3, 33, 22), // "onUdpStopButtonClicked"
 QT_MOC_LITERAL(4, 56, 16), // "onUdpSendMessage"
-QT_MOC_LITERAL(5, 73, 13), // "onSendMessage"
-QT_MOC_LITERAL(6, 87, 6), // "result"
-QT_MOC_LITERAL(7, 94, 18), // "onUdpAppendMessage"
-QT_MOC_LITERAL(8, 113, 4), // "from"
-QT_MOC_LITERAL(9, 118, 7), // "message"
-QT_MOC_LITERAL(10, 126, 20), // "on_but_getIP_clicked"
-QT_MOC_LITERAL(11, 147, 35), // "on_NetInterface_currentIndexC..."
-QT_MOC_LITERAL(12, 183, 5) // "index"
+QT_MOC_LITERAL(5, 73, 14), // "onSendMessageq"
+QT_MOC_LITERAL(6, 88, 6), // "result"
+QT_MOC_LITERAL(7, 95, 18), // "onUdpAppendMessage"
+QT_MOC_LITERAL(8, 114, 4), // "from"
+QT_MOC_LITERAL(9, 119, 7), // "message"
+QT_MOC_LITERAL(10, 127, 20), // "on_but_getIP_clicked"
+QT_MOC_LITERAL(11, 148, 35), // "on_NetInterface_currentIndexC..."
+QT_MOC_LITERAL(12, 184, 5) // "index"
 
     },
     "MainWindow\0on_but_start_clicked\0\0"
     "onUdpStopButtonClicked\0onUdpSendMessage\0"
-    "onSendMessage\0result\0onUdpAppendMessage\0"
+    "onSendMessageq\0result\0onUdpAppendMessage\0"
     "from\0message\0on_but_getIP_clicked\0"
     "on_NetInterface_currentIndexChanged\0"
     "index"
@@ -98,7 +98,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 0: _t->on_but_start_clicked(); break;
         case 1: _t->onUdpStopButtonClicked(); break;
         case 2: _t->onUdpSendMessage(); break;
-        case 3: _t->onSendMessage((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
+        case 3: _t->onSendMessageq((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
         case 4: _t->onUdpAppendMessage((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QJsonObject(*)>(_a[2]))); break;
         case 5: _t->on_but_getIP_clicked(); break;
         case 6: _t->on_NetInterface_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;

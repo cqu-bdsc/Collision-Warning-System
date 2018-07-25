@@ -35,7 +35,7 @@ private slots:
     void on_but_start_clicked();
     void onUdpStopButtonClicked();
     void onUdpSendMessage();
-    void onSendMessage(const QJsonObject &result);
+    void onSendMessageq(const QJsonObject &result);
     void onUdpAppendMessage(const QString &from, const QJsonObject &message);
 
     //获取本机IP地址

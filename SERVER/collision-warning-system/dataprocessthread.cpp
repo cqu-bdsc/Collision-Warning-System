@@ -97,6 +97,11 @@ QList<QJsonObject> DataProcessThread::isComputed(){
  */
 void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     QJsonObject result;
+    int id1 = list.at(0).find("id").value().toInt();
+
+    result.insert("id",id1);
+
+
 }
 
 void DataProcessThread::timeOutSlot(){
