@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1042</width>
-    <height>677</height>
+    <width>1039</width>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
+      <y>80</y>
       <width>321</width>
       <height>61</height>
      </rect>
@@ -80,7 +80,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>160</y>
+      <y>150</y>
       <width>321</width>
       <height>401</height>
      </rect>
@@ -94,7 +94,7 @@
        <x>10</x>
        <y>250</y>
        <width>301</width>
-       <height>141</height>
+       <height>151</height>
       </rect>
      </property>
      <property name="title">
@@ -527,9 +527,9 @@
     <property name="geometry">
      <rect>
       <x>340</x>
-      <y>90</y>
+      <y>130</y>
       <width>691</width>
-      <height>581</height>
+      <height>531</height>
      </rect>
     </property>
     <property name="title">
@@ -538,10 +538,10 @@
     <widget class="QGraphicsView" name="graphicsView">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>21</y>
+       <x>10</x>
+       <y>20</y>
        <width>671</width>
-       <height>551</height>
+       <height>501</height>
       </rect>
      </property>
     </widget>
@@ -550,7 +550,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>560</y>
+      <y>550</y>
       <width>321</width>
       <height>111</height>
      </rect>
@@ -575,12 +575,50 @@
       <x>560</x>
       <y>10</y>
       <width>461</width>
-      <height>81</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="title">
      <string>Info</string>
     </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>441</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_11">
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>地图信息支持：百度地图</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_13">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>441</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>All rights reserved. Big Data and Smart Computing Lab of CQU.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -628,6 +666,71 @@
     <property name="text">
      <string>TextLabel</string>
     </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>339</x>
+      <y>79</y>
+      <width>691</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>RSU 位置信息设定</string>
+    </property>
+    <widget class="QWidget" name="horizontalLayoutWidget_12">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>671</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_12">
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>经度：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>纬度：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_2"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>确认</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_8">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
  </widget>

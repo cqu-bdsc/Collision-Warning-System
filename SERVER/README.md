@@ -34,7 +34,7 @@
    **采取此方案开发必要的前期准备：**
 
    - [百度离线地图API V2.1](http://www.xiaoguo123.com/p/baidumap_offline_v21/)
-   - 瓦片地图，使用[万能地图下载器](https://www.cnblogs.com/i-gps/archive/2012/06/09/2543332.html)
+   - 瓦片地图
    - [百度地图JavaScript Document](http://lbsyun.baidu.com/cms/jsapi/reference/jsapi_reference.html#a0b0)
    - [百度地图API示例](http://developer.baidu.com/map/jsdemo.htm#a1_2)
      
