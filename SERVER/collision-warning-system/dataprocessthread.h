@@ -38,7 +38,8 @@ private:
     int idOne,idTwo;        //存储两辆车的ID
 
     const int FREQUENCY = 200;   // timer的时间频率
-
+    const int THRESHOLD = 1000;  // 碰撞时间的阈值
+    const int UNITTIME = 10;     // 求轨迹的单位时间
 private slots:
     void timeOutSlot();
 };
