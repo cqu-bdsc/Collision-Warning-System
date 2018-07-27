@@ -123,6 +123,13 @@ QList<QList<double>> Trajectory(double t, double v, double a, double rlat, doubl
  * @param list
  */
 void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
+<<<<<<< HEAD
+    QJsonObject result;
+    int id1 = list.at(0).find("id").value().toInt();
+
+    result.insert("id",id1);
+
+=======
     QList<QJsonObject> result;
     QJsonObject RVehicleOne,RVehicleTwo;
     QList<QList<double>> tra1,tra2;
@@ -214,6 +221,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
    //将结果保存进result
     result.append(RVehicleOne);
     result.append(RVehicleTwo);
+>>>>>>> a5c35911743cec149dd76012ed772dca5f218b0d
 
 }
 
