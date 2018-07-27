@@ -101,7 +101,7 @@ QList<QList<double>> Trajectory(double t, double v, double a, double rlat, doubl
     H=rlon-vlon;
     D=rlat-vlat;
     int t0=t;
-    while (abs(rlat-vlat)<lat_THRESHOLD && abs(rlon-vlon)<lon_THRESHOLD) {
+    while (abs(rlat-vlat)>lat_THRESHOLD && abs(rlon-vlon)>lon_THRESHOLD) {
         l=v*t+1/2*a*pow(t,2);    //计算斜边长
         h=l/L*H;                 //计算高
         d=l/L*D;                 //计算底边
@@ -154,8 +154,10 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     int lat21=list.at(2).find("lat").value().toDouble();
     int lat22=list.at(3).find("lat").value().toDouble();
     //求两辆车的平均lat（NTU)
-    int lat1=(lat11+lat12)/2*100000;
-    int lat2=(lat21+lat22)/2*100000;
+    int lat1=(lat11+lat12)/2;
+    int lat1_NTU=lat1*100000;
+    int lat2=(lat21+lat22)/2;
+    int lat2_NTU=lat2*100000;
 
     //提取两辆车的lon
     int lon11=list.at(0).find("lon").value().toDouble();
@@ -163,18 +165,22 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     int lon21=list.at(2).find("lon").value().toDouble();
     int lon22=list.at(3).find("lon").value().toDouble();
     //求两辆车的平均lon（NTU)
-    int lon1=(lon11+lon12)/2*100000;
-    int lon2=(lon21+lon22)/2*100000;
+    int lon1=(lon11+lon12)/2;
+    int lon1_NTU=lon1*100000;
+    int lon2=(lon21+lon22)/2;
+    int lon2_NTU=lon2*100000;
 
     //提取RSU的lat(NTU)
-    int Rlat=list.at(4).find("lat").value().toDouble()*100000;
+    int Rlat=list.at(4).find("lat").value().toDouble();
+    int Rlat_NTU=Rlat*100000;
 
     //提取RSU的lon(NTU)
-    int Rlon=list.at(4).find("lon").value().toDouble()*100000;
+    int Rlon=list.at(4).find("lon").value().toDouble();
+    int Rlon_NTU=Rlon*100000;
 
     //求两车与路口的距离
-    double dist1=sqrt(pow(lat1-Rlat,2)+pow(lon1-Rlon,2));
-    double dist2=sqrt(pow(lat2-Rlat,2)+pow(lon2-Rlon,2));
+    double dist1=sqrt(pow(lat1_NTU-Rlat_NTU,2)+pow(lon1_NTU-Rlon_NTU,2));
+    double dist2=sqrt(pow(lat2_NTU-Rlat_NTU,2)+pow(lon2_NTU-Rlon_NTU,2));
 
     //求两车可能的碰撞时间
     double t1=(-v1+sqrt(pow(v1,2)+2*acc1*dist1))/acc1;
@@ -187,7 +193,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
         RVehicleOne.insert("distance",dist1);
         //求车1的碰撞轨迹
         tra1=Trajectory(UNITTIME,v1,acc1,Rlat,Rlon,lat1,lon1);
-        //RVehicleOne.insert("trajectory",tra1);
+        //RVehicleOne.insert("trajectory",tra1);  //轨迹insert不进去
 
         RVehicleTwo.insert("id",id2);
         RVehicleTwo.insert("warning",true);
@@ -195,7 +201,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
         RVehicleTwo.insert("distance",dist2);
         //求碰撞轨迹
         tra2=Trajectory(UNITTIME,v2,acc2,Rlat,Rlon,lat2,lon2);
-        //RVehicleTwo.insert("trajectory",tra2);
+        //RVehicleTwo.insert("trajectory",tra2);  //轨迹insert不进去
     }else{//安全
         RVehicleOne.insert("id",id1);
         RVehicleOne.insert("warning",false);
