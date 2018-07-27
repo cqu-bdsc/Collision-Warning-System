@@ -103,20 +103,35 @@ public:
     QGroupBox *Log;
     QTextBrowser *textLog;
     QGroupBox *groupInfo;
+    QWidget *horizontalLayoutWidget_11;
+    QHBoxLayout *horizontalLayout_11;
+    QLabel *label_10;
+    QWidget *horizontalLayoutWidget_13;
+    QHBoxLayout *horizontalLayout_13;
+    QLabel *label_11;
     QLabel *label;
     QLabel *label_2;
     QLabel *label_logo;
+    QGroupBox *groupBox;
+    QWidget *horizontalLayoutWidget_12;
+    QHBoxLayout *horizontalLayout_12;
+    QLabel *label_8;
+    QLineEdit *lineEdit;
+    QLabel *label_9;
+    QLineEdit *lineEdit_2;
+    QPushButton *pushButton;
+    QSpacerItem *horizontalSpacer_8;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(1042, 677);
+        MainWindow->resize(1039, 666);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         NetworkInterface = new QGroupBox(centralWidget);
         NetworkInterface->setObjectName(QStringLiteral("NetworkInterface"));
-        NetworkInterface->setGeometry(QRect(10, 90, 321, 61));
+        NetworkInterface->setGeometry(QRect(10, 80, 321, 61));
         horizontalLayoutWidget_4 = new QWidget(NetworkInterface);
         horizontalLayoutWidget_4->setObjectName(QStringLiteral("horizontalLayoutWidget_4"));
         horizontalLayoutWidget_4->setGeometry(QRect(10, 20, 308, 31));
@@ -151,10 +166,10 @@ public:
 
         UDP = new QGroupBox(centralWidget);
         UDP->setObjectName(QStringLiteral("UDP"));
-        UDP->setGeometry(QRect(10, 160, 321, 401));
+        UDP->setGeometry(QRect(10, 150, 321, 401));
         groupSend = new QGroupBox(UDP);
         groupSend->setObjectName(QStringLiteral("groupSend"));
-        groupSend->setGeometry(QRect(10, 250, 301, 141));
+        groupSend->setGeometry(QRect(10, 250, 301, 151));
         horizontalLayoutWidget = new QWidget(groupSend);
         horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
         horizontalLayoutWidget->setGeometry(QRect(10, 20, 281, 31));
@@ -422,19 +437,45 @@ public:
 
         Map = new QGroupBox(centralWidget);
         Map->setObjectName(QStringLiteral("Map"));
-        Map->setGeometry(QRect(340, 90, 691, 581));
+        Map->setGeometry(QRect(340, 130, 691, 531));
         graphicsView = new QGraphicsView(Map);
         graphicsView->setObjectName(QStringLiteral("graphicsView"));
-        graphicsView->setGeometry(QRect(15, 21, 671, 551));
+        graphicsView->setGeometry(QRect(10, 20, 671, 501));
         Log = new QGroupBox(centralWidget);
         Log->setObjectName(QStringLiteral("Log"));
-        Log->setGeometry(QRect(10, 560, 321, 111));
+        Log->setGeometry(QRect(10, 550, 321, 111));
         textLog = new QTextBrowser(Log);
         textLog->setObjectName(QStringLiteral("textLog"));
         textLog->setGeometry(QRect(10, 20, 301, 81));
         groupInfo = new QGroupBox(centralWidget);
         groupInfo->setObjectName(QStringLiteral("groupInfo"));
-        groupInfo->setGeometry(QRect(560, 10, 461, 81));
+        groupInfo->setGeometry(QRect(560, 10, 461, 71));
+        horizontalLayoutWidget_11 = new QWidget(groupInfo);
+        horizontalLayoutWidget_11->setObjectName(QStringLiteral("horizontalLayoutWidget_11"));
+        horizontalLayoutWidget_11->setGeometry(QRect(10, 20, 441, 20));
+        horizontalLayout_11 = new QHBoxLayout(horizontalLayoutWidget_11);
+        horizontalLayout_11->setSpacing(6);
+        horizontalLayout_11->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_11->setObjectName(QStringLiteral("horizontalLayout_11"));
+        horizontalLayout_11->setContentsMargins(0, 0, 0, 0);
+        label_10 = new QLabel(horizontalLayoutWidget_11);
+        label_10->setObjectName(QStringLiteral("label_10"));
+
+        horizontalLayout_11->addWidget(label_10);
+
+        horizontalLayoutWidget_13 = new QWidget(groupInfo);
+        horizontalLayoutWidget_13->setObjectName(QStringLiteral("horizontalLayoutWidget_13"));
+        horizontalLayoutWidget_13->setGeometry(QRect(10, 40, 441, 20));
+        horizontalLayout_13 = new QHBoxLayout(horizontalLayoutWidget_13);
+        horizontalLayout_13->setSpacing(6);
+        horizontalLayout_13->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_13->setObjectName(QStringLiteral("horizontalLayout_13"));
+        horizontalLayout_13->setContentsMargins(0, 0, 0, 0);
+        label_11 = new QLabel(horizontalLayoutWidget_13);
+        label_11->setObjectName(QStringLiteral("label_11"));
+
+        horizontalLayout_13->addWidget(label_11);
+
         label = new QLabel(centralWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setGeometry(QRect(110, 20, 411, 31));
@@ -450,6 +491,46 @@ public:
         label_logo = new QLabel(centralWidget);
         label_logo->setObjectName(QStringLiteral("label_logo"));
         label_logo->setGeometry(QRect(20, 10, 71, 71));
+        groupBox = new QGroupBox(centralWidget);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setGeometry(QRect(339, 79, 691, 51));
+        horizontalLayoutWidget_12 = new QWidget(groupBox);
+        horizontalLayoutWidget_12->setObjectName(QStringLiteral("horizontalLayoutWidget_12"));
+        horizontalLayoutWidget_12->setGeometry(QRect(10, 10, 671, 31));
+        horizontalLayout_12 = new QHBoxLayout(horizontalLayoutWidget_12);
+        horizontalLayout_12->setSpacing(6);
+        horizontalLayout_12->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_12->setObjectName(QStringLiteral("horizontalLayout_12"));
+        horizontalLayout_12->setContentsMargins(0, 0, 0, 0);
+        label_8 = new QLabel(horizontalLayoutWidget_12);
+        label_8->setObjectName(QStringLiteral("label_8"));
+
+        horizontalLayout_12->addWidget(label_8);
+
+        lineEdit = new QLineEdit(horizontalLayoutWidget_12);
+        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+
+        horizontalLayout_12->addWidget(lineEdit);
+
+        label_9 = new QLabel(horizontalLayoutWidget_12);
+        label_9->setObjectName(QStringLiteral("label_9"));
+
+        horizontalLayout_12->addWidget(label_9);
+
+        lineEdit_2 = new QLineEdit(horizontalLayoutWidget_12);
+        lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
+
+        horizontalLayout_12->addWidget(lineEdit_2);
+
+        pushButton = new QPushButton(horizontalLayoutWidget_12);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+
+        horizontalLayout_12->addWidget(pushButton);
+
+        horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_12->addItem(horizontalSpacer_8);
+
         MainWindow->setCentralWidget(centralWidget);
 
         retranslateUi(MainWindow);
@@ -497,9 +578,15 @@ public:
         Map->setTitle(QApplication::translate("MainWindow", "Map", nullptr));
         Log->setTitle(QApplication::translate("MainWindow", "Log", nullptr));
         groupInfo->setTitle(QApplication::translate("MainWindow", "Info", nullptr));
+        label_10->setText(QApplication::translate("MainWindow", "\345\234\260\345\233\276\344\277\241\346\201\257\346\224\257\346\214\201\357\274\232\347\231\276\345\272\246\345\234\260\345\233\276", nullptr));
+        label_11->setText(QApplication::translate("MainWindow", "All rights reserved. Big Data and Smart Computing Lab of CQU.", nullptr));
         label->setText(QApplication::translate("MainWindow", "\351\207\215\345\272\206\345\244\247\345\255\246BDSC\345\256\236\351\252\214\345\256\244\350\275\246\350\276\206\347\242\260\346\222\236\351\242\204\350\255\246\347\263\273\347\273\237", nullptr));
         label_2->setText(QApplication::translate("MainWindow", "2018-7-18 \347\211\210\346\234\254\357\274\2321.0", nullptr));
         label_logo->setText(QApplication::translate("MainWindow", "TextLabel", nullptr));
+        groupBox->setTitle(QApplication::translate("MainWindow", "RSU \344\275\215\347\275\256\344\277\241\346\201\257\350\256\276\345\256\232", nullptr));
+        label_8->setText(QApplication::translate("MainWindow", "\347\273\217\345\272\246\357\274\232", nullptr));
+        label_9->setText(QApplication::translate("MainWindow", "\347\272\254\345\272\246\357\274\232", nullptr));
+        pushButton->setText(QApplication::translate("MainWindow", "\347\241\256\350\256\244", nullptr));
     } // retranslateUi
 
 };
