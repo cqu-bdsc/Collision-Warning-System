@@ -9,7 +9,7 @@ public class Message implements Serializable {
     public static int ERROR_VALUE = -666;
     private int id;
     private long timeStamp;
-    private double speed;
+    private float speed;
     private float direction;
     private double lat;
     private double lon;
@@ -49,11 +49,11 @@ public class Message implements Serializable {
         return direction;
     }
 
-    public void setSpeed(double speed) {
+    public void setSpeed(float speed) {
         this.speed = speed;
     }
 
-    public double getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 

@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private InfoThread infoThread;
 
     public LocationClient mLocationClient = null;
