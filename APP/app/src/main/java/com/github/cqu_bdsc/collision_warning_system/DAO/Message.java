@@ -1,4 +1,4 @@
-package com.github.cqu_bdsc.collision_warning_system.udp;
+package com.github.cqu_bdsc.collision_warning_system.DAO;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,22 +6,23 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-    int id;
-    int timeStamp;
-    double speed;
-    int direction;
-    double lat;
-    double lon;
-    double ace;
+    public static int ERROR_VALUE = -666;
+    private int id;
+    private long timeStamp;
+    private double speed;
+    private float direction;
+    private double lat;
+    private double lon;
+    private double ace;
 
    public   Message(){
-        id = 0;
-        timeStamp = 0;
-        speed = 0;
-        direction = 0;
-        lat = 0;
-        lon = 0;
-        ace = 0;
+        id = ERROR_VALUE;
+        timeStamp = ERROR_VALUE;
+        speed = ERROR_VALUE;
+        direction = ERROR_VALUE;
+        lat = ERROR_VALUE;
+        lon = ERROR_VALUE;
+        ace = ERROR_VALUE;
     }
 
     public void setId(int id) {
@@ -32,19 +33,19 @@ public class Message implements Serializable {
         return id;
     }
 
-    public void setTimeStamp(int timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 
-    public int getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setDirection(int direction) {
+    public void setDirection(float direction) {
         this.direction = direction;
     }
 
-    public int getDirection() {
+    public float getDirection() {
         return direction;
     }
 
@@ -96,7 +97,5 @@ public class Message implements Serializable {
             e.printStackTrace();
             return null;
         }
-
-
     }
 }

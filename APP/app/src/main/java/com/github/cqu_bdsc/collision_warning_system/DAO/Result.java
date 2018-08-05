@@ -1,4 +1,4 @@
-package com.github.cqu_bdsc.collision_warning_system.udp;
+package com.github.cqu_bdsc.collision_warning_system.DAO;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +11,7 @@ public class Result implements Serializable {
     private double distance;
     private  boolean warning;
 
-    Result(){
+    public Result(){
         id = 0;
         time = 0;
         distance = 0;
