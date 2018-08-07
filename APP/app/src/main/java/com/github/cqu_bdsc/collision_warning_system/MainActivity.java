@@ -30,11 +30,13 @@ public class MainActivity extends AppCompatActivity {
 
     private InfoThread infoThread;
 
+
     public LocationClient mLocationClient = null;
     private MyLocationListener myListener = new MyLocationListener();
     //BDAbstractLocationListener为7.2版本新增的Abstract类型的监听接口
     //原有BDLocationListener接口暂时同步保留。具体介绍请参考后文中的说明
 
+    public  static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
     private static final String SERVER_IP = "192.168.1.80";
     private static final String SERVER_PORT = "4040";
 
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(ReceiveThread.ACTION_STRING);
         intentFilter.addAction(ReceiveThread.ACTION_JSON);
         intentFilter.addAction(InfoThread.ACTION_INFORMATION);
+        intentFilter.addAction(MainActivity.ACTION_SEND_MESSAGE);
 
 
         etIp        = (EditText) findViewById(R.id.et_ipAdd);
@@ -143,30 +146,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {//只要一点发送，就有数据的录入，获取，转换，以及数据json格式的转化过程
 
-                String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
-                String timeStamp = et_timeStamp.getEditableText().toString();
-                String speed = et_speed.getEditableText().toString();
-                String direction = et_direction.getEditableText().toString();
-                String lat = et_lat.getEditableText().toString();
-                String lon = et_lon.getEditableText().toString();
-                String ace = et_ace.getEditableText().toString();
-
-                Message message = new Message();
-                message.setId(Integer.valueOf(id));//将上面得到的字符串类型的数据转化为具体相对应的类型
-                message.setTimeStamp(Integer.valueOf(timeStamp));
-                message.setSpeed(Double.valueOf(speed));
-                message.setDirection(Integer.valueOf(direction));
-                message.setLat(Double.valueOf(lat));
-                message.setLon(Double.valueOf(lon));
-                message.setAce(Double.valueOf(ace));
-//现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
-
-                Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
-                intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
-                intent.putExtra(SendService.EXTRAS_HOST,getServer_Add());//将执行服务活动的限制，IP地址，端口号，还有
-                intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
-                intent.putExtra(SendService.EXTRAS_JSON,message);
-                startService(intent);//现在真正执行服务
+              sendMessage();
 
             }
         });
@@ -366,11 +346,50 @@ public class MainActivity extends AppCompatActivity {
                     if (intentMessage.getTimeStamp() != Message.ERROR_VALUE){
                         et_timeStamp.setText(String.valueOf(intentMessage.getTimeStamp()));
                     }
+                    sendMessage();
+                    break;
+                case MainActivity.ACTION_SEND_MESSAGE:
+
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    private void sendMessage(){
+        String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
+        String timeStamp = et_timeStamp.getEditableText().toString();
+        String speed = et_speed.getEditableText().toString();
+        String direction = et_direction.getEditableText().toString();
+        String lat = et_lat.getEditableText().toString();
+        String lon = et_lon.getEditableText().toString();
+        String ace = et_ace.getEditableText().toString();
+
+        Message message = new Message();
+        message.setId(Integer.valueOf(id));//将上面得到的字符串类型的数据转化为具体相对应的类型
+        message.setTimeStamp(Long.valueOf(timeStamp));
+        if (!speed.equals("")){
+            message.setSpeed(Float.valueOf(speed));
+        }
+        message.setDirection(Float.valueOf(direction));
+        if (!lat.equals("")){
+            message.setLat(Double.valueOf(lat));
+        }
+        if (!lon.equals("")){
+            message.setLon(Double.valueOf(lon));
+        }
+        if (!ace.equals("")){
+            message.setAce(Double.valueOf(ace));
+        }
+//现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+
+        Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
+        intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
+        intent.putExtra(SendService.EXTRAS_HOST,getServer_Add());//将执行服务活动的限制，IP地址，端口号，还有
+        intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
+        intent.putExtra(SendService.EXTRAS_JSON,message);
+        startService(intent);//现在真正执行服务
     }
 
 }

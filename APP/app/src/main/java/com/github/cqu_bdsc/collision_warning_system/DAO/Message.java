@@ -85,13 +85,13 @@ public class Message implements Serializable {
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", getId());
-            jsonObject.put("timeStamp",getTimeStamp());
-            jsonObject.put("speed",getSpeed());
-            jsonObject.put("direction",getDirection());
-            jsonObject.put("lat",getLat());
-            jsonObject.put("lon",getLon());
-            jsonObject.put("acc",getAce());
+            jsonObject.put("id", String.valueOf(getId()));
+            jsonObject.put("timeStamp",String.valueOf(getTimeStamp()));
+            jsonObject.put("speed",String.valueOf(getSpeed()));
+            jsonObject.put("direction",String.valueOf(getDirection()));
+            jsonObject.put("lat",String.valueOf(getLat()));
+            jsonObject.put("lon",String.valueOf(getLon()));
+            jsonObject.put("acc",String.valueOf(getAce()));
             return jsonObject;
         } catch (JSONException e) {
             e.printStackTrace();
