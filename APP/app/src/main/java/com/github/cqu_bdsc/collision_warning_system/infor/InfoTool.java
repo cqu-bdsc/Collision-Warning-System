@@ -32,6 +32,8 @@ import java.util.TimeZone;
 public class InfoTool {
     public static final String TAG = "InfoTool";
 
+    private int i = 0;
+
     private Message message;
     private WifiManager wifiManager;
     private SensorManager sensorManager;
@@ -91,7 +93,22 @@ public class InfoTool {
          * 获取信息
          * 并通知Activity 进行显示
          */
-        getMac();                           //获得MAC地址
+        //getMac();                           //获得MAC地址
+
+
+        if (i % 2 == 0){
+            message.setId(1);
+            message.setLat(29.5699345275);
+            message.setLon(106.4775258188);
+            message.setSpeed(5);
+        } else {
+            message.setId(2);
+            message.setLat(29.5695192528);
+            message.setLon(106.4748865251);
+            message.setSpeed(5);
+        }
+        i ++;
+
         getTimeNow();                       //获得时间
         calculateOrientation();             //获得方向
         return message;

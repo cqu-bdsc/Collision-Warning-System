@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private InfoThread infoThread;
@@ -211,9 +212,11 @@ public class MainActivity extends AppCompatActivity {
         //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
         //更多LocationClientOption的配置，请参照类参考中LocationClientOption类的详细说明
 
+        /*********************
         mLocationClient.start();
         //mLocationClient为第二步初始化过的LocationClient对象
         //调用LocationClient的start()方法，便可发起定位请求
+         ***********************/
 
         infoThread = new InfoThread(MainActivity.this);
         infoThread.start();
