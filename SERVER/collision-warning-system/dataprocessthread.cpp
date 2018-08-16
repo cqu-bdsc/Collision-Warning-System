@@ -2,11 +2,7 @@
 
 DataProcessThread::DataProcessThread(const QJsonObject &rsulocation)
 {
-//    queueVehicleOne = new QQueue<QJsonObject>();
-//    queueVehicleTwo = new QQueue<QJsonObject>();
-    this->rsuLocation = rsulocation;
-    idOne = 0;
-    idTwo = 0;
+    this->setRsuLocation(rsulocation);
 }
 
 DataProcessThread::~DataProcessThread(){
@@ -30,6 +26,20 @@ void DataProcessThread::run(){
     this->exec();
 }
 
+/**
+ * 设置RSU的位置
+ * @brief DataProcessThread::setRsuLocation
+ * @param rsuLocation
+ */
+void DataProcessThread::setRsuLocation(const QJsonObject &rsuLocation){
+    if (this->isRunning()){  //正在运行
+        this->exit();
+        this->rsuLocation = rsuLocation;
+        this->run();   //重新运行
+    } else{
+        this->rsuLocation = rsuLocation;
+    }
+}
 
 /**
  * 向队列中添加Message
@@ -39,35 +49,54 @@ void DataProcessThread::run(){
  */
 bool DataProcessThread::addMessage(const QJsonObject &message){
     bool isSuccess = true;
+    int flag = 0;
     int sizeOne = queueVehicleOne.size();
     int sizeTwo = queueVehicleTwo.size();
-    int idMessage = message.find("id").value().toInt();
+    int idMessage = message.find("id").value().toString().toInt();
+    double lon = message.find("lon").value().toString().toDouble();
+    double lat = message.find("lat").value().toString().toDouble();
+    emit newLogInfo("idMessage:");
+    emit newLogInfo(QString::number(idMessage));
     if(0 == sizeOne && 0 == sizeTwo){    //两个队列均为空
-        idOne = idMessage;
         queueVehicleOne.enqueue(message); //在队尾添加一个元素
+        emit newVehicleOne(lon, lat);
+        flag = 11;
     } else if(0 != sizeOne && 0 == sizeTwo){  //第二个队列为空
-        if(idMessage != idOne){
-            idTwo = idMessage;
-            queueVehicleTwo.enqueue(message);
-        }else{
+        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){
             queueVehicleOne.enqueue(message);
+            emit newVehicleOne(lon, lat);
+            flag = 21;
+        }else{
+            queueVehicleTwo.enqueue(message);
+            emit newVehicleTwo(lon, lat);
+            flag = 22;
         }
     } else if(0 != sizeTwo && 0 == sizeOne){   //第一个队列为空
-        if(idMessage != idTwo){
-            idOne = idMessage;
+        if(idMessage != queueVehicleTwo.head().find("id").value().toString().toInt()){
             queueVehicleOne.enqueue(message);
+            emit newVehicleOne(lon, lat);
+            flag = 31;
         }else{
             queueVehicleTwo.enqueue(message);
+            emit newVehicleTwo(lon, lat);
+            flag = 32;
         }
     } else{                                  //两个队列均不为空
-        if(idMessage == idOne){
+        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){
             queueVehicleOne.enqueue(message);
-        } else if(idMessage == idTwo){
+            emit newVehicleOne(lon, lat);
+            flag = 41;
+        } else if(idMessage == queueVehicleTwo.head().find("id").value().toString().toInt()){
             queueVehicleTwo.enqueue(message);
+            emit newVehicleTwo(lon, lat);
+            flag = 42;
         } else{
             isSuccess = false;
+            flag = 666;
         }
     }
+    emit newLogInfo("flag：");
+    emit newLogInfo(QString::number(flag));
     return isSuccess;
 }
 
@@ -77,18 +106,19 @@ bool DataProcessThread::addMessage(const QJsonObject &message){
  * @return
  */
 QList<QJsonObject> DataProcessThread::isComputed(){
-    QList<QJsonObject> list;
+    QList<QJsonObject> jsonArray;
     int sizeOne = queueVehicleOne.size();
     int sizeTwo = queueVehicleTwo.size();
     if(sizeOne >= 2 && sizeTwo >= 2){
+        emit newLogInfo("队列各出队两个");
         //车辆一的队列出队两个
-        list.append(queueVehicleOne.dequeue());
-        list.append(queueVehicleOne.dequeue());
+        jsonArray.append(queueVehicleOne.dequeue());
+        jsonArray.append(queueVehicleOne.dequeue());
         //车辆二的队列出队两个
-        list.append(queueVehicleTwo.dequeue());
-        list.append(queueVehicleTwo.dequeue());
+        jsonArray.append(queueVehicleTwo.dequeue());
+        jsonArray.append(queueVehicleTwo.dequeue());
     }
-    return list;
+    return jsonArray;
 }
 
 QList<QList<double>> Trajectory(double t, double v, double a, double rlat, double rlon, double vlat, double vlon){
@@ -123,37 +153,36 @@ QList<QList<double>> Trajectory(double t, double v, double a, double rlat, doubl
  * @brief DataProcessThread::ComputerResult
  * @param list
  */
-void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
-    QList<QJsonObject> result;
+void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
     QJsonObject RVehicleOne,RVehicleTwo;
-    QList<QList<double>> tra1,tra2;
+   // QList<QList<double>> tra1,tra2;
     //提取两辆车的id
-    int id1=list.at(0).find("id").value().toString().toInt();
-    int id2=list.at(2).find("id").value().toString().toInt();
+    int id1=fourMessages.at(0).find("id").value().toString().toInt();
+    int id2=fourMessages.at(2).find("id").value().toString().toInt();
 
     //提取两辆车的速度
-    float v11=list.at(0).find("speed").value().toString().toFloat();
-    float v12=list.at(1).find("speed").value().toString().toFloat();
-    float v21=list.at(2).find("speed").value().toString().toFloat();
-    float v22=list.at(3).find("speed").value().toString().toFloat();
+    float v11=fourMessages.at(0).find("speed").value().toString().toFloat();
+    float v12=fourMessages.at(1).find("speed").value().toString().toFloat();
+    float v21=fourMessages.at(2).find("speed").value().toString().toFloat();
+    float v22=fourMessages.at(3).find("speed").value().toString().toFloat();
     //求两辆车的平均速度
     float v1=(v11+v12)/2;
     float v2=(v21+v22)/2;
 
     //提取两辆车的加速度
-    double acc11=list.at(0).find("acc").value().toString().toDouble();
-    double acc12=list.at(1).find("acc").value().toString().toDouble();
-    double acc21=list.at(2).find("acc").value().toString().toDouble();
-    double acc22=list.at(3).find("acc").value().toString().toDouble();
+    double acc11=fourMessages.at(0).find("acc").value().toString().toDouble();
+    double acc12=fourMessages.at(1).find("acc").value().toString().toDouble();
+    double acc21=fourMessages.at(2).find("acc").value().toString().toDouble();
+    double acc22=fourMessages.at(3).find("acc").value().toString().toDouble();
     //求两辆车的平均加速度
     double acc1=(acc11+acc12)/2;
     double acc2=(acc21+acc22)/2;
 
     //提取两辆车的lat
-    double lat11=list.at(0).find("lat").value().toString().toDouble();
-    double lat12=list.at(1).find("lat").value().toString().toDouble();
-    double lat21=list.at(2).find("lat").value().toString().toDouble();
-    double lat22=list.at(3).find("lat").value().toString().toDouble();
+    double lat11=fourMessages.at(0).find("lat").value().toString().toDouble();
+    double lat12=fourMessages.at(1).find("lat").value().toString().toDouble();
+    double lat21=fourMessages.at(2).find("lat").value().toString().toDouble();
+    double lat22=fourMessages.at(3).find("lat").value().toString().toDouble();
     //求两辆车的平均lat（NTU)
     double lat1=(lat11+lat12)/2;
     double lat1_NTU=lat1*100000;
@@ -161,10 +190,10 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     double lat2_NTU=lat2*100000;
 
     //提取两辆车的lon
-    double lon11=list.at(0).find("lon").value().toString().toDouble();
-    double lon12=list.at(1).find("lon").value().toString().toDouble();
-    double lon21=list.at(2).find("lon").value().toString().toDouble();
-    double lon22=list.at(3).find("lon").value().toString().toDouble();
+    double lon11=fourMessages.at(0).find("lon").value().toString().toDouble();
+    double lon12=fourMessages.at(1).find("lon").value().toString().toDouble();
+    double lon21=fourMessages.at(2).find("lon").value().toString().toDouble();
+    double lon22=fourMessages.at(3).find("lon").value().toString().toDouble();
     //求两辆车的平均lon（NTU)
     double lon1=(lon11+lon12)/2;
     double lon1_NTU=lon1*100000;
@@ -172,11 +201,11 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     double lon2_NTU=lon2*100000;
 
     //提取RSU的lat(NTU)
-    double Rlat=list.at(4).find("lat").value().toString().toDouble();
+    double Rlat=this->rsuLocation.find("lat").value().toString().toDouble();
     double Rlat_NTU=Rlat*100000;
 
     //提取RSU的lon(NTU)
-    double Rlon=list.at(4).find("lon").value().toString().toDouble();
+    double Rlon=this->rsuLocation.find("lon").value().toString().toDouble();
     double Rlon_NTU=Rlon*100000;
 
     //求两车与路口的距离
@@ -193,7 +222,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
         RVehicleOne.insert("time",t1);
         RVehicleOne.insert("distance",dist1);
         //求车1的碰撞轨迹
-        tra1=Trajectory(UNITTIME,v1,acc1,Rlat,Rlon,lat1,lon1);
+        //tra1=Trajectory(UNITTIME,v1,acc1,Rlat,Rlon,lat1,lon1);
         //RVehicleOne.insert("trajectory",tra1);  //轨迹insert不进去
 
         RVehicleTwo.insert("id",id2);
@@ -201,7 +230,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
         RVehicleTwo.insert("time",t2);
         RVehicleTwo.insert("distance",dist2);
         //求碰撞轨迹
-        tra2=Trajectory(UNITTIME,v2,acc2,Rlat,Rlon,lat2,lon2);
+        //tra2=Trajectory(UNITTIME,v2,acc2,Rlat,Rlon,lat2,lon2);
         //RVehicleTwo.insert("trajectory",tra2);  //轨迹insert不进去
     }else{//安全
         RVehicleOne.insert("id",id1);
@@ -217,15 +246,15 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
     emit sendResult(RVehicleOne);
    // emit sendResult(RVehicleTwo);
 
-    result.append(RVehicleOne);
-    result.append(RVehicleTwo);
-
 }
 
 void DataProcessThread::timeOutSlot(){
-    QList<QJsonObject> list = isComputed();
-    if(0 != list.size()){
-        ComputerResult(list);
+    QList<QJsonObject> jsonArray = isComputed();
+    QString message = "队列中的个数：";
+    message.append(QString::number(jsonArray.size()));
+    emit newLogInfo(message);
+    if(4 == jsonArray.size()){
+        emit newComputable(jsonArray);
     }
 }
 

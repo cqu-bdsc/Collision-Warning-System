@@ -7,6 +7,7 @@
 #include <QNetworkInterface>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QDateTime>
 #include "myudp.h"
 #include "dataprocessthread.h"
 
@@ -63,18 +64,16 @@ private slots:
 //    void setCarOneFutureTrace();
 //    void setCarTwoFutureTrace();
 
-
+    void showLog(const QString &logInfo);
     void on_pushButton_clicked();
 
 signals:
-
+    void newMessage(const QJsonObject &message);            //有新的信息，添加到队列中
+    void newLogInfo(const QString &logInfo);            //发送一些调试信息
 
 private:
     Ui::MainWindow *ui;
     //对UI进行初始化，主要对IP地址等进行约束
-
-    double rsuLon;    //RSU经度
-    double rsuLat;    //RSU纬度
 
     QAxObject * document;
     QAxObject * parentWindow;
@@ -85,6 +84,7 @@ private:
     bool setupConnection();
     //获取本地IP地址
     void findLocalIP();
+
 
     QList<QNetworkInterface> interfaceList; //保存网卡接口的链表
 

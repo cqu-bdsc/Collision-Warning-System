@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
     connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
 
+    connect(this, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -35,7 +36,7 @@ void MainWindow::initUI(){
     ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
     ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
     ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
-    QString webstr=QString("file:///C:/MapDownload/baidumaps/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    QString webstr=QString("file:///D:/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
     ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
 
     //加载LOGO
@@ -190,26 +191,24 @@ void MainWindow::onUdpStopButtonClicked(){
  */
 void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &message){
 
-    int    id           = message.find("id").value().toString().toInt();
-    long long   timeStamp    = message.find("timeStamp").value().toString().toLongLong();
-    float    direction    = message.find("direction").value().toString().toDouble();
-    double    lat          = message.find("lat").value().toString().toDouble();
-    double    lon          = message.find("lon").value().toString().toDouble();
-    float    speed        = message.find("speed").value().toString().toFloat();
-    double    acc          = message.find("acc").value().toString().toDouble();
+    int         id               = message.find("id").value().toString().toInt();
+    long long   timeStamp        = message.find("timeStamp").value().toString().toLongLong();
+    float       direction        = message.find("direction").value().toString().toDouble();
+    double      lat              = message.find("lat").value().toString().toDouble();
+    double      lon              = message.find("lon").value().toString().toDouble();
+    float       speed            = message.find("speed").value().toString().toFloat();
+    double      acc              = message.find("acc").value().toString().toDouble();
 
     ui->label_from->setText(from);
     ui->label_id->setText(QString::number(id));
     ui->label_timeStamp->setText(QString::number(timeStamp));
-    ui->label_speed->setText(QString::number(speed));
+    ui->label_speed->setText(QString::number(speed,10,10));
     ui->label_direction->setText(QString::number(direction));
-    ui->label_Lat->setText(QString::number(lat));
-    ui->label_lon->setText(QString::number(lon));
-    ui->label_acc->setText(QString::number(acc));
+    ui->label_Lat->setText(QString::number(lat,10,10));
+    ui->label_lon->setText(QString::number(lon,10,10));
+    ui->label_acc->setText(QString::number(acc,10,10));
 
-    if (processThread != nullptr){
-        processThread->addMessage(message);
-    }
+    emit newMessage(message);
 
 }
 
@@ -260,8 +259,10 @@ void MainWindow::onUdpSendMessage(){
  * @param result
  */
 void MainWindow::onSendMessageq(const QJsonObject &result){
-    udpTargetAddr.setAddress(ui->editSendIP->text());
-    udpTargetPort = ui->editSendPort->text().toInt();
+//    udpTargetAddr.setAddress(ui->editSendIP->text());
+//    udpTargetPort = ui->editSendPort->text().toInt();
+    udpTargetAddr.setAddress("192.168.0.2");
+    udpTargetPort = 4040;
     myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 }
 
@@ -271,8 +272,6 @@ void MainWindow::onSendMessageq(const QJsonObject &result){
  * **************************************/
 
 void MainWindow::setRsu(const double &rsuLon, const double &rsuLat){
-    this->rsuLon = rsuLon;
-    this->rsuLat = rsuLat;
     document = this->ui->axWidget->querySubObject("Document");
     parentWindow = document->querySubObject("parentWindow");
     QString js = "shwoMap(new BMap.Point(";
@@ -291,18 +290,37 @@ void MainWindow::setRsu(const double &rsuLon, const double &rsuLat){
     if(processThread == nullptr){
         processThread = new DataProcessThread(rsuLocation);
         processThread->start();
-       // connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(onSendMessage(QJsonObject)));
+        emit newLogInfo("processThread is started.");
+        connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
+        connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(ComputerResult(QList<QJsonObject>)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
+        connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
+        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
     }
 
 }
 
 void MainWindow::setCarOneNowPosition(const double &lon, const double &lat){
+    QString demand = "addGreendPoint(";
+    demand.append("new BMap.Point(");
+    demand.append(QString::number(lon));
+    demand.append(", ");
+    demand.append(QString::number(lat));
+    demand.append("))");
+    parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
 
 }
 
 void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
-
+    QString demand = "addBulePoint(";
+    demand.append("new BMap.Point(");
+    demand.append(QString::number(lon));
+    demand.append(", ");
+    demand.append(QString::number(lat));
+    demand.append("))");
+    parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
 }
 
 void MainWindow::on_pushButton_clicked(){
@@ -316,18 +334,12 @@ void MainWindow::showResult(const QJsonObject &result){
     ui->editDistance->setText(QString::number(result.find("distance").value().toDouble()));
     ui->editTime->setText(QString::number(result.find("time").value().toDouble()));
     ui->editWarning->setText(QString::number(result.find("warning").value().toBool()));
-//    if(result.find("id").value().toInt() != nullptr){
-//        ui->editID->setText(result.find("id").value());
-//    }
-//    if (result.find("distance").value().toDouble() != nullptr){
-//        ui->editDistance->setText(result.find("distance").value().toDouble());
-//    }
-//    if (result.find("time").value().toDouble() != nullptr){
-//        ui->editTime->setText(result.find("time").value().toDouble());
-//    }
-//    if (result.find("warning").value().toBool() != nullptr){
-//        ui->editWarning->setText(result.find("warning").value().toBool());
-//    }
+}
 
-
+void MainWindow::showLog(const QString &logInfo){
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString message = currentDateTime.toString();
+    message.append("  ");
+    message.append(logInfo);
+    ui->textLog->append(message);
 }
