@@ -1,9 +1,10 @@
 #include <dataprocessthread.h>
 
-DataProcessThread::DataProcessThread()
+DataProcessThread::DataProcessThread(const QJsonObject &rsulocation)
 {
 //    queueVehicleOne = new QQueue<QJsonObject>();
 //    queueVehicleTwo = new QQueue<QJsonObject>();
+    this->rsuLocation = rsulocation;
     idOne = 0;
     idTwo = 0;
 }
@@ -123,67 +124,60 @@ QList<QList<double>> Trajectory(double t, double v, double a, double rlat, doubl
  * @param list
  */
 void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
-<<<<<<< HEAD
-    QJsonObject result;
-    int id1 = list.at(0).find("id").value().toInt();
-
-    result.insert("id",id1);
-
-=======
     QList<QJsonObject> result;
     QJsonObject RVehicleOne,RVehicleTwo;
     QList<QList<double>> tra1,tra2;
     //提取两辆车的id
-    int id1=list.at(0).find("id").value().toInt();
-    int id2=list.at(2).find("id").value().toInt();
+    int id1=list.at(0).find("id").value().toString().toInt();
+    int id2=list.at(2).find("id").value().toString().toInt();
 
     //提取两辆车的速度
-    int v11=list.at(0).find("speed").value().toDouble();
-    int v12=list.at(1).find("speed").value().toDouble();
-    int v21=list.at(2).find("speed").value().toDouble();
-    int v22=list.at(3).find("speed").value().toDouble();
+    float v11=list.at(0).find("speed").value().toString().toFloat();
+    float v12=list.at(1).find("speed").value().toString().toFloat();
+    float v21=list.at(2).find("speed").value().toString().toFloat();
+    float v22=list.at(3).find("speed").value().toString().toFloat();
     //求两辆车的平均速度
-    int v1=(v11+v12)/2;
-    int v2=(v21+v22)/2;
+    float v1=(v11+v12)/2;
+    float v2=(v21+v22)/2;
 
     //提取两辆车的加速度
-    int acc11=list.at(0).find("acc").value().toDouble();
-    int acc12=list.at(1).find("acc").value().toDouble();
-    int acc21=list.at(2).find("acc").value().toDouble();
-    int acc22=list.at(3).find("acc").value().toDouble();
+    double acc11=list.at(0).find("acc").value().toString().toDouble();
+    double acc12=list.at(1).find("acc").value().toString().toDouble();
+    double acc21=list.at(2).find("acc").value().toString().toDouble();
+    double acc22=list.at(3).find("acc").value().toString().toDouble();
     //求两辆车的平均加速度
-    int acc1=(acc11+acc12)/2;
-    int acc2=(acc21+acc22)/2;
+    double acc1=(acc11+acc12)/2;
+    double acc2=(acc21+acc22)/2;
 
     //提取两辆车的lat
-    int lat11=list.at(0).find("lat").value().toDouble();
-    int lat12=list.at(1).find("lat").value().toDouble();
-    int lat21=list.at(2).find("lat").value().toDouble();
-    int lat22=list.at(3).find("lat").value().toDouble();
+    double lat11=list.at(0).find("lat").value().toString().toDouble();
+    double lat12=list.at(1).find("lat").value().toString().toDouble();
+    double lat21=list.at(2).find("lat").value().toString().toDouble();
+    double lat22=list.at(3).find("lat").value().toString().toDouble();
     //求两辆车的平均lat（NTU)
-    int lat1=(lat11+lat12)/2;
-    int lat1_NTU=lat1*100000;
-    int lat2=(lat21+lat22)/2;
-    int lat2_NTU=lat2*100000;
+    double lat1=(lat11+lat12)/2;
+    double lat1_NTU=lat1*100000;
+    double lat2=(lat21+lat22)/2;
+    double lat2_NTU=lat2*100000;
 
     //提取两辆车的lon
-    int lon11=list.at(0).find("lon").value().toDouble();
-    int lon12=list.at(1).find("lon").value().toDouble();
-    int lon21=list.at(2).find("lon").value().toDouble();
-    int lon22=list.at(3).find("lon").value().toDouble();
+    double lon11=list.at(0).find("lon").value().toString().toDouble();
+    double lon12=list.at(1).find("lon").value().toString().toDouble();
+    double lon21=list.at(2).find("lon").value().toString().toDouble();
+    double lon22=list.at(3).find("lon").value().toString().toDouble();
     //求两辆车的平均lon（NTU)
-    int lon1=(lon11+lon12)/2;
-    int lon1_NTU=lon1*100000;
-    int lon2=(lon21+lon22)/2;
-    int lon2_NTU=lon2*100000;
+    double lon1=(lon11+lon12)/2;
+    double lon1_NTU=lon1*100000;
+    double lon2=(lon21+lon22)/2;
+    double lon2_NTU=lon2*100000;
 
     //提取RSU的lat(NTU)
-    int Rlat=list.at(4).find("lat").value().toDouble();
-    int Rlat_NTU=Rlat*100000;
+    double Rlat=list.at(4).find("lat").value().toString().toDouble();
+    double Rlat_NTU=Rlat*100000;
 
     //提取RSU的lon(NTU)
-    int Rlon=list.at(4).find("lon").value().toDouble();
-    int Rlon_NTU=Rlon*100000;
+    double Rlon=list.at(4).find("lon").value().toString().toDouble();
+    double Rlon_NTU=Rlon*100000;
 
     //求两车与路口的距离
     double dist1=sqrt(pow(lat1_NTU-Rlat_NTU,2)+pow(lon1_NTU-Rlon_NTU,2));
@@ -219,9 +213,12 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &list){
         RVehicleTwo.insert("distance",dist2);
     }
    //将结果保存进result
+
+    emit sendResult(RVehicleOne);
+   // emit sendResult(RVehicleTwo);
+
     result.append(RVehicleOne);
     result.append(RVehicleTwo);
->>>>>>> a5c35911743cec149dd76012ed772dca5f218b0d
 
 }
 

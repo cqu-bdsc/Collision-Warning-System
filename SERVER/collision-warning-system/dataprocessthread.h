@@ -1,6 +1,5 @@
 #ifndef DATAPROCESSTHREAD_H
 #define DATAPROCESSTHREAD_H
-
 #include <QJsonObject>
 #include <QThread>
 #include <QTimer>
@@ -11,7 +10,7 @@ class DataProcessThread : public QThread
 {
     Q_OBJECT
 public:
-    DataProcessThread();
+    DataProcessThread(const QJsonObject &rsuLocation);
     ~DataProcessThread();
     /**
      * 是否可以开始计算
@@ -32,6 +31,8 @@ signals:
     void sendResult(const QJsonObject &result);
 
 private:
+    QJsonObject rsuLocation;
+
     QTimer * timer;
     QQueue<QJsonObject> queueVehicleOne;
     QQueue<QJsonObject> queueVehicleTwo;

@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <QAxObject>
 #include <QMainWindow>
 #include <QTextTable>
 #include <QScrollBar>
@@ -43,14 +43,42 @@ private slots:
 
     void on_NetInterface_currentIndexChanged(int index);
 
+    /*******************************
+     * 数据处理
+     *
+     * ****************************/
+    void showResult(const QJsonObject &result);
+
+
+    /***********************************
+     *
+     * QT与JS进行通信
+     * setRsu                       设置RSU的坐标位置信息
+     * setCarOneNowPosition         设置第一辆车当前位置，形成轨迹
+     * setCarTwoNowPosition         设置第二辆车当前位置，形成轨迹
+     * *********************************/
+    void setRsu(const double &rsuLon, const double &rsuLat);
+    void setCarOneNowPosition(const double &lon, const double &lat);
+    void setCarTwoNowPosition(const double &lon, const double &lat);
+//    void setCarOneFutureTrace();
+//    void setCarTwoFutureTrace();
+
+
+    void on_pushButton_clicked();
 
 signals:
 
 
 private:
     Ui::MainWindow *ui;
-
     //对UI进行初始化，主要对IP地址等进行约束
+
+    double rsuLon;    //RSU经度
+    double rsuLat;    //RSU纬度
+
+    QAxObject * document;
+    QAxObject * parentWindow;
+
     void initUI();
 
     //初始化Socket的连接性

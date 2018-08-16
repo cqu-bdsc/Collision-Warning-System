@@ -19,12 +19,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
     connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
 
-    if(processThread == nullptr){
-        processThread = new DataProcessThread();
-        processThread->start();
-        connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(onSendMessage(QJsonObject)));
-    }
-
 }
 
 MainWindow::~MainWindow()
@@ -37,6 +31,13 @@ MainWindow::~MainWindow()
  **************************************************/
 
 void MainWindow::initUI(){
+    //加载网页
+    ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
+    ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
+    ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
+    QString webstr=QString("file:///C:/MapDownload/baidumaps/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
+
     //加载LOGO
     QString logoPath = ":/image/logo.png";
     QPixmap logo(logoPath);
@@ -57,6 +58,7 @@ void MainWindow::initUI(){
      * @brief findLocalIP
      */
     findLocalIP();
+
 }
 
 
@@ -138,7 +140,7 @@ void MainWindow::on_but_start_clicked()
                             + localAddr.toString()+ ":"+ QString::number(udpListenPort));
         //重新绑定槽函数
         connect(ui->but_start, SIGNAL(clicked()),this,SLOT(onUdpStopButtonClicked()));
-        ui->but_start->setText("停止");
+        ui->but_start->setText("Stop");
 
         //绑定接收到消息的槽函数
         connect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
@@ -171,12 +173,10 @@ bool MainWindow::setupConnection(){
  */
 void MainWindow::onUdpStopButtonClicked(){
     disconnect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
-
-    ui->textLog->append(messageUDP + "Stoped.");
+    ui->textLog->append(messageUDP+ "Stoped.");
     //解除槽函数绑定
     disconnect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
-
-    ui->but_start->setText("开始");
+    ui->but_start->setText("Start");
     myudp->unbindPort();
     //重新绑定槽函数
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
@@ -190,13 +190,13 @@ void MainWindow::onUdpStopButtonClicked(){
  */
 void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &message){
 
-    int    id           = message.find("id").value().toInt();
-    int    timeStamp    = message.find("timeStamp").value().toInt();
-    int    direction    = message.find("direction").value().toInt();
-    double    lat          = message.find("lat").value().toDouble();
-    double    lon          = message.find("lon").value().toDouble();
-    double    speed        = message.find("speed").value().toDouble();
-    double    acc          = message.find("acc").value().toDouble();
+    int    id           = message.find("id").value().toString().toInt();
+    long long   timeStamp    = message.find("timeStamp").value().toString().toLongLong();
+    float    direction    = message.find("direction").value().toString().toDouble();
+    double    lat          = message.find("lat").value().toString().toDouble();
+    double    lon          = message.find("lon").value().toString().toDouble();
+    float    speed        = message.find("speed").value().toString().toFloat();
+    double    acc          = message.find("acc").value().toString().toDouble();
 
     ui->label_from->setText(from);
     ui->label_id->setText(QString::number(id));
@@ -207,7 +207,9 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
     ui->label_lon->setText(QString::number(lon));
     ui->label_acc->setText(QString::number(acc));
 
-    processThread->addMessage(message);
+    if (processThread != nullptr){
+        processThread->addMessage(message);
+    }
 
 }
 
@@ -261,4 +263,71 @@ void MainWindow::onSendMessageq(const QJsonObject &result){
     udpTargetAddr.setAddress(ui->editSendIP->text());
     udpTargetPort = ui->editSendPort->text().toInt();
     myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+}
+
+/***************************************
+ * 显示地图UI界面
+ * QT与JS进行通信的模块
+ * **************************************/
+
+void MainWindow::setRsu(const double &rsuLon, const double &rsuLat){
+    this->rsuLon = rsuLon;
+    this->rsuLat = rsuLat;
+    document = this->ui->axWidget->querySubObject("Document");
+    parentWindow = document->querySubObject("parentWindow");
+    QString js = "shwoMap(new BMap.Point(";
+    js.append(QString::number(rsuLon));
+    js.append(",");
+    js.append(QString::number(rsuLat));
+    js.append(" ))");
+    parentWindow->dynamicCall("execScript(QString,QString)", js,"JavaScript");
+
+    /************
+     * 启动处理线程
+     * *********/
+    QJsonObject rsuLocation;
+    rsuLocation.insert("lon", QString::number(rsuLon));
+    rsuLocation.insert("lat", QString::number(rsuLat));
+    if(processThread == nullptr){
+        processThread = new DataProcessThread(rsuLocation);
+        processThread->start();
+       // connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(onSendMessage(QJsonObject)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
+    }
+
+}
+
+void MainWindow::setCarOneNowPosition(const double &lon, const double &lat){
+
+}
+
+void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
+
+}
+
+void MainWindow::on_pushButton_clicked(){
+    double rsuLon = ui->lonEdit->text().toDouble();
+    double rsuLat = ui->latEdit->text().toDouble();
+    setRsu(rsuLon, rsuLat);
+}
+
+void MainWindow::showResult(const QJsonObject &result){
+    ui->editID->setText(QString::number(result.find("id").value().toInt()));
+    ui->editDistance->setText(QString::number(result.find("distance").value().toDouble()));
+    ui->editTime->setText(QString::number(result.find("time").value().toDouble()));
+    ui->editWarning->setText(QString::number(result.find("warning").value().toBool()));
+//    if(result.find("id").value().toInt() != nullptr){
+//        ui->editID->setText(result.find("id").value());
+//    }
+//    if (result.find("distance").value().toDouble() != nullptr){
+//        ui->editDistance->setText(result.find("distance").value().toDouble());
+//    }
+//    if (result.find("time").value().toDouble() != nullptr){
+//        ui->editTime->setText(result.find("time").value().toDouble());
+//    }
+//    if (result.find("warning").value().toBool() != nullptr){
+//        ui->editWarning->setText(result.find("warning").value().toBool());
+//    }
+
+
 }
