@@ -14,6 +14,7 @@ public class Message implements Serializable {
     private double lat;
     private double lon;
     private double ace;
+    private String mac;
 
    public   Message(){
         id = ERROR_VALUE;
@@ -23,6 +24,7 @@ public class Message implements Serializable {
         lat = ERROR_VALUE;
         lon = ERROR_VALUE;
         ace = ERROR_VALUE;
+        mac = "666";
     }
 
     public void setId(int id) {
@@ -79,6 +81,14 @@ public class Message implements Serializable {
 
     public double getAce() {
         return ace;
+    }
+
+    public String getMac() {
+        return mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
     }
 
     public JSONObject toJSON(){

@@ -1,14 +1,23 @@
 package com.github.cqu_bdsc.collision_warning_system;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -37,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     //BDAbstractLocationListener为7.2版本新增的Abstract类型的监听接口
     //原有BDLocationListener接口暂时同步保留。具体介绍请参考后文中的说明
 
-    public  static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
+    public static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
     private static final String SERVER_IP = "192.168.1.80";
     private static final String SERVER_PORT = "4040";
 
@@ -46,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver broadcastReceiver = null;
     private final IntentFilter intentFilter = new IntentFilter();
     private Button      btnPing;//以下是可视化程序里面的常量
-    private Button        btnSend;
+    private Button      btnSend;
 
     private EditText    etIp;
     private TextView    tvPingResult;
@@ -55,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView    tv_time;
     private TextView    tv_distance;
     private TextView    tv_log;
+    private TextView    tv_mac;
 
     private EditText    et_id;
     private EditText    et_timeStamp;
@@ -63,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText    et_lat;
     private EditText    et_lon;
     private EditText    et_ace;
+
+    private ImageView   img_warning;
 
 
     @Override
@@ -112,6 +124,11 @@ public class MainActivity extends AppCompatActivity {
         tv_warning = (TextView) findViewById(R.id.tv_warning);
 
         tv_log = (TextView) findViewById(R.id.textLog);
+        tv_mac = (TextView) findViewById(R.id.tv_mac);
+
+        img_warning = (ImageView) findViewById(R.id.img_warning);
+        img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_safe));
+
 
         btnSend     = (Button)   findViewById(R.id.btn_send);
 
@@ -212,11 +229,10 @@ public class MainActivity extends AppCompatActivity {
         //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
         //更多LocationClientOption的配置，请参照类参考中LocationClientOption类的详细说明
 
-        /*********************
+
         mLocationClient.start();
         //mLocationClient为第二步初始化过的LocationClient对象
         //调用LocationClient的start()方法，便可发起定位请求
-         ***********************/
 
         infoThread = new InfoThread(MainActivity.this);
         infoThread.start();
@@ -281,9 +297,16 @@ public class MainActivity extends AppCompatActivity {
             //获取定位类型、定位错误返回码，具体信息可参照类参考中BDLocation类中的说明
 
             Message message = new Message();
+
             message.setLat(latitude);
             message.setLon(longitude);
             message.setSpeed(speed);
+
+            if (61 != errorCode){
+                message.setLat(29.5699345275);
+                message.setLon(106.4775258188);
+                message.setSpeed(1);
+            }
 
             Intent intent = new Intent();
             intent.setAction(InfoThread.ACTION_INFORMATION);//告诉android将要执行什么功能
@@ -315,10 +338,25 @@ public class MainActivity extends AppCompatActivity {
                 case ReceiveThread.ACTION_JSON:
                     Result result = (Result) Objects.requireNonNull(intent.getExtras()).get(ReceiveThread.JSON_CONTEXT);
                     if (result != null){
-                        tv_showid.setText(String.valueOf(result.getId()));
-                        tv_warning.setText(String.valueOf(result.isWarning()));
-                        tv_distance.setText(String.valueOf(result.getDistance()));
-                        tv_time.setText(String.valueOf(result.getTime()));
+
+                        if (String.valueOf(result.getId()).equals(et_id.getEditableText().toString())){
+                            tv_showid.setText(String.valueOf(result.getId()));
+                            tv_warning.setText(String.valueOf(result.isWarning()));
+                            tv_distance.setText(String.valueOf(result.getDistance()));
+                            tv_time.setText(String.valueOf(result.getTime()));
+
+                            if (result.isWarning()){
+                                getWarning();
+                            } else {
+                                getSafe();
+                            }
+                        } else {
+                            tv_showid.setText("0");
+                            tv_warning.setText("0");
+                            tv_distance.setText("0");
+                            tv_time.setText("0");
+                        }
+
                     } else {
                         tv_showid.setText("0");
                         tv_warning.setText("0");
@@ -348,6 +386,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (intentMessage.getTimeStamp() != Message.ERROR_VALUE){
                         et_timeStamp.setText(String.valueOf(intentMessage.getTimeStamp()));
+                    }
+                    if (!intentMessage.getMac().equals("666")){
+                        tv_mac.setText(intentMessage.getMac());
                     }
                     sendMessage();
                     break;
@@ -385,7 +426,7 @@ public class MainActivity extends AppCompatActivity {
         if (!ace.equals("")){
             message.setAce(Double.valueOf(ace));
         }
-//现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+        //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
 
         Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
         intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
@@ -393,6 +434,21 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
         intent.putExtra(SendService.EXTRAS_JSON,message);
         startService(intent);//现在真正执行服务
+    }
+
+    public void getWarning(){
+        img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_danger));
+
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Ringtone mRingtone = RingtoneManager.getRingtone(getApplicationContext(),uri);
+        mRingtone.play();
+
+        Vibrator vibrator=(Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
+        vibrator.vibrate(1000);//震动时长 ms
+    }
+
+    public void getSafe(){
+        img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_safe));
     }
 
 }

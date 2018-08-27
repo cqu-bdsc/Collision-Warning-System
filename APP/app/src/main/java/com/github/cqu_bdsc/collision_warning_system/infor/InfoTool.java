@@ -5,6 +5,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -22,17 +24,21 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.TimeZone;
 
 public class InfoTool {
     public static final String TAG = "InfoTool";
 
-    private int i = 0;
+  //  private int i = 0;
 
     private Message message;
     private WifiManager wifiManager;
@@ -45,7 +51,6 @@ public class InfoTool {
     /**
      * accelerometer    加速度传感器
      * magnetic_field   磁场传感器
-     *
      */
     private Sensor accelerometer;
     private Sensor magnetic_field;
@@ -83,31 +88,31 @@ public class InfoTool {
     /**
      * 注销服务
      */
-    public void uninit(){
+    public void uninit() {
         sensorManager.unregisterListener(new MySensorEventListener(InfoTool.this));
         resetInfor();
     }
 
-    public Message getInfo(){
+    public Message getInfo() {
         /**
          * 获取信息
          * 并通知Activity 进行显示
          */
-        //getMac();                           //获得MAC地址
+        getMac();                           //获得MAC地址
+        getIPAddress();
 
-
-        if (i % 2 == 0){
-            message.setId(1);
-            message.setLat(29.5699345275);
-            message.setLon(106.4775258188);
-            message.setSpeed(5);
-        } else {
-            message.setId(2);
-            message.setLat(29.5695192528);
-            message.setLon(106.4748865251);
-            message.setSpeed(5);
-        }
-        i ++;
+//        if (i % 2 == 0){
+//            message.setId(1);
+//            message.setLat(29.5699345275);
+//            message.setLon(106.4775258188);
+//            message.setSpeed(5);
+//        } else {
+//            message.setId(2);
+//            message.setLat(29.5695192528);
+//            message.setLon(106.4748865251);
+//            message.setSpeed(5);
+//        }
+//        i ++;
 
         getTimeNow();                       //获得时间
         calculateOrientation();             //获得方向
@@ -122,7 +127,7 @@ public class InfoTool {
      * 获取时间
      * 获取更精确时间，精确到毫秒
      */
-    private void getTimeNow(){
+    private void getTimeNow() {
         message.setTimeStamp(System.currentTimeMillis());
     }
 
@@ -132,6 +137,7 @@ public class InfoTool {
      * 90为正东
      * -90为正西
      * 180或-180为正南
+     *
      * @return
      */
     private boolean calculateOrientation() {
@@ -147,10 +153,11 @@ public class InfoTool {
     }
 
     private class MySensorEventListener implements SensorEventListener {
-        private float gravity[] = {0,0,0};
-        private float linear_acceleration[] = {0,0,0};
+        private float gravity[] = {0, 0, 0};
+        private float linear_acceleration[] = {0, 0, 0};
         private InfoTool infoTool;
-        public MySensorEventListener(InfoTool infoTool){
+
+        public MySensorEventListener(InfoTool infoTool) {
             this.infoTool = infoTool;
         }
 
@@ -190,33 +197,34 @@ public class InfoTool {
     /**
      * 获取MAC地址，并根据MAC地址的哈希值获得设备号
      */
-    private void getMac(){
+    private void getMac() {
         String macAddress = null;
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         if (wifiInfo != null &&
-                marshmallowMacAddress.equals(wifiInfo.getMacAddress())){
+                marshmallowMacAddress.equals(wifiInfo.getMacAddress())) {
             try {
                 macAddress = getAdressMacByInterface();
-                if (macAddress != null){
+                if (macAddress != null) {
 
-                }else {
+                } else {
                     macAddress = getAddressMacByFile(wifiManager);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        }else {
-            if (wifiInfo != null && wifiInfo.getMacAddress() != null){
+        } else {
+            if (wifiInfo != null && wifiInfo.getMacAddress() != null) {
                 macAddress = wifiInfo.getMacAddress();
-            }else {
+            } else {
                 macAddress = marshmallowMacAddress;
             }
         }
         int deviceNo = macAddress.hashCode();
+        message.setMac(macAddress);
         message.setId(deviceNo);
     }
 
-    private static String getAdressMacByInterface(){
+    private static String getAdressMacByInterface() {
         try {
             List<NetworkInterface> all = Collections.list(NetworkInterface.getNetworkInterfaces());
             for (NetworkInterface nif : all) {
@@ -228,7 +236,7 @@ public class InfoTool {
 
                     StringBuilder res1 = new StringBuilder();
                     for (byte b : macBytes) {
-                        res1.append(String.format("%02X:",b));
+                        res1.append(String.format("%02X:", b));
                     }
 
                     if (res1.length() > 0) {
@@ -279,4 +287,54 @@ public class InfoTool {
         }
     }
 
+    /**
+     * 获得IP地址，分为两种情况，一是wifi下，二是移动网络下，得到的ip地址是不一样的
+     */
+    public boolean getIPAddress() {
+        NetworkInfo info = ((ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            if (info.getType() == ConnectivityManager.TYPE_MOBILE) {//当前使用2G/3G/4G网络
+                try {
+                    //Enumeration<NetworkInterface> en=NetworkInterface.getNetworkInterfaces();
+                    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                        NetworkInterface intf = en.nextElement();
+                        for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                            InetAddress inetAddress = enumIpAddr.nextElement();
+                            if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                                return false;
+                            }
+                        }
+                    }
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                }
+
+            } else if (info.getType() == ConnectivityManager.TYPE_WIFI) {//当前使用无线网络
+                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                //调用方法将int转换为地址字符串
+                String ipAddress = intIP2StringIP(wifiInfo.getIpAddress());//得到IPV4地址
+                message.setMac(ipAddress);
+                return true;
+            }
+        } else {
+            return false;
+            //当前无网络连接,请在设置中打开网络
+        }
+        return false;
+    }
+
+    /**
+     * 将得到的int类型的IP转换为String类型
+     *
+     * @param ip
+     * @return
+     */
+    public static String intIP2StringIP(int ip) {
+        return (ip & 0xFF) + "." +
+                ((ip >> 8) & 0xFF) + "." +
+                ((ip >> 16) & 0xFF) + "." +
+                (ip >> 24 & 0xFF);
+    }
 }
