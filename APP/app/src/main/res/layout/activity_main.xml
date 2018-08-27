@@ -5,22 +5,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+<HorizontalScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="10dp">
+
+        <ImageView
+            android:id="@+id/img_warning"
+            android:layout_centerHorizontal="true"
+            android:layout_width="199dp"
+            android:layout_height="199dp" />
 
         <EditText
             android:id="@+id/et_ipAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/img_warning"
             android:hint="默认192.168.1.80" />
 
         <Button
             android:id="@+id/btn_testPing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/img_warning"
             android:layout_toEndOf="@+id/et_ipAdd"
             android:text="Ping" />
 
@@ -28,6 +39,7 @@
             android:id="@+id/tvPingResult"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/img_warning"
             android:layout_toEndOf="@+id/btn_testPing"
             android:hint="测试结果" />
 
@@ -40,16 +52,33 @@
             <TableRow>
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="本机IP"/>
+
+                <TextView
+                    android:id="@+id/tv_mac"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="本机IP"/>
+
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
                     android:id="@+id/tv_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写车辆id" />
+                    android:text="车辆id" />
 
                 <EditText
                     android:id="@+id/et_id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="send_id" />
+
+
             </TableRow>
 
             <TableRow>
@@ -58,7 +87,7 @@
                     android:id="@+id/tv_timeStamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写时间戳" />
+                    android:text="时间戳" />
 
                 <EditText
                     android:id="@+id/et_timeStamp"
@@ -73,7 +102,7 @@
                     android:id="@+id/tv_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写车辆速度" />
+                    android:text="车辆速度" />
 
                 <EditText
                     android:id="@+id/et_speed"
@@ -89,7 +118,7 @@
                     android:id="@+id/tv_direction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写车辆方向" />
+                    android:text="车辆方向" />
 
                 <EditText
                     android:id="@+id/et_direction"
@@ -104,7 +133,7 @@
                     android:id="@+id/tv_lat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写车辆纬度" />
+                    android:text="车辆纬度" />
 
                 <EditText
                     android:id="@+id/et_lat"
@@ -120,7 +149,7 @@
                     android:id="@+id/tv_lon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写车辆经度" />
+                    android:text="车辆经度" />
 
                 <EditText
                     android:id="@+id/et_lon"
@@ -135,7 +164,7 @@
                     android:id="@+id/tv_ace"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="填写车辆加速度" />
+                    android:text="车辆加速度" />
 
                 <EditText
                     android:id="@+id/et_ace"
@@ -198,8 +227,7 @@
             android:layout_below="@+id/table_showtest"
             android:text="TextView" />
 
-
     </RelativeLayout>
-
+</HorizontalScrollView>
 
 </android.support.constraint.ConstraintLayout>

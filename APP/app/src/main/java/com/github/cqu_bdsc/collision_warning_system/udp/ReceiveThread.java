@@ -3,6 +3,8 @@ package com.github.cqu_bdsc.collision_warning_system.udp;
 import android.content.Context;
 import android.content.Intent;
 
+import com.github.cqu_bdsc.collision_warning_system.DAO.Result;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

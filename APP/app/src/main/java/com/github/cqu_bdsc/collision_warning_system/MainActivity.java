@@ -1,19 +1,33 @@
 package com.github.cqu_bdsc.collision_warning_system;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.cqu_bdsc.collision_warning_system.udp.Message;
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.github.cqu_bdsc.collision_warning_system.DAO.Message;
+import com.github.cqu_bdsc.collision_warning_system.infor.InfoThread;
 import com.github.cqu_bdsc.collision_warning_system.udp.ReceiveThread;
-import com.github.cqu_bdsc.collision_warning_system.udp.Result;
+import com.github.cqu_bdsc.collision_warning_system.DAO.Result;
 import com.github.cqu_bdsc.collision_warning_system.udp.SendService;
 
 import java.io.IOException;
@@ -24,14 +38,24 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
+    private InfoThread infoThread;
+
+
+    public LocationClient mLocationClient = null;
+    private MyLocationListener myListener = new MyLocationListener();
+    //BDAbstractLocationListener为7.2版本新增的Abstract类型的监听接口
+    //原有BDLocationListener接口暂时同步保留。具体介绍请参考后文中的说明
+
+    public static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
     private static final String SERVER_IP = "192.168.1.80";
     private static final String SERVER_PORT = "4040";
+
     private String Server_Add = "192.168.1.80";
 
     private BroadcastReceiver broadcastReceiver = null;
     private final IntentFilter intentFilter = new IntentFilter();
     private Button      btnPing;//以下是可视化程序里面的常量
-    private Button        btnSend;
+    private Button      btnSend;
 
     private EditText    etIp;
     private TextView    tvPingResult;
@@ -40,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView    tv_time;
     private TextView    tv_distance;
     private TextView    tv_log;
+    private TextView    tv_mac;
 
     private EditText    et_id;
     private EditText    et_timeStamp;
@@ -49,13 +74,16 @@ public class MainActivity extends AppCompatActivity {
     private EditText    et_lon;
     private EditText    et_ace;
 
+    private ImageView   img_warning;
+
 
     @Override
     protected void onResume() {
         super.onResume();
         broadcastReceiver = new RecationBroadcast();
-        registerReceiver(broadcastReceiver, intentFilter);
+        registerReceiver(broadcastReceiver, intentFilter);//广播注册
     }
+
 
     @Override
     protected void onPause() {
@@ -63,13 +91,17 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(broadcastReceiver);
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);//加载布局
 
         intentFilter.addAction(ReceiveThread.ACTION_STRING);
         intentFilter.addAction(ReceiveThread.ACTION_JSON);
+        intentFilter.addAction(InfoThread.ACTION_INFORMATION);
+        intentFilter.addAction(MainActivity.ACTION_SEND_MESSAGE);
+
 
         etIp        = (EditText) findViewById(R.id.et_ipAdd);
         btnPing     = (Button)   findViewById(R.id.btn_testPing);
@@ -92,8 +124,14 @@ public class MainActivity extends AppCompatActivity {
         tv_warning = (TextView) findViewById(R.id.tv_warning);
 
         tv_log = (TextView) findViewById(R.id.textLog);
+        tv_mac = (TextView) findViewById(R.id.tv_mac);
+
+        img_warning = (ImageView) findViewById(R.id.img_warning);
+        img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_safe));
+
 
         btnSend     = (Button)   findViewById(R.id.btn_send);
+
 
         btnPing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,34 +162,9 @@ public class MainActivity extends AppCompatActivity {
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view) {//只要一点发送，就有数据的录入，获取，转换，以及数据json格式的转化过程
 
-                String id = et_id.getEditableText().toString();
-                String timeStamp = et_timeStamp.getEditableText().toString();
-                String speed = et_speed.getEditableText().toString();
-                String direction = et_direction.getEditableText().toString();
-                String lat = et_lat.getEditableText().toString();
-                String lon = et_lon.getEditableText().toString();
-                String ace = et_ace.getEditableText().toString();
-
-                Message message = new Message();
-                message.setId(Integer.valueOf(id));
-                message.setTimeStamp(Integer.valueOf(timeStamp));
-                message.setSpeed(Double.valueOf(speed));
-                message.setDirection(Integer.valueOf(direction));
-                message.setLat(Double.valueOf(lat));
-                message.setLon(Double.valueOf(lon));
-                message.setAce(Double.valueOf(ace));
-
-
-
-
-                Intent intent = new Intent(MainActivity.this, SendService.class);
-                intent.setAction(SendService.ACTION_SEND_JSON);
-                intent.putExtra(SendService.EXTRAS_HOST,getServer_Add());
-                intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
-                intent.putExtra(SendService.EXTRAS_JSON,message);
-                startService(intent);
+              sendMessage();
 
             }
         });
@@ -162,6 +175,67 @@ public class MainActivity extends AppCompatActivity {
          */
         ReceiveThread receiveThread = new ReceiveThread(MainActivity.this, getServer_Add());
         receiveThread.start();
+
+        /**
+         * 百度定位
+         */
+        mLocationClient = new LocationClient(getApplicationContext());
+        //声明LocationClient类
+        mLocationClient.registerLocationListener(myListener);
+        //注册监听函数
+        LocationClientOption option = new LocationClientOption();
+
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
+        //可选，设置定位模式，默认高精度
+        //LocationMode.Hight_Accuracy：高精度；
+        //LocationMode. Battery_Saving：低功耗；
+        //LocationMode. Device_Sensors：仅使用设备；
+
+        option.setCoorType("bd09ll");
+        //可选，设置返回经纬度坐标类型，默认gcj02
+        //gcj02：国测局坐标；
+        //bd09ll：百度经纬度坐标；
+        //bd09：百度墨卡托坐标；
+        //海外地区定位，无需设置坐标类型，统一返回wgs84类型坐标
+
+        option.setScanSpan(1000);
+        //可选，设置发起定位请求的间隔，int类型，单位ms
+        //如果设置为0，则代表单次定位，即仅定位一次，默认为0
+        //如果设置非0，需设置1000ms以上才有效
+
+        option.setOpenGps(true);
+        //可选，设置是否使用gps，默认false
+        //使用高精度和仅用设备两种定位模式的，参数必须设置为true
+
+        option.setLocationNotify(true);
+        //可选，设置是否当GPS有效时按照1S/1次频率输出GPS结果，默认false
+
+        option.setIgnoreKillProcess(false);
+        //可选，定位SDK内部是一个service，并放到了独立进程。
+        //设置是否在stop的时候杀死这个进程，默认（建议）不杀死，即setIgnoreKillProcess(true)
+
+        option.SetIgnoreCacheException(true);
+        //可选，设置是否收集Crash信息，默认收集，即参数为false
+
+        option.setWifiCacheTimeOut(5*60*1000);
+        //可选，7.2版本新增能力
+        //如果设置了该接口，首次启动定位时，会先判断当前WiFi是否超出有效期，若超出有效期，会先重新扫描WiFi，然后定位
+
+        option.setEnableSimulateGps(false);
+        //可选，设置是否需要过滤GPS仿真结果，默认需要，即参数为false
+
+        mLocationClient.setLocOption(option);
+        //mLocationClient为第二步初始化过的LocationClient对象
+        //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
+        //更多LocationClientOption的配置，请参照类参考中LocationClientOption类的详细说明
+
+
+        mLocationClient.start();
+        //mLocationClient为第二步初始化过的LocationClient对象
+        //调用LocationClient的start()方法，便可发起定位请求
+
+        infoThread = new InfoThread(MainActivity.this);
+        infoThread.start();
 
     }
 
@@ -182,7 +256,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return false;
         }
-
     }
 
     //ip地址是否匹配
@@ -202,34 +275,181 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * 获取百度GPS坐标
+     */
+    public class MyLocationListener extends BDAbstractLocationListener {
+        @Override
+        public void onReceiveLocation(BDLocation location){
+            //此处的BDLocation为定位结果信息类，通过它的各种get方法可获取定位相关的全部结果
+            //以下只列举部分获取经纬度相关（常用）的结果信息
+            //更多结果信息获取说明，请参照类参考中BDLocation类中的说明
+
+            double latitude = location.getLatitude();    //获取纬度信息
+            double longitude = location.getLongitude();    //获取经度信息
+            float radius = location.getRadius();    //获取定位精度，默认值为0.0f
+            float speed = location.getSpeed();
+
+            String coorType = location.getCoorType();
+            //获取经纬度坐标类型，以LocationClientOption中设置过的坐标类型为准
+
+            int errorCode = location.getLocType();
+            //获取定位类型、定位错误返回码，具体信息可参照类参考中BDLocation类中的说明
+
+            Message message = new Message();
+
+            message.setLat(latitude);
+            message.setLon(longitude);
+            message.setSpeed(speed);
+
+            if (61 != errorCode){
+                message.setLat(29.5699345275);
+                message.setLon(106.4775258188);
+                message.setSpeed(1);
+            }
+
+            Intent intent = new Intent();
+            intent.setAction(InfoThread.ACTION_INFORMATION);//告诉android将要执行什么功能
+            intent.putExtra(InfoThread.EXTRAR_INFORMATION, message);//信息
+            getApplicationContext().sendBroadcast(intent);//广播信息
+
+            sendLog(String.valueOf(errorCode));
+
+        }
+    }
+
+    public void sendLog(String log){
+        Intent intent = new Intent();
+        intent.setAction(ReceiveThread.ACTION_STRING);//告诉android将要执行什么功能
+        intent.putExtra(ReceiveThread.STRING_CONTEXT, log);//信息
+        getApplicationContext().sendBroadcast(intent);//广播信息
+    }
+
     public class RecationBroadcast extends BroadcastReceiver {
 
-        @Override
+        @Override//复写onReceive方法
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             switch (action){
                 case ReceiveThread.ACTION_STRING:
                     String message = intent.getExtras().getString(ReceiveThread.STRING_CONTEXT);
-                    //tvReceive.setText(message);
                     tv_log.setText(message);
                     break;
                 case ReceiveThread.ACTION_JSON:
                     Result result = (Result) Objects.requireNonNull(intent.getExtras()).get(ReceiveThread.JSON_CONTEXT);
                     if (result != null){
-                        tv_showid.setText(String.valueOf(result.getId()));
-                        tv_warning.setText(String.valueOf(result.isWarning()));
-                        tv_distance.setText(String.valueOf(result.getDistance()));
-                        tv_time.setText(String.valueOf(result.getTime()));
+
+                        if (String.valueOf(result.getId()).equals(et_id.getEditableText().toString())){
+                            tv_showid.setText(String.valueOf(result.getId()));
+                            tv_warning.setText(String.valueOf(result.isWarning()));
+                            tv_distance.setText(String.valueOf(result.getDistance()));
+                            tv_time.setText(String.valueOf(result.getTime()));
+
+                            if (result.isWarning()){
+                                getWarning();
+                            } else {
+                                getSafe();
+                            }
+                        } else {
+                            tv_showid.setText("0");
+                            tv_warning.setText("0");
+                            tv_distance.setText("0");
+                            tv_time.setText("0");
+                        }
+
                     } else {
                         tv_showid.setText("0");
                         tv_warning.setText("0");
                         tv_distance.setText("0");
                         tv_time.setText("0");
                     }
+                    break;
+                case InfoThread.ACTION_INFORMATION:
+                    Message intentMessage = (Message) Objects.requireNonNull(intent.getExtras()).get(InfoThread.EXTRAR_INFORMATION);
+                    if (intentMessage.getId() != Message.ERROR_VALUE){
+                        et_id.setText(String.valueOf(intentMessage.getId()));
+                    }
+                    if (intentMessage.getAce() != Message.ERROR_VALUE){
+                        et_ace.setText(String.valueOf(intentMessage.getAce()));
+                    }
+                    if (intentMessage.getDirection() != Message.ERROR_VALUE){
+                        et_direction.setText(String.valueOf(intentMessage.getDirection()));
+                    }
+                    if (intentMessage.getLat() != Message.ERROR_VALUE){
+                        et_lat.setText(String.valueOf(intentMessage.getLat()));
+                    }
+                    if (intentMessage.getLon() != Message.ERROR_VALUE){
+                        et_lon.setText(String.valueOf(intentMessage.getLon()));
+                    }
+                    if (intentMessage.getSpeed() != Message.ERROR_VALUE){
+                        et_speed.setText(String.valueOf(intentMessage.getSpeed()));
+                    }
+                    if (intentMessage.getTimeStamp() != Message.ERROR_VALUE){
+                        et_timeStamp.setText(String.valueOf(intentMessage.getTimeStamp()));
+                    }
+                    if (!intentMessage.getMac().equals("666")){
+                        tv_mac.setText(intentMessage.getMac());
+                    }
+                    sendMessage();
+                    break;
+                case MainActivity.ACTION_SEND_MESSAGE:
 
+                    break;
                 default:
                     break;
             }
         }
     }
+
+    private void sendMessage(){
+        String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
+        String timeStamp = et_timeStamp.getEditableText().toString();
+        String speed = et_speed.getEditableText().toString();
+        String direction = et_direction.getEditableText().toString();
+        String lat = et_lat.getEditableText().toString();
+        String lon = et_lon.getEditableText().toString();
+        String ace = et_ace.getEditableText().toString();
+
+        Message message = new Message();
+        message.setId(Integer.valueOf(id));//将上面得到的字符串类型的数据转化为具体相对应的类型
+        message.setTimeStamp(Long.valueOf(timeStamp));
+        if (!speed.equals("")){
+            message.setSpeed(Float.valueOf(speed));
+        }
+        message.setDirection(Float.valueOf(direction));
+        if (!lat.equals("")){
+            message.setLat(Double.valueOf(lat));
+        }
+        if (!lon.equals("")){
+            message.setLon(Double.valueOf(lon));
+        }
+        if (!ace.equals("")){
+            message.setAce(Double.valueOf(ace));
+        }
+        //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+
+        Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
+        intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
+        intent.putExtra(SendService.EXTRAS_HOST,getServer_Add());//将执行服务活动的限制，IP地址，端口号，还有
+        intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
+        intent.putExtra(SendService.EXTRAS_JSON,message);
+        startService(intent);//现在真正执行服务
+    }
+
+    public void getWarning(){
+        img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_danger));
+
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Ringtone mRingtone = RingtoneManager.getRingtone(getApplicationContext(),uri);
+        mRingtone.play();
+
+        Vibrator vibrator=(Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
+        vibrator.vibrate(1000);//震动时长 ms
+    }
+
+    public void getSafe(){
+        img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_safe));
+    }
+
 }
+
