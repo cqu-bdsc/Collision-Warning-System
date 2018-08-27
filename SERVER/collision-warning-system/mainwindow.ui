@@ -662,16 +662,19 @@
          </widget>
         </widget>
         <widget class="QGroupBox" name="Log">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>400</y>
            <width>441</width>
-           <height>171</height>
+           <height>181</height>
           </rect>
          </property>
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -691,11 +694,11 @@
             <x>10</x>
             <y>20</y>
             <width>411</width>
-            <height>151</height>
+            <height>141</height>
            </rect>
           </property>
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -763,6 +766,16 @@
           </item>
           <item>
            <widget class="QLineEdit" name="latEdit"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>时间：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="timeEdit"/>
           </item>
           <item>
            <spacer name="horizontalSpacer_8">

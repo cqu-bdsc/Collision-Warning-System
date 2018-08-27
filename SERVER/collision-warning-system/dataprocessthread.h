@@ -1,6 +1,7 @@
 #ifndef DATAPROCESSTHREAD_H
 #define DATAPROCESSTHREAD_H
 #include <QJsonObject>
+#include <QJsonDocument>
 #include <QJsonArray>
 #include <QThread>
 #include <QTimer>

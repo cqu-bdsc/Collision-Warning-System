@@ -117,6 +117,10 @@ QList<QJsonObject> DataProcessThread::isComputed(){
         //车辆二的队列出队两个
         jsonArray.append(queueVehicleTwo.dequeue());
         jsonArray.append(queueVehicleTwo.dequeue());
+        emit newLogInfo(QString(QJsonDocument(jsonArray.at(0)).toJson()));
+        emit newLogInfo(QString(QJsonDocument(jsonArray.at(1)).toJson()));
+        emit newLogInfo(QString(QJsonDocument(jsonArray.at(2)).toJson()));
+        emit newLogInfo(QString(QJsonDocument(jsonArray.at(3)).toJson()));
     }
     return jsonArray;
 }
@@ -183,6 +187,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
     double lat12=fourMessages.at(1).find("lat").value().toString().toDouble();
     double lat21=fourMessages.at(2).find("lat").value().toString().toDouble();
     double lat22=fourMessages.at(3).find("lat").value().toString().toDouble();
+
     //求两辆车的平均lat（NTU)
     double lat1=(lat11+lat12)/2;
     double lat1_NTU=lat1*100000;
@@ -194,6 +199,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
     double lon12=fourMessages.at(1).find("lon").value().toString().toDouble();
     double lon21=fourMessages.at(2).find("lon").value().toString().toDouble();
     double lon22=fourMessages.at(3).find("lon").value().toString().toDouble();
+
     //求两辆车的平均lon（NTU)
     double lon1=(lon11+lon12)/2;
     double lon1_NTU=lon1*100000;
@@ -208,6 +214,8 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
     double Rlon=this->rsuLocation.find("lon").value().toString().toDouble();
     double Rlon_NTU=Rlon*100000;
 
+    double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
+
     //求两车与路口的距离
     double dist1=sqrt(pow(lat1_NTU-Rlat_NTU,2)+pow(lon1_NTU-Rlon_NTU,2));
     double dist2=sqrt(pow(lat2_NTU-Rlat_NTU,2)+pow(lon2_NTU-Rlon_NTU,2));
@@ -216,7 +224,7 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
     double t1=(-v1+sqrt(pow(v1,2)+2*acc1*dist1))/acc1;
     double t2=(-v2+sqrt(pow(v2,2)+2*acc2*dist2))/acc2;
 
-    if (abs(t1-t2)<THRESHOLD){//碰撞
+    if (abs(t1-t2)<= timeCrash){//碰撞
         RVehicleOne.insert("id",id1);
         RVehicleOne.insert("warning",true);
         RVehicleOne.insert("time",t1);
@@ -232,6 +240,8 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
         //求碰撞轨迹
         //tra2=Trajectory(UNITTIME,v2,acc2,Rlat,Rlon,lat2,lon2);
         //RVehicleTwo.insert("trajectory",tra2);  //轨迹insert不进去
+
+
     }else{//安全
         RVehicleOne.insert("id",id1);
         RVehicleOne.insert("warning",false);
@@ -243,8 +253,14 @@ void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
     }
    //将结果保存进result
 
-    emit sendResult(RVehicleOne);
+    //emit sendResult(RVehicleOne);
    // emit sendResult(RVehicleTwo);
+
+    emit newLogInfo(QString(QJsonDocument(RVehicleOne).toJson()));
+    emit newLogInfo(QString(QJsonDocument(RVehicleTwo).toJson()));
+
+    emit sendResult(RVehicleOne);
+    emit sendResult(RVehicleTwo);
 
 }
 

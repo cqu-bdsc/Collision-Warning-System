@@ -36,8 +36,10 @@ void MainWindow::initUI(){
     ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
     ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
     ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
-    QString webstr=QString("file:///D:/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    QString webstr=QString("file:///C:/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
     ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
+
+    ui->textLog->setText("显示LOG信息");
 
     //加载LOGO
     QString logoPath = ":/image/logo.png";
@@ -261,9 +263,21 @@ void MainWindow::onUdpSendMessage(){
 void MainWindow::onSendMessageq(const QJsonObject &result){
 //    udpTargetAddr.setAddress(ui->editSendIP->text());
 //    udpTargetPort = ui->editSendPort->text().toInt();
-    udpTargetAddr.setAddress("192.168.0.2");
-    udpTargetPort = 4040;
-    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+    bool warning = result.find("warning").value().toBool();
+    if(warning){
+//        udpTargetAddr.setAddress("192.168.1.80");
+//        udpTargetPort = 4040;
+//        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+        udpTargetAddr.setAddress("192.168.43.111");
+        udpTargetPort = 4040;
+        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+        udpTargetAddr.setAddress("192.168.43.14");
+        udpTargetPort = 4040;
+        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+    }
 }
 
 /***************************************
@@ -271,7 +285,7 @@ void MainWindow::onSendMessageq(const QJsonObject &result){
  * QT与JS进行通信的模块
  * **************************************/
 
-void MainWindow::setRsu(const double &rsuLon, const double &rsuLat){
+void MainWindow::setRsu(const double &rsuLon, const double &rsuLat, const double &timeCrash){
     document = this->ui->axWidget->querySubObject("Document");
     parentWindow = document->querySubObject("parentWindow");
     QString js = "shwoMap(new BMap.Point(";
@@ -287,6 +301,7 @@ void MainWindow::setRsu(const double &rsuLon, const double &rsuLat){
     QJsonObject rsuLocation;
     rsuLocation.insert("lon", QString::number(rsuLon));
     rsuLocation.insert("lat", QString::number(rsuLat));
+    rsuLocation.insert("time", QString::number(timeCrash));
     if(processThread == nullptr){
         processThread = new DataProcessThread(rsuLocation);
         processThread->start();
@@ -326,7 +341,8 @@ void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
 void MainWindow::on_pushButton_clicked(){
     double rsuLon = ui->lonEdit->text().toDouble();
     double rsuLat = ui->latEdit->text().toDouble();
-    setRsu(rsuLon, rsuLat);
+    double timeCrash = ui->timeEdit->text().toDouble();
+    setRsu(rsuLon, rsuLat, timeCrash);
 }
 
 void MainWindow::showResult(const QJsonObject &result){
