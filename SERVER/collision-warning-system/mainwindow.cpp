@@ -15,10 +15,11 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     //绑定发送UDP报文事件
     connect(ui->but_send, SIGNAL(clicked()), this, SLOT(onUdpSendMessage()));
-    //connect(ui->editMessage, SIGNAL(returnPressed()), this, SLOT(onUdpSendMessage()));
 
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
     connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
+
+    connect(this, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -31,13 +32,20 @@ MainWindow::~MainWindow()
  **************************************************/
 
 void MainWindow::initUI(){
+    //加载网页
+    ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
+    ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
+    ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
+    QString webstr=QString("file:///C:/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
+
+    ui->textLog->setText("显示LOG信息");
+
     //加载LOGO
     QString logoPath = ":/image/logo.png";
     QPixmap logo(logoPath);
     ui->label_logo->setPixmap(logo);
     ui->label_logo->resize(logo.width(),logo.height());
-
-   //tableFormat.setBorder(0);
 
     /**
     * 使用正则表达式对IP地址和端口号做约束
@@ -53,6 +61,7 @@ void MainWindow::initUI(){
      * @brief findLocalIP
      */
     findLocalIP();
+
 }
 
 
@@ -134,7 +143,7 @@ void MainWindow::on_but_start_clicked()
                             + localAddr.toString()+ ":"+ QString::number(udpListenPort));
         //重新绑定槽函数
         connect(ui->but_start, SIGNAL(clicked()),this,SLOT(onUdpStopButtonClicked()));
-        ui->but_start->setText("停止");
+        ui->but_start->setText("Stop");
 
         //绑定接收到消息的槽函数
         connect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
@@ -167,52 +176,42 @@ bool MainWindow::setupConnection(){
  */
 void MainWindow::onUdpStopButtonClicked(){
     disconnect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
-
-    ui->textLog->append(messageUDP + "Stoped.");
+    ui->textLog->append(messageUDP+ "Stoped.");
     //解除槽函数绑定
     disconnect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
-
-    ui->but_start->setText("开始");
+    ui->but_start->setText("Start");
     myudp->unbindPort();
     //重新绑定槽函数
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
 }
 
 /**
- * 将接收到的消息显示出来
+ * 将接收到的消息显示出来并将其发送到DataProcessThread
  * @brief MainWindow::onUdpAppendMessage
  * @param $from
  * @param message
  */
 void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &message){
 
-//    if(from == "System"){
-//        QColor color = ui->textReceive->textColor();
-//        ui->textReceive->setTextColor(Qt::gray);
-//        ui->textReceive->append(message);
-//        ui->textReceive->setTextColor(color);
-//    } else{
-//        ui->textReceive->append("<"+ from + ">   "+ message);
-//    }
-//    QScrollBar *bar = ui->textReceive->verticalScrollBar();
-//    bar->setValue(bar->maximum());
-
-    int    id           = message.find("id").value().toInt();
-    int    timeStamp    = message.find("timeStamp").value().toInt();
-    int    direction    = message.find("direction").value().toInt();
-    double    lat          = message.find("lat").value().toDouble();
-    double    lon          = message.find("lon").value().toDouble();
-    double    speed        = message.find("speed").value().toDouble();
-    double    acc          = message.find("acc").value().toDouble();
+    int         id               = message.find("id").value().toString().toInt();
+    long long   timeStamp        = message.find("timeStamp").value().toString().toLongLong();
+    float       direction        = message.find("direction").value().toString().toDouble();
+    double      lat              = message.find("lat").value().toString().toDouble();
+    double      lon              = message.find("lon").value().toString().toDouble();
+    float       speed            = message.find("speed").value().toString().toFloat();
+    double      acc              = message.find("acc").value().toString().toDouble();
 
     ui->label_from->setText(from);
     ui->label_id->setText(QString::number(id));
     ui->label_timeStamp->setText(QString::number(timeStamp));
-    ui->label_speed->setText(QString::number(speed));
+    ui->label_speed->setText(QString::number(speed,10,10));
     ui->label_direction->setText(QString::number(direction));
-    ui->label_Lat->setText(QString::number(lat));
-    ui->label_lon->setText(QString::number(lon));
-    ui->label_acc->setText(QString::number(acc));
+    ui->label_Lat->setText(QString::number(lat,10,10));
+    ui->label_lon->setText(QString::number(lon,10,10));
+    ui->label_acc->setText(QString::number(acc,10,10));
+
+    emit newMessage(message);
+
 }
 
 /**
@@ -220,10 +219,6 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
  * @brief MainWindow::onUdpSendMessage
  */
 void MainWindow::onUdpSendMessage(){
-  //  QString text = ui->editMessage->text();
-  //  if(text.isEmpty()){
-  //      return;
-  //  }
 
     QString id = ui->editID->text();
     if(id.isEmpty()){
@@ -252,13 +247,115 @@ void MainWindow::onUdpSendMessage(){
     udpTargetPort = ui->editSendPort->text().toInt();
     myudp->sendMessage(udpTargetAddr, udpTargetPort, message);
 
-    //onUdpAppendMessage("ME", text);
-    //ui->editMessage->clear();
-
     ui->textLog->append("ME send:" + QString(QJsonDocument(message).toJson()));
-//    ui->editID->clear();
-//    ui->editTime->clear();
-//    ui->editDistance->clear();
-//    ui->editWarning->clear();
+    ui->editID->clear();
+    ui->editTime->clear();
+    ui->editDistance->clear();
+    ui->editWarning->clear();
 
+}
+
+/**
+ * 通过UDP发送QJsonObject result
+ * @brief MainWindow::onUdpSendMessage
+ * @param result
+ */
+void MainWindow::onSendMessageq(const QJsonObject &result){
+//    udpTargetAddr.setAddress(ui->editSendIP->text());
+//    udpTargetPort = ui->editSendPort->text().toInt();
+    bool warning = result.find("warning").value().toBool();
+    if(warning){
+//        udpTargetAddr.setAddress("192.168.1.80");
+//        udpTargetPort = 4040;
+//        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+        udpTargetAddr.setAddress("192.168.43.111");
+        udpTargetPort = 4040;
+        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+        udpTargetAddr.setAddress("192.168.43.14");
+        udpTargetPort = 4040;
+        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+    }
+}
+
+/***************************************
+ * 显示地图UI界面
+ * QT与JS进行通信的模块
+ * **************************************/
+
+void MainWindow::setRsu(const double &rsuLon, const double &rsuLat, const double &timeCrash){
+    document = this->ui->axWidget->querySubObject("Document");
+    parentWindow = document->querySubObject("parentWindow");
+    QString js = "shwoMap(new BMap.Point(";
+    js.append(QString::number(rsuLon));
+    js.append(",");
+    js.append(QString::number(rsuLat));
+    js.append(" ))");
+    parentWindow->dynamicCall("execScript(QString,QString)", js,"JavaScript");
+
+    /************
+     * 启动处理线程
+     * *********/
+    QJsonObject rsuLocation;
+    rsuLocation.insert("lon", QString::number(rsuLon));
+    rsuLocation.insert("lat", QString::number(rsuLat));
+    rsuLocation.insert("time", QString::number(timeCrash));
+    if(processThread == nullptr){
+        processThread = new DataProcessThread(rsuLocation);
+        processThread->start();
+        emit newLogInfo("processThread is started.");
+        connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
+        connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(ComputerResult(QList<QJsonObject>)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
+        connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
+        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
+    }
+
+}
+
+void MainWindow::setCarOneNowPosition(const double &lon, const double &lat){
+    QString demand = "addGreendPoint(";
+    demand.append("new BMap.Point(");
+    demand.append(QString::number(lon));
+    demand.append(", ");
+    demand.append(QString::number(lat));
+    demand.append("))");
+    parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
+
+}
+
+void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
+    QString demand = "addBulePoint(";
+    demand.append("new BMap.Point(");
+    demand.append(QString::number(lon));
+    demand.append(", ");
+    demand.append(QString::number(lat));
+    demand.append("))");
+    parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
+}
+
+void MainWindow::on_pushButton_clicked(){
+    double rsuLon = ui->lonEdit->text().toDouble();
+    double rsuLat = ui->latEdit->text().toDouble();
+    double timeCrash = ui->timeEdit->text().toDouble();
+    setRsu(rsuLon, rsuLat, timeCrash);
+}
+
+void MainWindow::showResult(const QJsonObject &result){
+    ui->editID->setText(QString::number(result.find("id").value().toInt()));
+    ui->editDistance->setText(QString::number(result.find("distance").value().toDouble()));
+    ui->editTime->setText(QString::number(result.find("time").value().toDouble()));
+    ui->editWarning->setText(QString::number(result.find("warning").value().toBool()));
+}
+
+void MainWindow::showLog(const QString &logInfo){
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString message = currentDateTime.toString();
+    message.append("  ");
+    message.append(logInfo);
+    ui->textLog->append(message);
 }
