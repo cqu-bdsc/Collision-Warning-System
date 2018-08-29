@@ -157,112 +157,112 @@ QList<QList<double>> Trajectory(double t, double v, double a, double rlat, doubl
  * @brief DataProcessThread::ComputerResult
  * @param list
  */
-void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
-    QJsonObject RVehicleOne,RVehicleTwo;
-   // QList<QList<double>> tra1,tra2;
-    //提取两辆车的id
-    int id1=fourMessages.at(0).find("id").value().toString().toInt();
-    int id2=fourMessages.at(2).find("id").value().toString().toInt();
+//void DataProcessThread::ComputerResult(const QList<QJsonObject> &fourMessages){
+//    QJsonObject RVehicleOne,RVehicleTwo;
+//   // QList<QList<double>> tra1,tra2;
+//    //提取两辆车的id
+//    int id1=fourMessages.at(0).find("id").value().toString().toInt();
+//    int id2=fourMessages.at(2).find("id").value().toString().toInt();
 
-    //提取两辆车的速度
-    float v11=fourMessages.at(0).find("speed").value().toString().toFloat();
-    float v12=fourMessages.at(1).find("speed").value().toString().toFloat();
-    float v21=fourMessages.at(2).find("speed").value().toString().toFloat();
-    float v22=fourMessages.at(3).find("speed").value().toString().toFloat();
-    //求两辆车的平均速度
-    float v1=(v11+v12)/2;
-    float v2=(v21+v22)/2;
+//    //提取两辆车的速度
+//    float v11=fourMessages.at(0).find("speed").value().toString().toFloat();
+//    float v12=fourMessages.at(1).find("speed").value().toString().toFloat();
+//    float v21=fourMessages.at(2).find("speed").value().toString().toFloat();
+//    float v22=fourMessages.at(3).find("speed").value().toString().toFloat();
+//    //求两辆车的平均速度
+//    float v1=(v11+v12)/2;
+//    float v2=(v21+v22)/2;
 
-    //提取两辆车的加速度
-    double acc11=fourMessages.at(0).find("acc").value().toString().toDouble();
-    double acc12=fourMessages.at(1).find("acc").value().toString().toDouble();
-    double acc21=fourMessages.at(2).find("acc").value().toString().toDouble();
-    double acc22=fourMessages.at(3).find("acc").value().toString().toDouble();
-    //求两辆车的平均加速度
-    double acc1=(acc11+acc12)/2;
-    double acc2=(acc21+acc22)/2;
+//    //提取两辆车的加速度
+//    double acc11=fourMessages.at(0).find("acc").value().toString().toDouble();
+//    double acc12=fourMessages.at(1).find("acc").value().toString().toDouble();
+//    double acc21=fourMessages.at(2).find("acc").value().toString().toDouble();
+//    double acc22=fourMessages.at(3).find("acc").value().toString().toDouble();
+//    //求两辆车的平均加速度
+//    double acc1=(acc11+acc12)/2;
+//    double acc2=(acc21+acc22)/2;
 
-    //提取两辆车的lat
-    double lat11=fourMessages.at(0).find("lat").value().toString().toDouble();
-    double lat12=fourMessages.at(1).find("lat").value().toString().toDouble();
-    double lat21=fourMessages.at(2).find("lat").value().toString().toDouble();
-    double lat22=fourMessages.at(3).find("lat").value().toString().toDouble();
+//    //提取两辆车的lat
+//    double lat11=fourMessages.at(0).find("lat").value().toString().toDouble();
+//    double lat12=fourMessages.at(1).find("lat").value().toString().toDouble();
+//    double lat21=fourMessages.at(2).find("lat").value().toString().toDouble();
+//    double lat22=fourMessages.at(3).find("lat").value().toString().toDouble();
 
-    //求两辆车的平均lat（NTU)
-    double lat1=(lat11+lat12)/2;
-    double lat1_NTU=lat1*100000;
-    double lat2=(lat21+lat22)/2;
-    double lat2_NTU=lat2*100000;
+//    //求两辆车的平均lat（NTU)
+//    double lat1=(lat11+lat12)/2;
+//    double lat1_NTU=lat1*100000;
+//    double lat2=(lat21+lat22)/2;
+//    double lat2_NTU=lat2*100000;
 
-    //提取两辆车的lon
-    double lon11=fourMessages.at(0).find("lon").value().toString().toDouble();
-    double lon12=fourMessages.at(1).find("lon").value().toString().toDouble();
-    double lon21=fourMessages.at(2).find("lon").value().toString().toDouble();
-    double lon22=fourMessages.at(3).find("lon").value().toString().toDouble();
+//    //提取两辆车的lon
+//    double lon11=fourMessages.at(0).find("lon").value().toString().toDouble();
+//    double lon12=fourMessages.at(1).find("lon").value().toString().toDouble();
+//    double lon21=fourMessages.at(2).find("lon").value().toString().toDouble();
+//    double lon22=fourMessages.at(3).find("lon").value().toString().toDouble();
 
-    //求两辆车的平均lon（NTU)
-    double lon1=(lon11+lon12)/2;
-    double lon1_NTU=lon1*100000;
-    double lon2=(lon21+lon22)/2;
-    double lon2_NTU=lon2*100000;
+//    //求两辆车的平均lon（NTU)
+//    double lon1=(lon11+lon12)/2;
+//    double lon1_NTU=lon1*100000;
+//    double lon2=(lon21+lon22)/2;
+//    double lon2_NTU=lon2*100000;
 
-    //提取RSU的lat(NTU)
-    double Rlat=this->rsuLocation.find("lat").value().toString().toDouble();
-    double Rlat_NTU=Rlat*100000;
+//    //提取RSU的lat(NTU)
+//    double Rlat=this->rsuLocation.find("lat").value().toString().toDouble();
+//    double Rlat_NTU=Rlat*100000;
 
-    //提取RSU的lon(NTU)
-    double Rlon=this->rsuLocation.find("lon").value().toString().toDouble();
-    double Rlon_NTU=Rlon*100000;
+//    //提取RSU的lon(NTU)
+//    double Rlon=this->rsuLocation.find("lon").value().toString().toDouble();
+//    double Rlon_NTU=Rlon*100000;
 
-    double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
+//    double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
 
-    //求两车与路口的距离
-    double dist1=sqrt(pow(lat1_NTU-Rlat_NTU,2)+pow(lon1_NTU-Rlon_NTU,2));
-    double dist2=sqrt(pow(lat2_NTU-Rlat_NTU,2)+pow(lon2_NTU-Rlon_NTU,2));
+//    //求两车与路口的距离
+//    double dist1=sqrt(pow(lat1_NTU-Rlat_NTU,2)+pow(lon1_NTU-Rlon_NTU,2));
+//    double dist2=sqrt(pow(lat2_NTU-Rlat_NTU,2)+pow(lon2_NTU-Rlon_NTU,2));
 
-    //求两车可能的碰撞时间
-    double t1=(-v1+sqrt(pow(v1,2)+2*acc1*dist1))/acc1;
-    double t2=(-v2+sqrt(pow(v2,2)+2*acc2*dist2))/acc2;
+//    //求两车可能的碰撞时间
+//    double t1=(-v1+sqrt(pow(v1,2)+2*acc1*dist1))/acc1;
+//    double t2=(-v2+sqrt(pow(v2,2)+2*acc2*dist2))/acc2;
 
-    if (abs(t1-t2)<= timeCrash){//碰撞
-        RVehicleOne.insert("id",id1);
-        RVehicleOne.insert("warning",true);
-        RVehicleOne.insert("time",t1);
-        RVehicleOne.insert("distance",dist1);
-        //求车1的碰撞轨迹
-        //tra1=Trajectory(UNITTIME,v1,acc1,Rlat,Rlon,lat1,lon1);
-        //RVehicleOne.insert("trajectory",tra1);  //轨迹insert不进去
+//    if (abs(t1-t2)<= timeCrash){//碰撞
+//        RVehicleOne.insert("id",id1);
+//        RVehicleOne.insert("warning",true);
+//        RVehicleOne.insert("time",t1);
+//        RVehicleOne.insert("distance",dist1);
+//        //求车1的碰撞轨迹
+//        //tra1=Trajectory(UNITTIME,v1,acc1,Rlat,Rlon,lat1,lon1);
+//        //RVehicleOne.insert("trajectory",tra1);  //轨迹insert不进去
 
-        RVehicleTwo.insert("id",id2);
-        RVehicleTwo.insert("warning",true);
-        RVehicleTwo.insert("time",t2);
-        RVehicleTwo.insert("distance",dist2);
-        //求碰撞轨迹
-        //tra2=Trajectory(UNITTIME,v2,acc2,Rlat,Rlon,lat2,lon2);
-        //RVehicleTwo.insert("trajectory",tra2);  //轨迹insert不进去
+//        RVehicleTwo.insert("id",id2);
+//        RVehicleTwo.insert("warning",true);
+//        RVehicleTwo.insert("time",t2);
+//        RVehicleTwo.insert("distance",dist2);
+//        //求碰撞轨迹
+//        //tra2=Trajectory(UNITTIME,v2,acc2,Rlat,Rlon,lat2,lon2);
+//        //RVehicleTwo.insert("trajectory",tra2);  //轨迹insert不进去
 
 
-    }else{//安全
-        RVehicleOne.insert("id",id1);
-        RVehicleOne.insert("warning",false);
-        RVehicleOne.insert("distance",dist1);
+//    }else{//安全
+//        RVehicleOne.insert("id",id1);
+//        RVehicleOne.insert("warning",false);
+//        RVehicleOne.insert("distance",dist1);
 
-        RVehicleTwo.insert("id",id2);
-        RVehicleTwo.insert("warning",false);
-        RVehicleTwo.insert("distance",dist2);
-    }
-   //将结果保存进result
+//        RVehicleTwo.insert("id",id2);
+//        RVehicleTwo.insert("warning",false);
+//        RVehicleTwo.insert("distance",dist2);
+//    }
+//   //将结果保存进result
 
-    //emit sendResult(RVehicleOne);
-   // emit sendResult(RVehicleTwo);
+//    //emit sendResult(RVehicleOne);
+//   // emit sendResult(RVehicleTwo);
 
-    emit newLogInfo(QString(QJsonDocument(RVehicleOne).toJson()));
-    emit newLogInfo(QString(QJsonDocument(RVehicleTwo).toJson()));
+//    emit newLogInfo(QString(QJsonDocument(RVehicleOne).toJson()));
+//    emit newLogInfo(QString(QJsonDocument(RVehicleTwo).toJson()));
 
-    emit sendResult(RVehicleOne);
-    emit sendResult(RVehicleTwo);
+//    emit sendResult(RVehicleOne);
+//    emit sendResult(RVehicleTwo);
 
-}
+//}
 
 void DataProcessThread::timeOutSlot(){
     QList<QJsonObject> jsonArray = isComputed();
@@ -343,6 +343,8 @@ void DataProcessThread::computerResultByLinearRegression(const QList<QJsonObject
 }
 
 void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject> &messages){
+    static double DEF_PI180= 0.01745329252; // PI/180.0
+
     //提取两辆车的id
     int id1=messages.at(0).find("id").value().toString().toInt();
     int id2=messages.at(2).find("id").value().toString().toInt();
@@ -353,7 +355,7 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     float v21=messages.at(2).find("speed").value().toString().toFloat();
     float v22=messages.at(3).find("speed").value().toString().toFloat();
     //求两辆车的平均速度
-    float v1=(v11+v12)/2/3.6;
+    float v1=(v11+v12)/2/3.6;  //传过来的速度为KM/H
     float v2=(v21+v22)/2/3.6;
 
     //提取两辆车的方向
@@ -410,10 +412,14 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     long long time1 = (time11+time12)/2;
     long long time2 = (time21+time22)/2;
 
-    double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
+    printf("time1 = %s\n",QString::number(time1).toStdString().data());
+    printf("time2 = %s\n",QString::number(time2).toStdString().data());
+    printf("time1-time2 = %s\n",QString::number(abs(time1-time2)).toStdString().data());
+
+    //double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
+    double timeCrash = 10000;
 
     bool isCrash = false;
-    double t; //碰撞时间
 
     QJsonObject RVehicleOne,RVehicleTwo;
     double t1, t2, dist1 , dist2;
@@ -421,86 +427,226 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
 
     if(abs(time1-time2) < 1500){ //相隔时间戳小于1.5s
         QJsonObject jsonObject = getDistance(lon1, lat1, lon2, lat2);
-        double distance = jsonObject.find("distance").value().toDouble();
-        double dx       = jsonObject.find("dx").value().toDouble();
-        double dy       = jsonObject.find("dy").value().toDouble();
-        double angle    = jsonObject.find("angle").value().toDouble();
 
-        double angle1;
-        double angle2;
+        printf(QJsonDocument(jsonObject).toJson()+ "\n");
 
-        double x, y;
+        double distance = jsonObject.find("distance").value().toString().toDouble();
+        double dx       = jsonObject.find("dx").value().toString().toDouble();
+        double dy       = jsonObject.find("dy").value().toString().toDouble();
+        double angle    = jsonObject.find("angle").value().toString().toDouble();
 
-        if(0< abs(d1-d2) < 20 || abs(d1-d2) > 340){
-            if(0 < abs((d1+d2)/2-angle) < 20 || abs((d1+d2)/2-angle) >340){ //共线
-                double v = v1+v2;
-                double acc = acc1 +acc2;
-                t = (-v + sqrt(pow(v,2) + 2*acc*distance))/acc;
-                if (t < timeCrash){
-                    isCrash = true;
-                    t1 = t2 = t;
-                    dist1 = dist2  = distance /2;
-                } else{
+        printf("d1 = %s\n",QString::number(d1).toStdString().data());
+        printf("d2 = %s\n",QString::number(d2).toStdString().data());
+        printf("d1-d2 = %s\n",QString::number(abs(d1-d2)).toStdString().data());
+        if((abs(d1-d2) < 30) || (abs(d1-d2) > 330)){
+            printf("number one\n");
+            if( (abs((d1+d2)/2-angle) < 30 ) || ( abs((d1+d2)/2-angle) > 330 )){ //共线
+                printf("number one one\n");
+                double b = (v1-v2)/2;
+                double a = (acc1-acc2)/2;
+                double delta = pow(b,2) - 4*a*(-distance);
+                printf("delat = %lf\n", delta);
+                if(delta < 0){
                     isCrash = false;
+                }else{
+                    if(a != 0){
+                        double t = (-b+ sqrt(pow(b,2) - a*(-distance)))/a;
+                        printf("t = %lf\n", t);
+                        if (t < timeCrash && 0 < t){
+                            isCrash = true;
+                            t1 = t2 = t;
+                            dist1 = v1*t + acc1*pow(t,2)/2;
+                            dist2 = v2*t + acc2*pow(t,2)/2;
+                        } else{
+                            isCrash = false;
+                        }
+                    } else{
+                        double t = distance /(v1-v2);
+                        if (t < timeCrash && 0 < t){
+                            isCrash = true;
+                            t1 = t2 = t;
+                            dist1 = v1*t + acc1*pow(t,2)/2;
+                            dist2 = v2*t + acc2*pow(t,2)/2;
+                        } else{
+                            isCrash = false;
+                        }
+                    }
                 }
-            } else{
+
+            } else if((165 < abs((d1+d2)/2-angle)) && (abs((d1+d2)/2-angle) < 195)){
+                printf("number one two\n");
+                double b = (v2-v1)/2;
+                double a = (acc2-acc1)/2;
+                double delta = pow(b,2) - 4*a*(-distance);
+                printf("delat = %lf\n", delta);
+                if(delta < 0){
+                    isCrash = false;
+                }else{
+                    if(a != 0){
+                        double t = (-b+ sqrt(pow(b,2) - a*(-distance)))/a;
+                        printf("t = %lf\n", t);
+                        if (t < timeCrash){
+                            isCrash = true;
+                            t1 = t2 = t;
+                            dist1 = v1*t + acc1*pow(t,2)/2;
+                            dist2 = v2*t + acc2*pow(t,2)/2;
+                        } else{
+                            isCrash = false;
+                        }
+                    } else{
+                        double t = distance /(v2-v1);
+                        if (t < timeCrash){
+                            isCrash = true;
+                            t1 = t2 = t;
+                            dist1 = v1*t + acc1*pow(t,2)/2;
+                            dist2 = v2*t + acc2*pow(t,2)/2;
+                        } else{
+                            isCrash = false;
+                        }
+                    }
+                }
+            }else{
                 isCrash = false;
             }
-        } else if(170 < abs(d1-d2) <190){
-            if((0< abs(d1-angle) < 20 || abs(d1-angle) > 340) || (0< abs(d2-angle) < 20 || abs(d2-angle) > 340)){
-                double v = abs(v1-v2);
-                double acc = abs(acc1-acc2);
-                t = (-v + sqrt(pow(v,2) + 2*acc*distance))/acc;
-                if (t < timeCrash) {
-                    isCrash = true;
-                    t1 = t2 = t;
-
-
-
-                    dist1 = dist2  = distance;
-                } else{
+        } else if((165 < abs(d1-d2)) && (abs(d1-d2) < 195)){
+            printf("number two\n");
+            if( abs(d1-angle) < 30 ){
+                double b = (v1+v2)/2;
+                double a = (acc1+acc2)/2;
+                double delta = pow(b,2) - 4*a*(-distance);
+                printf("delta = %lf", delta);
+                if(delta < 0){
                     isCrash = false;
+                } else{
+                    if(a != 0){
+                        double t = (-b+ sqrt(pow(b,2) - a*(-distance)))/a;
+                        printf("t = %lf\n", t);
+                        if (t < timeCrash){
+                            isCrash = true;
+                            t1 = t2 = t;
+                            dist1 = v1*t + acc1*pow(t,2)/2;
+                            dist2 = v2*t + acc2*pow(t,2)/2;
+                        } else{
+                            isCrash = false;
+                        }
+                    } else{
+                        double t = distance /(v1+v2);
+                        if (t < timeCrash){
+                            isCrash = true;
+                            t1 = t2 = t;
+                            dist1 = v1*t + acc1*pow(t,2)/2;
+                            dist2 = v2*t + acc2*pow(t,2)/2;
+                        } else{
+                            isCrash = false;
+                        }
+                    }
                 }
             } else{
                 isCrash = false;
             }
         } else{
-            if (((angle < d1 < 180+angle) && (angle < d2 < 180+angle)) || ((d1 < angle || d1 > 180+angle) && (d2 < angle || d2 > 180+angle))){ // 在同一侧
-                if (d1 < 180+angle){
-                    angle1 = abs(d1 - angle);
-                } else{
-                    angle1 = abs(angle + 360-d1);
-                }
-                if (d2 < 180+angle){
-                    angle2 = abs(d2-angle);
-                }else{
-                    angle2 = abs(angle + 360-d2);
-                }
-                if(angle1 + angle2 <180){
-                    x = (tan(d2)*dy+dx)/((tan(d2)/(tan(d2)))-1);
-                    y = x/tan(d1);
-                    double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
-                    double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
+            double angle1;
+            double angle2;
+            double x, y;
+            printf("first else\n");
+            if(angle < 180){
+                printf("first else one\n");
+                if (((angle < d1 && d1 < 180+angle) && (angle < d2 && d2 < 180+angle))
+                        || ((d1 < angle || d1 > 180+angle) && (d2 < angle || d2 > 180+angle))){ // 在同一侧
+                    if (d1 < 180+angle){
+                        angle1 = abs(d1 - angle);
+                    } else{
+                        angle1 = abs(angle + 360-d1);
+                    }
+                    if (d2 < 180+angle){
+                        angle2 = abs(d2-angle);
+                    }else{
+                        angle2 = abs(angle + 360-d2);
+                    }
+                    if(angle1 + angle2 <180){
+                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+                        y = tan(d1*DEF_PI180) * x;
 
-                    double t11=(-v1+sqrt(pow(v1,2)+2*acc1*distanceCrossOne))/acc1;
-                    double t22=(-v2+sqrt(pow(v2,2)+2*acc2*distanceCrossTwo))/acc2;
+                        printf("x = %lf\n", x);
+                        printf("y = %lf\n", y);
 
-                    if(abs(t11-t22) < timeCrash){
-                        isCrash = true;
-                        t1 = t11;
-                        t2 = t22;
-                        dist1 = distanceCrossOne;
-                        dist2 = distanceCrossTwo;
+                        double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
+                        double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
+
+                        if(isSolved((acc1/2), (v1/2), -distanceCrossOne) && isSolved((acc2/2), (v2/2), -distanceCrossTwo)){
+                            double t11 = solveTime((acc1/2), (v1/2), -distanceCrossOne);
+                            double t22 = solveTime((acc2/2), (v2/2), -distanceCrossTwo);
+                            if (abs(t11 - t22) < timeCrash ){
+                                isCrash = true;
+                                t1 = t11;
+                                t2 = t22;
+                                dist1 = distanceCrossOne;
+                                dist2 = distanceCrossTwo;
+                            } else{
+                                isCrash = false;
+                            }
+                        } else{
+                            isCrash = false;
+                        }
+
                     } else{
                         isCrash = false;
                     }
-
                 } else{
                     isCrash = false;
                 }
-            } else{
-                isCrash = false;
+            }else{
+                printf("first else two\n");
+                printf("180+angle-360 = %lf\n", angle-180);
+                if (((angle < d1 && d1 < (180+angle-360)) && (angle < d2 && d2 < (180+angle-360)))
+                        || ((d1 < angle || d1 > (180+angle-360)) && (d2 < angle || d2 > (180+angle-360)))){ // 在同一侧
+                    if (d1 < (180+angle-360)){
+                        angle1 = abs(180-abs((angle-180)-d1));
+                    } else{
+                        angle1 = abs(angle -d1);
+                    }
+                    if (d2 < 180+angle-360){
+                        angle2 = abs(180-abs((angle-180)-d2));
+                    }else{
+                        angle2 = abs(angle -d2);
+                    }
+                    printf("angle1 = %lf\n", angle1);
+                    printf("angle2 = %lf\n", angle2);
+                    if(angle1 + angle2 <180){
+                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+                        y = tan(d1*DEF_PI180) * x;
+
+                        printf("x = %lf\n", x);
+                        printf("y = %lf\n", y);
+
+                        double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
+                        double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
+
+                        if(isSolved((acc1/2), (v1/2), -distanceCrossOne) && isSolved((acc2/2), (v2/2), -distanceCrossTwo)){
+                            double t11 = solveTime((acc1/2), (v1/2), -distanceCrossOne);
+                            double t22 = solveTime((acc2/2), (v2/2), -distanceCrossTwo);
+                            if (abs(t11 - t22) < timeCrash ){
+                                isCrash = true;
+                                t1 = t11;
+                                t2 = t22;
+                                dist1 = distanceCrossOne;
+                                dist2 = distanceCrossTwo;
+                            } else{
+                                isCrash = false;
+                            }
+                        } else{
+                            isCrash = false;
+                        }
+
+
+                    } else{
+                        isCrash = false;
+                    }
+                } else{
+                    isCrash = false;
+                }
             }
+
         }
     }
 
@@ -514,4 +660,31 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     RVehicleTwo.insert("time",t2);
     RVehicleTwo.insert("distance",dist2);
 
+    printf(QJsonDocument(RVehicleOne).toJson()+ "\n");
+    printf(QJsonDocument(RVehicleTwo).toJson()+ "\n");
+
+    emit sendResult(RVehicleOne);
+    emit sendResult(RVehicleTwo);
+}
+
+bool DataProcessThread::isSolved(double a, double b, double c){
+    double delta = pow(b,2) - 4*a*c;
+    printf("delta = %lf\n", delta);
+    if(delta < 0){
+        return false;
+    } else{
+        return true;
+    }
+}
+
+bool DataProcessThread::solveTime(double a, double b, double c){
+    double time;
+    if(a != 0){
+        time = (-b+ sqrt(pow(b,2) - a*c))/a;
+        printf("t = %lf\n", time);
+    } else{
+        time = (-c)/(2*b);
+        printf("t = %lf\n", time);
+    }
+    return time;
 }

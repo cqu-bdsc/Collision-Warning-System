@@ -285,29 +285,29 @@ void MainWindow::onSendMessageq(const QJsonObject &result){
  * QT与JS进行通信的模块
  * **************************************/
 
-void MainWindow::setRsu(const double &rsuLon, const double &rsuLat, const double &timeCrash){
-    document = this->ui->axWidget->querySubObject("Document");
-    parentWindow = document->querySubObject("parentWindow");
-    QString js = "shwoMap(new BMap.Point(";
-    js.append(QString::number(rsuLon));
-    js.append(",");
-    js.append(QString::number(rsuLat));
-    js.append(" ))");
-    parentWindow->dynamicCall("execScript(QString,QString)", js,"JavaScript");
+void MainWindow::setRsu(const double &timeCrash){
+//    document = this->ui->axWidget->querySubObject("Document");
+//    parentWindow = document->querySubObject("parentWindow");
+//    QString js = "shwoMap(new BMap.Point(";
+//    js.append(QString::number(rsuLon));
+//    js.append(",");
+//    js.append(QString::number(rsuLat));
+//    js.append(" ))");
+//    parentWindow->dynamicCall("execScript(QString,QString)", js,"JavaScript");
 
     /************
      * 启动处理线程
      * *********/
     QJsonObject rsuLocation;
-    rsuLocation.insert("lon", QString::number(rsuLon));
-    rsuLocation.insert("lat", QString::number(rsuLat));
+//    rsuLocation.insert("lon", QString::number(rsuLon));
+//    rsuLocation.insert("lat", QString::number(rsuLat));
     rsuLocation.insert("time", QString::number(timeCrash));
     if(processThread == nullptr){
         processThread = new DataProcessThread(rsuLocation);
         processThread->start();
         emit newLogInfo("processThread is started.");
         connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
-        connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(ComputerResult(QList<QJsonObject>)));
+        connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(computerResultByAverageFeatures(QList<QJsonObject>)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
         connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
@@ -339,10 +339,8 @@ void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
 }
 
 void MainWindow::on_pushButton_clicked(){
-    double rsuLon = ui->lonEdit->text().toDouble();
-    double rsuLat = ui->latEdit->text().toDouble();
     double timeCrash = ui->timeEdit->text().toDouble();
-    setRsu(rsuLon, rsuLat, timeCrash);
+    setRsu(timeCrash);
 }
 
 void MainWindow::showResult(const QJsonObject &result){

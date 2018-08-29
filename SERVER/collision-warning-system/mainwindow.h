@@ -58,7 +58,7 @@ private slots:
      * setCarOneNowPosition         设置第一辆车当前位置，形成轨迹
      * setCarTwoNowPosition         设置第二辆车当前位置，形成轨迹
      * *********************************/
-    void setRsu(const double &rsuLon, const double &rsuLat, const double &timeCrash);
+    void setRsu(const double &timeCrash);
     void setCarOneNowPosition(const double &lon, const double &lat);
     void setCarTwoNowPosition(const double &lon, const double &lat);
 //    void setCarOneFutureTrace();

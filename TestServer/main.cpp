@@ -58,6 +58,28 @@ QJsonObject getDistance(double lon1, double lat1, double lon2, double lat2){
     return jsonObject;
 }
 
+bool isSolved(double a, double b, double c){
+    double delta = pow(b,2) - 4*a*c;
+    printf("delta = %lf\n", delta);
+    if(delta < 0){
+        return false;
+    } else{
+        return true;
+    }
+}
+
+double solveTime(double a, double b, double c){
+    double time;
+    if(a != 0){
+        time = (-b+ sqrt(pow(b,2) - a*c))/a;
+        printf("t = %lf\n", time);
+    } else{
+        time = (-c)/(2*b);
+        printf("t = %lf\n", time);
+    }
+    return time;
+}
+
 void computerResultByAverageFeatures(const QList<QJsonObject> &messages){
     static double DEF_PI180= 0.01745329252; // PI/180.0
 
@@ -289,15 +311,18 @@ void computerResultByAverageFeatures(const QList<QJsonObject> &messages){
                         double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
                         double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
 
-                        double t11=(-v1+sqrt(pow(v1,2)+2*acc1*distanceCrossOne))/acc1;
-                        double t22=(-v2+sqrt(pow(v2,2)+2*acc2*distanceCrossTwo))/acc2;
-
-                        if(abs(t11-t22) < timeCrash){
-                            isCrash = true;
-                            t1 = t11;
-                            t2 = t22;
-                            dist1 = distanceCrossOne;
-                            dist2 = distanceCrossTwo;
+                        if(isSolved((acc1/2), (v1/2), -distanceCrossOne) && isSolved((acc2/2), (v2/2), -distanceCrossTwo)){
+                            double t11 = solveTime((acc1/2), (v1/2), -distanceCrossOne);
+                            double t22 = solveTime((acc2/2), (v2/2), -distanceCrossTwo);
+                            if (abs(t11 - t22) < timeCrash ){
+                                isCrash = true;
+                                t1 = t11;
+                                t2 = t22;
+                                dist1 = distanceCrossOne;
+                                dist2 = distanceCrossTwo;
+                            } else{
+                                isCrash = false;
+                            }
                         } else{
                             isCrash = false;
                         }
@@ -335,18 +360,22 @@ void computerResultByAverageFeatures(const QList<QJsonObject> &messages){
                         double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
                         double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
 
-                        double t11=(-v1+sqrt(pow(v1,2)+2*acc1*distanceCrossOne))/acc1;
-                        double t22=(-v2+sqrt(pow(v2,2)+2*acc2*distanceCrossTwo))/acc2;
-
-                        if(abs(t11-t22) < timeCrash){
-                            isCrash = true;
-                            t1 = t11;
-                            t2 = t22;
-                            dist1 = distanceCrossOne;
-                            dist2 = distanceCrossTwo;
+                        if(isSolved((acc1/2), (v1/2), -distanceCrossOne) && isSolved((acc2/2), (v2/2), -distanceCrossTwo)){
+                            double t11 = solveTime((acc1/2), (v1/2), -distanceCrossOne);
+                            double t22 = solveTime((acc2/2), (v2/2), -distanceCrossTwo);
+                            if (abs(t11 - t22) < timeCrash ){
+                                isCrash = true;
+                                t1 = t11;
+                                t2 = t22;
+                                dist1 = distanceCrossOne;
+                                dist2 = distanceCrossTwo;
+                            } else{
+                                isCrash = false;
+                            }
                         } else{
                             isCrash = false;
                         }
+
 
                     } else{
                         isCrash = false;
@@ -466,37 +495,37 @@ QList<QJsonObject> inputMessage(){
         message1.insert("id",       "1");
         message1.insert("timeStamp","1535507945116");
         message1.insert("speed",    "5");
-        message1.insert("direction","-150");
-        message1.insert("lat",      "29.5695799110");
-        message1.insert("lon",      "106.4772951488");
-        message1.insert("acc",      "1");
+        message1.insert("direction","-140");
+        message1.insert("lat",      "29.5701911572");
+        message1.insert("lon",      "106.4777135734");
+        message1.insert("acc",      "0");
 
         QJsonObject message2;
         message2.insert("id",       "1");
         message2.insert("timeStamp","1535507946210");
         message2.insert("speed",    "5");
-        message2.insert("direction","-150");
-        message2.insert("lat",      "29.5695799110");
-        message2.insert("lon",      "106.4772951488");
-        message2.insert("acc",      "1");
+        message2.insert("direction","-140");
+        message2.insert("lat",      "29.5701911572");
+        message2.insert("lon",      "106.4777135734");
+        message2.insert("acc",      "0");
 
         QJsonObject message3;
         message3.insert("id",       "2");
         message3.insert("timeStamp","1535507945116");
         message3.insert("speed",    "5");
         message3.insert("direction","125");
-        message3.insert("lat",      "29.5694259323");
-        message3.insert("lon",      "106.4750206356");
-        message3.insert("acc",      "1");
+        message3.insert("lat",      "29.5694305984");
+        message3.insert("lon",      "106.4750474577");
+        message3.insert("acc",      "0");
 
         QJsonObject message4;
         message4.insert("id",       "2");
         message4.insert("timeStamp","1535507946210");
         message4.insert("speed",    "5");
         message4.insert("direction","125");
-        message4.insert("lat",      "29.5694259323");
-        message4.insert("lon",      "106.4750206356");
-        message4.insert("acc",      "1");
+        message4.insert("lat",      "29.5694305984");
+        message4.insert("lon",      "106.4750474577");
+        message4.insert("acc",      "0");
 
     QList<QJsonObject> messages;
     messages.append(message1);
