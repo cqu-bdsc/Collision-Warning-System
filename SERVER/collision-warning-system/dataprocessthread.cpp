@@ -274,3 +274,244 @@ void DataProcessThread::timeOutSlot(){
     }
 }
 
+QJsonObject DataProcessThread::getDistance(double lon1, double lat1, double lon2, double lat2){
+    static double DEF_PI = 3.14159265359; // PI
+    static double DEF_2PI= 6.28318530712; // 2*PI
+    static double DEF_PI180= 0.01745329252; // PI/180.0
+    static double DEF_R =6370693.5; // radius of earth
+    //适用于近距离
+    double ew1, ns1, ew2, ns2;
+    double dx, dy, dew;
+    double distance, angle;
+    // 角度转换为弧度
+    ew1 = lon1 * DEF_PI180;
+    ns1 = lat1 * DEF_PI180;
+    ew2 = lon2 * DEF_PI180;
+    ns2 = lat2 * DEF_PI180;
+    //经度差
+    dew = ew1 - ew2;
+    // 若跨东经和西经180 度，进行调整
+    if (dew > DEF_PI)
+        dew = DEF_2PI - dew;
+    else if (dew < -DEF_PI)
+        dew = DEF_2PI + dew;
+    dx = DEF_R * cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
+    dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
+    // 勾股定理求斜边长
+    distance = sqrt(dx * dx + dy * dy);
+    // 根据dx与dy求点二相对于点一以正北为0度的方位角
+    if (dx >= 0){
+        if (dy >= 0){  //dx与dy均为正数，点二在以点一为原点的坐标系的第三象限
+            angle = atan2(dy, dx)/DEF_PI*180;
+            angle = angle + 180;  //angle为以正北为0度顺时针的角度
+        } else{        //dx大于0， dy小于0， 点二在以点一为原点的坐标系的第四象限
+            angle = atan2(-dy, dx)/DEF_PI*180;
+            dy = -dy;
+            angle = angle + 270;
+        }
+    } else{
+        if (dy >= 0){  //dx小于0， dy大于0，点二在以点一为原点的坐标系的第二象限
+            angle = atan2(dy, -dx)/DEF_PI*180;
+            dx = -dx;
+            angle = angle + 90;
+        } else{  //dx与dy均小于0，点二在以点一为原点的坐标系的第一象限
+            angle = atan2(-dy, -dx)/DEF_PI*180;
+            dx = -dx;
+            dy = -dy;
+        }
+    }
+    QJsonObject jsonObject;
+    jsonObject.insert("distance", distance);
+    jsonObject.insert("angle", angle);
+    jsonObject.insert("dx", dx);  //横坐标距离
+    jsonObject.insert("dy", dy);  //纵坐标距离
+    return jsonObject;
+}
+
+/**
+ * 根据车辆发送的信息进行车辆轨迹预测
+ *
+ * @brief DataProcessThread::computerResult
+ * @param messages
+ */
+void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
+
+}
+
+void DataProcessThread::computerResultByLinearRegression(const QList<QJsonObject> &messages){
+
+}
+
+void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject> &messages){
+    //提取两辆车的id
+    int id1=messages.at(0).find("id").value().toString().toInt();
+    int id2=messages.at(2).find("id").value().toString().toInt();
+
+    //提取两辆车的速度
+    float v11=messages.at(0).find("speed").value().toString().toFloat();
+    float v12=messages.at(1).find("speed").value().toString().toFloat();
+    float v21=messages.at(2).find("speed").value().toString().toFloat();
+    float v22=messages.at(3).find("speed").value().toString().toFloat();
+    //求两辆车的平均速度
+    float v1=(v11+v12)/2/3.6;
+    float v2=(v21+v22)/2/3.6;
+
+    //提取两辆车的方向
+    /***************
+     * 0为正北，90正东，-90正西，180或-180正南
+     */
+    float d11=messages.at(0).find("direction").value().toString().toFloat();
+    float d12=messages.at(1).find("direction").value().toString().toFloat();
+    float d21=messages.at(2).find("direction").value().toString().toFloat();
+    float d22=messages.at(3).find("direction").value().toString().toFloat();
+    //求两辆车的平均方向
+    float d1=(d11+d12)/2;
+    float d2=(d21+d22)/2;
+    if(d1 < 0){
+        d1 = d1 + 360;
+    }
+    if(d2 <0){
+        d2 = d2 + 360;
+    }
+
+    //提取两辆车的加速度
+    double acc11=messages.at(0).find("acc").value().toString().toDouble();
+    double acc12=messages.at(1).find("acc").value().toString().toDouble();
+    double acc21=messages.at(2).find("acc").value().toString().toDouble();
+    double acc22=messages.at(3).find("acc").value().toString().toDouble();
+    //求两辆车的平均加速度
+    double acc1=(acc11+acc12)/2;
+    double acc2=(acc21+acc22)/2;
+
+    //提取两辆车的lat
+    double lat11=messages.at(0).find("lat").value().toString().toDouble();
+    double lat12=messages.at(1).find("lat").value().toString().toDouble();
+    double lat21=messages.at(2).find("lat").value().toString().toDouble();
+    double lat22=messages.at(3).find("lat").value().toString().toDouble();
+    //求两辆车的平均lat
+    double lat1=(lat11+lat12)/2;
+    double lat2=(lat21+lat22)/2;
+
+    //提取两辆车的lon
+    double lon11=messages.at(0).find("lon").value().toString().toDouble();
+    double lon12=messages.at(1).find("lon").value().toString().toDouble();
+    double lon21=messages.at(2).find("lon").value().toString().toDouble();
+    double lon22=messages.at(3).find("lon").value().toString().toDouble();
+    //求两辆车的平均lon
+    double lon1=(lon11+lon12)/2;
+    double lon2=(lon21+lon22)/2;
+
+    //提取两辆车message的时间戳
+    long long time11 = messages.at(0).find("timeStamp").value().toString().toLongLong();
+    long long time12 = messages.at(1).find("timeStamp").value().toString().toLongLong();
+    long long time21 = messages.at(2).find("timeStamp").value().toString().toLongLong();
+    long long time22 = messages.at(3).find("timeStamp").value().toString().toLongLong();
+    //求平均时间戳
+    long long time1 = (time11+time12)/2;
+    long long time2 = (time21+time22)/2;
+
+    double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
+
+    bool isCrash = false;
+    double t; //碰撞时间
+
+    QJsonObject RVehicleOne,RVehicleTwo;
+    double t1, t2, dist1 , dist2;
+    t1 = t2 = dist1 = dist2 = 99999999;
+
+    if(abs(time1-time2) < 1500){ //相隔时间戳小于1.5s
+        QJsonObject jsonObject = getDistance(lon1, lat1, lon2, lat2);
+        double distance = jsonObject.find("distance").value().toDouble();
+        double dx       = jsonObject.find("dx").value().toDouble();
+        double dy       = jsonObject.find("dy").value().toDouble();
+        double angle    = jsonObject.find("angle").value().toDouble();
+
+        double angle1;
+        double angle2;
+
+        double x, y;
+
+        if(0< abs(d1-d2) < 20 || abs(d1-d2) > 340){
+            if(0 < abs((d1+d2)/2-angle) < 20 || abs((d1+d2)/2-angle) >340){ //共线
+                double v = v1+v2;
+                double acc = acc1 +acc2;
+                t = (-v + sqrt(pow(v,2) + 2*acc*distance))/acc;
+                if (t < timeCrash){
+                    isCrash = true;
+                    t1 = t2 = t;
+                    dist1 = dist2  = distance /2;
+                } else{
+                    isCrash = false;
+                }
+            } else{
+                isCrash = false;
+            }
+        } else if(170 < abs(d1-d2) <190){
+            if((0< abs(d1-angle) < 20 || abs(d1-angle) > 340) || (0< abs(d2-angle) < 20 || abs(d2-angle) > 340)){
+                double v = abs(v1-v2);
+                double acc = abs(acc1-acc2);
+                t = (-v + sqrt(pow(v,2) + 2*acc*distance))/acc;
+                if (t < timeCrash) {
+                    isCrash = true;
+                    t1 = t2 = t;
+
+
+
+                    dist1 = dist2  = distance;
+                } else{
+                    isCrash = false;
+                }
+            } else{
+                isCrash = false;
+            }
+        } else{
+            if (((angle < d1 < 180+angle) && (angle < d2 < 180+angle)) || ((d1 < angle || d1 > 180+angle) && (d2 < angle || d2 > 180+angle))){ // 在同一侧
+                if (d1 < 180+angle){
+                    angle1 = abs(d1 - angle);
+                } else{
+                    angle1 = abs(angle + 360-d1);
+                }
+                if (d2 < 180+angle){
+                    angle2 = abs(d2-angle);
+                }else{
+                    angle2 = abs(angle + 360-d2);
+                }
+                if(angle1 + angle2 <180){
+                    x = (tan(d2)*dy+dx)/((tan(d2)/(tan(d2)))-1);
+                    y = x/tan(d1);
+                    double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
+                    double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
+
+                    double t11=(-v1+sqrt(pow(v1,2)+2*acc1*distanceCrossOne))/acc1;
+                    double t22=(-v2+sqrt(pow(v2,2)+2*acc2*distanceCrossTwo))/acc2;
+
+                    if(abs(t11-t22) < timeCrash){
+                        isCrash = true;
+                        t1 = t11;
+                        t2 = t22;
+                        dist1 = distanceCrossOne;
+                        dist2 = distanceCrossTwo;
+                    } else{
+                        isCrash = false;
+                    }
+
+                } else{
+                    isCrash = false;
+                }
+            } else{
+                isCrash = false;
+            }
+        }
+    }
+
+    RVehicleOne.insert("id",id1);
+    RVehicleOne.insert("warning",isCrash);
+    RVehicleOne.insert("time",t1);
+    RVehicleOne.insert("distance",dist1);
+
+    RVehicleTwo.insert("id",id2);
+    RVehicleTwo.insert("warning",isCrash);
+    RVehicleTwo.insert("time",t2);
+    RVehicleTwo.insert("distance",dist2);
+
+}

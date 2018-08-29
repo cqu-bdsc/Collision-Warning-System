@@ -195,7 +195,7 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
 
     int         id               = message.find("id").value().toString().toInt();
     long long   timeStamp        = message.find("timeStamp").value().toString().toLongLong();
-    float       direction        = message.find("direction").value().toString().toDouble();
+    float       direction        = message.find("direction").value().toString().toFloat();
     double      lat              = message.find("lat").value().toString().toDouble();
     double      lon              = message.find("lon").value().toString().toDouble();
     float       speed            = message.find("speed").value().toString().toFloat();
