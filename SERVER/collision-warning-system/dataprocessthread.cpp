@@ -412,9 +412,9 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     long long time1 = (time11+time12)/2;
     long long time2 = (time21+time22)/2;
 
-    printf("time1 = %s\n",QString::number(time1).toStdString().data());
-    printf("time2 = %s\n",QString::number(time2).toStdString().data());
-    printf("time1-time2 = %s\n",QString::number(abs(time1-time2)).toStdString().data());
+//    printf("time1 = %s\n",QString::number(time1).toStdString().data());
+//    printf("time2 = %s\n",QString::number(time2).toStdString().data());
+//    printf("time1-time2 = %s\n",QString::number(abs(time1-time2)).toStdString().data());
 
     //double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
     double timeCrash = 10000;
@@ -428,30 +428,30 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     if(abs(time1-time2) < 1500){ //相隔时间戳小于1.5s
         QJsonObject jsonObject = getDistance(lon1, lat1, lon2, lat2);
 
-        printf(QJsonDocument(jsonObject).toJson()+ "\n");
+//        printf(QJsonDocument(jsonObject).toJson()+ "\n");
 
         double distance = jsonObject.find("distance").value().toString().toDouble();
         double dx       = jsonObject.find("dx").value().toString().toDouble();
         double dy       = jsonObject.find("dy").value().toString().toDouble();
         double angle    = jsonObject.find("angle").value().toString().toDouble();
 
-        printf("d1 = %s\n",QString::number(d1).toStdString().data());
-        printf("d2 = %s\n",QString::number(d2).toStdString().data());
-        printf("d1-d2 = %s\n",QString::number(abs(d1-d2)).toStdString().data());
+//        printf("d1 = %s\n",QString::number(d1).toStdString().data());
+//        printf("d2 = %s\n",QString::number(d2).toStdString().data());
+//        printf("d1-d2 = %s\n",QString::number(abs(d1-d2)).toStdString().data());
         if((abs(d1-d2) < 30) || (abs(d1-d2) > 330)){
-            printf("number one\n");
+//            printf("number one\n");
             if( (abs((d1+d2)/2-angle) < 30 ) || ( abs((d1+d2)/2-angle) > 330 )){ //共线
-                printf("number one one\n");
+//                printf("number one one\n");
                 double b = (v1-v2)/2;
                 double a = (acc1-acc2)/2;
                 double delta = pow(b,2) - 4*a*(-distance);
-                printf("delat = %lf\n", delta);
+//                printf("delat = %lf\n", delta);
                 if(delta < 0){
                     isCrash = false;
                 }else{
                     if(a != 0){
                         double t = (-b+ sqrt(pow(b,2) - a*(-distance)))/a;
-                        printf("t = %lf\n", t);
+//                        printf("t = %lf\n", t);
                         if (t < timeCrash && 0 < t){
                             isCrash = true;
                             t1 = t2 = t;
@@ -474,17 +474,17 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
                 }
 
             } else if((165 < abs((d1+d2)/2-angle)) && (abs((d1+d2)/2-angle) < 195)){
-                printf("number one two\n");
+//                printf("number one two\n");
                 double b = (v2-v1)/2;
                 double a = (acc2-acc1)/2;
                 double delta = pow(b,2) - 4*a*(-distance);
-                printf("delat = %lf\n", delta);
+//                printf("delat = %lf\n", delta);
                 if(delta < 0){
                     isCrash = false;
                 }else{
                     if(a != 0){
                         double t = (-b+ sqrt(pow(b,2) - a*(-distance)))/a;
-                        printf("t = %lf\n", t);
+//                        printf("t = %lf\n", t);
                         if (t < timeCrash){
                             isCrash = true;
                             t1 = t2 = t;
@@ -509,18 +509,18 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
                 isCrash = false;
             }
         } else if((165 < abs(d1-d2)) && (abs(d1-d2) < 195)){
-            printf("number two\n");
+//            printf("number two\n");
             if( abs(d1-angle) < 30 ){
                 double b = (v1+v2)/2;
                 double a = (acc1+acc2)/2;
                 double delta = pow(b,2) - 4*a*(-distance);
-                printf("delta = %lf", delta);
+//                printf("delta = %lf", delta);
                 if(delta < 0){
                     isCrash = false;
                 } else{
                     if(a != 0){
                         double t = (-b+ sqrt(pow(b,2) - a*(-distance)))/a;
-                        printf("t = %lf\n", t);
+//                        printf("t = %lf\n", t);
                         if (t < timeCrash){
                             isCrash = true;
                             t1 = t2 = t;
@@ -548,9 +548,9 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
             double angle1;
             double angle2;
             double x, y;
-            printf("first else\n");
+//            printf("first else\n");
             if(angle < 180){
-                printf("first else one\n");
+//                printf("first else one\n");
                 if (((angle < d1 && d1 < 180+angle) && (angle < d2 && d2 < 180+angle))
                         || ((d1 < angle || d1 > 180+angle) && (d2 < angle || d2 > 180+angle))){ // 在同一侧
                     if (d1 < 180+angle){
@@ -567,8 +567,8 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
                         x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
                         y = tan(d1*DEF_PI180) * x;
 
-                        printf("x = %lf\n", x);
-                        printf("y = %lf\n", y);
+//                        printf("x = %lf\n", x);
+//                        printf("y = %lf\n", y);
 
                         double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
                         double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
@@ -596,8 +596,8 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
                     isCrash = false;
                 }
             }else{
-                printf("first else two\n");
-                printf("180+angle-360 = %lf\n", angle-180);
+//                printf("first else two\n");
+//                printf("180+angle-360 = %lf\n", angle-180);
                 if (((angle < d1 && d1 < (180+angle-360)) && (angle < d2 && d2 < (180+angle-360)))
                         || ((d1 < angle || d1 > (180+angle-360)) && (d2 < angle || d2 > (180+angle-360)))){ // 在同一侧
                     if (d1 < (180+angle-360)){
@@ -610,14 +610,14 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
                     }else{
                         angle2 = abs(angle -d2);
                     }
-                    printf("angle1 = %lf\n", angle1);
-                    printf("angle2 = %lf\n", angle2);
+//                    printf("angle1 = %lf\n", angle1);
+//                    printf("angle2 = %lf\n", angle2);
                     if(angle1 + angle2 <180){
                         x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
                         y = tan(d1*DEF_PI180) * x;
 
-                        printf("x = %lf\n", x);
-                        printf("y = %lf\n", y);
+//                        printf("x = %lf\n", x);
+//                        printf("y = %lf\n", y);
 
                         double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
                         double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
@@ -660,8 +660,8 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     RVehicleTwo.insert("time",t2);
     RVehicleTwo.insert("distance",dist2);
 
-    printf(QJsonDocument(RVehicleOne).toJson()+ "\n");
-    printf(QJsonDocument(RVehicleTwo).toJson()+ "\n");
+//    printf(QJsonDocument(RVehicleOne).toJson()+ "\n");
+//    printf(QJsonDocument(RVehicleTwo).toJson()+ "\n");
 
     emit sendResult(RVehicleOne);
     emit sendResult(RVehicleTwo);
@@ -669,7 +669,7 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
 
 bool DataProcessThread::isSolved(double a, double b, double c){
     double delta = pow(b,2) - 4*a*c;
-    printf("delta = %lf\n", delta);
+//    printf("delta = %lf\n", delta);
     if(delta < 0){
         return false;
     } else{

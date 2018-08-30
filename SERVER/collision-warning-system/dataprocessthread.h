@@ -44,6 +44,7 @@ private slots:
      */
     void setRsuLocation(const QJsonObject &rsuLocation);  //设置RSU位置
     bool addMessage(const QJsonObject &message);          //将信息添加到队列中
+//    void ComputerResult(const QList<QJsonObject> &messages);
     void computerResult(const QList<QJsonObject> &messages);
     void computerResultByLinearRegression(const QList<QJsonObject> &messages); //使用线性回归的方法
     void computerResultByAverageFeatures(const QList<QJsonObject> &messages); //使用平均的特征以及物理特性

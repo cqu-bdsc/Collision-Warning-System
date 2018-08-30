@@ -265,17 +265,17 @@ void MainWindow::onSendMessageq(const QJsonObject &result){
 //    udpTargetPort = ui->editSendPort->text().toInt();
     bool warning = result.find("warning").value().toBool();
     if(warning){
-//        udpTargetAddr.setAddress("192.168.1.80");
+        udpTargetAddr.setAddress("192.168.1.80");
+        udpTargetPort = 4040;
+        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+//        udpTargetAddr.setAddress("192.168.43.111");
 //        udpTargetPort = 4040;
 //        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 
-        udpTargetAddr.setAddress("192.168.43.111");
-        udpTargetPort = 4040;
-        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-
-        udpTargetAddr.setAddress("192.168.43.14");
-        udpTargetPort = 4040;
-        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+//        udpTargetAddr.setAddress("192.168.43.14");
+//        udpTargetPort = 4040;
+//        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 
     }
 }
@@ -311,8 +311,8 @@ void MainWindow::setRsu(const double &timeCrash){
         connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
         connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
-        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
-        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
+//        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+//        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
     }
 
 }
