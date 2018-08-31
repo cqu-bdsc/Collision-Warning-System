@@ -118,10 +118,6 @@ public:
     QGroupBox *groupBox;
     QWidget *horizontalLayoutWidget_12;
     QHBoxLayout *horizontalLayout_12;
-    QLabel *label_8;
-    QLineEdit *lonEdit;
-    QLabel *label_9;
-    QLineEdit *latEdit;
     QLabel *label_12;
     QLineEdit *timeEdit;
     QSpacerItem *horizontalSpacer_8;
@@ -572,26 +568,6 @@ public:
         horizontalLayout_12->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_12->setObjectName(QStringLiteral("horizontalLayout_12"));
         horizontalLayout_12->setContentsMargins(0, 0, 0, 0);
-        label_8 = new QLabel(horizontalLayoutWidget_12);
-        label_8->setObjectName(QStringLiteral("label_8"));
-
-        horizontalLayout_12->addWidget(label_8);
-
-        lonEdit = new QLineEdit(horizontalLayoutWidget_12);
-        lonEdit->setObjectName(QStringLiteral("lonEdit"));
-
-        horizontalLayout_12->addWidget(lonEdit);
-
-        label_9 = new QLabel(horizontalLayoutWidget_12);
-        label_9->setObjectName(QStringLiteral("label_9"));
-
-        horizontalLayout_12->addWidget(label_9);
-
-        latEdit = new QLineEdit(horizontalLayoutWidget_12);
-        latEdit->setObjectName(QStringLiteral("latEdit"));
-
-        horizontalLayout_12->addWidget(latEdit);
-
         label_12 = new QLabel(horizontalLayoutWidget_12);
         label_12->setObjectName(QStringLiteral("label_12"));
 
@@ -689,9 +665,7 @@ public:
         label_textTimeStamp->setText(QApplication::translate("MainWindow", "\346\227\266\351\227\264\346\210\263", nullptr));
         label_timeStamp->setText(QApplication::translate("MainWindow", "00000000000000", nullptr));
         Log->setTitle(QApplication::translate("MainWindow", "Log", nullptr));
-        groupBox->setTitle(QApplication::translate("MainWindow", "RSU \344\275\215\347\275\256\344\277\241\346\201\257\350\256\276\345\256\232", nullptr));
-        label_8->setText(QApplication::translate("MainWindow", "\347\273\217\345\272\246\357\274\232", nullptr));
-        label_9->setText(QApplication::translate("MainWindow", "\347\272\254\345\272\246\357\274\232", nullptr));
+        groupBox->setTitle(QApplication::translate("MainWindow", "\347\242\260\346\222\236\346\227\266\351\227\264\351\230\210\345\200\274\350\256\276\345\256\232", nullptr));
         label_12->setText(QApplication::translate("MainWindow", "\346\227\266\351\227\264\357\274\232", nullptr));
         pushButton->setText(QApplication::translate("MainWindow", "Confirm", nullptr));
         Map->setTitle(QApplication::translate("MainWindow", "Map", nullptr));

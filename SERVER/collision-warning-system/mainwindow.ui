@@ -735,7 +735,7 @@
          </size>
         </property>
         <property name="title">
-         <string>RSU 位置信息设定</string>
+         <string>碰撞时间阈值设定</string>
         </property>
         <widget class="QWidget" name="horizontalLayoutWidget_12">
          <property name="geometry">
@@ -747,26 +747,6 @@
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_12">
-          <item>
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>经度：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lonEdit"/>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>纬度：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="latEdit"/>
-          </item>
           <item>
            <widget class="QLabel" name="label_12">
             <property name="text">
