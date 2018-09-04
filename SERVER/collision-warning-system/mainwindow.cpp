@@ -210,6 +210,8 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
     ui->label_lon->setText(QString::number(lon,10,10));
     ui->label_acc->setText(QString::number(acc,10,10));
 
+    this->saveFile(message);
+
     emit newMessage(message);
 
 }
@@ -309,6 +311,7 @@ void MainWindow::setRsu(const double &timeCrash){
         connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
         connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(computerResultByAverageFeatures(QList<QJsonObject>)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(saveFile(QJsonObject)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
         connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
 //        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
@@ -356,4 +359,26 @@ void MainWindow::showLog(const QString &logInfo){
     message.append("  ");
     message.append(logInfo);
     ui->textLog->append(message);
+}
+
+void MainWindow::saveFile(const QJsonObject &message){
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString time = currentDateTime.toString();
+    QFile file("C://Collision-Warning-System/mess.txt");
+    bool ok = file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text );
+    if(ok)
+    {
+        QTextStream out(&file);
+        QJsonDocument document;
+        document.setObject(message);
+        QByteArray byteArray = document.toJson(QJsonDocument::Compact);
+        QString jsonStr(byteArray);
+
+        out<<time<<"  "<<jsonStr<<endl;//转化成纯文本
+        file.close();
+    }
+    else
+    {
+        printf("file fail to save");
+    }
 }

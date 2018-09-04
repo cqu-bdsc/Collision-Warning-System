@@ -303,23 +303,22 @@ QJsonObject DataProcessThread::getDistance(double lon1, double lat1, double lon2
     if (dx >= 0){
         if (dy >= 0){  //dx与dy均为正数，点二在以点一为原点的坐标系的第三象限
             angle = atan2(dy, dx)/DEF_PI*180;
-            angle = angle + 180;  //angle为以正北为0度顺时针的角度
+            angle = 270 - angle;  //angle为以正北为0度顺时针的角度
         } else{        //dx大于0， dy小于0， 点二在以点一为原点的坐标系的第四象限
             angle = atan2(-dy, dx)/DEF_PI*180;
-            dy = -dy;
-            angle = angle + 270;
+            angle = 270 + angle;
         }
     } else{
         if (dy >= 0){  //dx小于0， dy大于0，点二在以点一为原点的坐标系的第二象限
             angle = atan2(dy, -dx)/DEF_PI*180;
-            dx = -dx;
-            angle = angle + 90;
+            angle = 90 + angle;
         } else{  //dx与dy均小于0，点二在以点一为原点的坐标系的第一象限
             angle = atan2(-dy, -dx)/DEF_PI*180;
-            dx = -dx;
-            dy = -dy;
+            angle = 90 - angle;
         }
     }
+    dx = -dx;
+    dy = -dy;
     QJsonObject jsonObject;
     jsonObject.insert("distance", distance);
     jsonObject.insert("angle", angle);
@@ -564,11 +563,10 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
                         angle2 = abs(angle + 360-d2);
                     }
                     if(angle1 + angle2 <180){
-                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+                        double ddx = abs(dx);
+                        double ddy = abs(dy);
+                        x = (ddy + ddx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
                         y = tan(d1*DEF_PI180) * x;
-
-//                        printf("x = %lf\n", x);
-//                        printf("y = %lf\n", y);
 
                         double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
                         double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
@@ -613,11 +611,10 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
 //                    printf("angle1 = %lf\n", angle1);
 //                    printf("angle2 = %lf\n", angle2);
                     if(angle1 + angle2 <180){
-                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+                        double ddx = abs(dx);
+                        double ddy = abs(dy);
+                        x = (ddy + ddx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
                         y = tan(d1*DEF_PI180) * x;
-
-//                        printf("x = %lf\n", x);
-//                        printf("y = %lf\n", y);
 
                         double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
                         double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));

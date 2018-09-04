@@ -8,6 +8,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDateTime>
+#include<QFile>
+#include<QTextStream>
 #include "myudp.h"
 #include "dataprocessthread.h"
 
@@ -38,6 +40,7 @@ private slots:
     void onUdpSendMessage();
     void onSendMessageq(const QJsonObject &result);
     void onUdpAppendMessage(const QString &from, const QJsonObject &message);
+    void saveFile(const QJsonObject &message);
 
     //获取本机IP地址
     void on_but_getIP_clicked();

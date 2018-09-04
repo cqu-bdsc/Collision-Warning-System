@@ -3,6 +3,10 @@
 #include <QList>
 #include <QString>
 #include <QJsonDocument>
+#include<QDebug>
+#include <QDateTime>
+#include<QFile>
+#include<QTextStream>
 
 QJsonObject getDistance(double lon1, double lat1, double lon2, double lat2){
     static double DEF_PI = 3.14159265359; // PI
@@ -33,19 +37,26 @@ QJsonObject getDistance(double lon1, double lat1, double lon2, double lat2){
     if (dx >= 0){
         if (dy >= 0){  //dx与dy均为正数，点二在以点一为原点的坐标系的第三象限
             angle = atan2(dy, dx)/DEF_PI*180;
-            angle = angle + 180;  //angle为以正北为0度顺时针的角度
+            angle = 270 - angle;  //angle为以正北为0度顺时针的角度
+            dx = -dx;
+            dy = -dy;
         } else{        //dx大于0， dy小于0， 点二在以点一为原点的坐标系的第四象限
             angle = atan2(-dy, dx)/DEF_PI*180;
+//            dy = -dy;
+            angle = 270 + angle;
+            dx = -dx;
             dy = -dy;
-            angle = angle + 270;
         }
     } else{
         if (dy >= 0){  //dx小于0， dy大于0，点二在以点一为原点的坐标系的第二象限
             angle = atan2(dy, -dx)/DEF_PI*180;
+//            dx = -dx;
+            angle = 90 + angle;
             dx = -dx;
-            angle = angle + 90;
+            dy = -dy;
         } else{  //dx与dy均小于0，点二在以点一为原点的坐标系的第一象限
             angle = atan2(-dy, -dx)/DEF_PI*180;
+            angle = 90 - angle;
             dx = -dx;
             dy = -dy;
         }
@@ -301,8 +312,21 @@ void computerResultByAverageFeatures(const QList<QJsonObject> &messages){
                     }else{
                         angle2 = abs(angle + 360-d2);
                     }
+                    printf("angle1 = %lf\n", angle1);
+                    printf("angle2 = %lf\n", angle2);
                     if(angle1 + angle2 <180){
-                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+//                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+//                        y = tan(d1*DEF_PI180) * x;
+
+//                        printf("x = %lf\n", x);
+//                        printf("y = %lf\n", y);
+
+//                        double distanceCrossOne = sqrt(pow(x,2)+pow(y,2));
+//                        double distanceCrossTwo = sqrt(pow(abs(dx-x),2)+ pow(abs(dy-y),2));
+
+                        double ddx = abs(dx);
+                        double ddy = abs(dy);
+                        x = (ddy + ddx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
                         y = tan(d1*DEF_PI180) * x;
 
                         printf("x = %lf\n", x);
@@ -351,7 +375,9 @@ void computerResultByAverageFeatures(const QList<QJsonObject> &messages){
                     printf("angle1 = %lf\n", angle1);
                     printf("angle2 = %lf\n", angle2);
                     if(angle1 + angle2 <180){
-                        x = (dy + dx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
+                        double ddx = abs(dx);
+                        double ddy = abs(dy);
+                        x = (ddy + ddx*tan(d2*DEF_PI180))/(tan(d1*DEF_PI180) - tan(d2*DEF_PI180));
                         y = tan(d1*DEF_PI180) * x;
 
                         printf("x = %lf\n", x);
@@ -402,6 +428,28 @@ void computerResultByAverageFeatures(const QList<QJsonObject> &messages){
     printf(QJsonDocument(RVehicleTwo).toJson()+ "\n");
 
 
+}
+
+void saveFile(const QJsonObject &message){
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString time = currentDateTime.toString();
+    QFile file("C://Collision-Warning-System/mess.txt");
+    bool ok = file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text );
+    if(ok)
+    {
+        QTextStream out(&file);
+        QJsonDocument document;
+        document.setObject(message);
+        QByteArray byteArray = document.toJson(QJsonDocument::Compact);
+        QString jsonStr(byteArray);
+
+        out<<time<<"  "<<jsonStr<<endl;//转化成纯文本
+        file.close();
+    }
+    else
+    {
+        printf("file fail to save");
+    }
 }
 
 QList<QJsonObject> inputMessage(){
@@ -527,6 +575,86 @@ QList<QJsonObject> inputMessage(){
         message4.insert("lon",      "106.4750474577");
         message4.insert("acc",      "0");
 
+    /***********************************
+     *
+     * *********/
+
+//        QJsonObject message1;
+//        message1.insert("id",       "1");
+//        message1.insert("timeStamp","1535507945116");
+//        message1.insert("speed",    "5");
+//        message1.insert("direction","125");
+//        message1.insert("lat",      "29.5694305984");
+//        message1.insert("lon",      "106.4750474577");
+//        message1.insert("acc",      "0");
+
+//        QJsonObject message2;
+//        message2.insert("id",       "1");
+//        message2.insert("timeStamp","1535507946210");
+//        message2.insert("speed",    "5");
+//        message2.insert("direction","125");
+//        message2.insert("lat",      "29.5694305984");
+//        message2.insert("lon",      "106.4750474577");
+//        message2.insert("acc",      "0");
+
+//        QJsonObject message3;
+//        message3.insert("id",       "2");
+//        message3.insert("timeStamp","1535507945116");
+//        message3.insert("speed",    "5");
+//        message3.insert("direction","-140");
+//        message3.insert("lat",      "29.5701911572");
+//        message3.insert("lon",      "106.4777135734");
+//        message3.insert("acc",      "0");
+
+//        QJsonObject message4;
+//        message4.insert("id",       "2");
+//        message4.insert("timeStamp","1535507946210");
+//        message4.insert("speed",    "5");
+//        message4.insert("direction","-140");
+//        message4.insert("lat",      "29.5701911572");
+//        message4.insert("lon",      "106.4777135734");
+//        message4.insert("acc",      "0");
+
+
+    /***********************************
+     *
+     * *********/
+//        QJsonObject message1;
+//        message1.insert("id",       "1");
+//        message1.insert("timeStamp","1535507945116");
+//        message1.insert("speed",    "5");
+//        message1.insert("direction","125");
+//        message1.insert("lat",      "29.5701911572");
+//        message1.insert("lon",      "106.4777100000");
+//        message1.insert("acc",      "0");
+
+//        QJsonObject message2;
+//        message2.insert("id",       "1");
+//        message2.insert("timeStamp","1535507946210");
+//        message2.insert("speed",    "5");
+//        message2.insert("direction","125");
+//        message2.insert("lat",      "29.5701911572");
+//        message2.insert("lon",      "106.4777100000");
+//        message2.insert("acc",      "0");
+
+//        QJsonObject message3;
+//        message3.insert("id",       "2");
+//        message3.insert("timeStamp","1535507945116");
+//        message3.insert("speed",    "5");
+//        message3.insert("direction","-140");
+//        message3.insert("lat",      "29.5701911572");
+//        message3.insert("lon",      "106.4760130529");
+//        message3.insert("acc",      "0");
+
+//        QJsonObject message4;
+//        message4.insert("id",       "2");
+//        message4.insert("timeStamp","1535507946210");
+//        message4.insert("speed",    "5");
+//        message4.insert("direction","-140");
+//        message4.insert("lat",      "29.5701911572");
+//        message4.insert("lon",      "106.4760130529");
+//        message4.insert("acc",      "0");
+
     QList<QJsonObject> messages;
     messages.append(message1);
     printf(QJsonDocument(message1).toJson()+ "\n");
@@ -543,7 +671,12 @@ QList<QJsonObject> inputMessage(){
 
 int main()
 {
-    computerResultByAverageFeatures(inputMessage());
+    //QJsonObject jsonObject = getDistance(106.4763885622, 29.5684833914, 106.4763885622, 29.5681240136);
+    //QJsonObject jsonObject = getDistance(106.4763885622, 29.5684833914, 106.4757801647, 29.5684833914);
+   // printf(QJsonDocument(jsonObject).toJson()+ "\n");
+   // computerResultByAverageFeatures(inputMessage());
+    saveFile(inputMessage().at(0));
+    saveFile(inputMessage().at(1));
     return 1;
 }
 

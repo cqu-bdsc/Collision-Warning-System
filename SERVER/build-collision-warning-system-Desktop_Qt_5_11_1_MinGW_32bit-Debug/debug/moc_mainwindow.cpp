@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[25];
-    char stringdata0[328];
+    QByteArrayData data[26];
+    char stringdata0[337];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -44,25 +44,26 @@ QT_MOC_LITERAL(9, 111, 14), // "onSendMessageq"
 QT_MOC_LITERAL(10, 126, 6), // "result"
 QT_MOC_LITERAL(11, 133, 18), // "onUdpAppendMessage"
 QT_MOC_LITERAL(12, 152, 4), // "from"
-QT_MOC_LITERAL(13, 157, 20), // "on_but_getIP_clicked"
-QT_MOC_LITERAL(14, 178, 35), // "on_NetInterface_currentIndexC..."
-QT_MOC_LITERAL(15, 214, 5), // "index"
-QT_MOC_LITERAL(16, 220, 10), // "showResult"
-QT_MOC_LITERAL(17, 231, 6), // "setRsu"
-QT_MOC_LITERAL(18, 238, 9), // "timeCrash"
-QT_MOC_LITERAL(19, 248, 20), // "setCarOneNowPosition"
-QT_MOC_LITERAL(20, 269, 3), // "lon"
-QT_MOC_LITERAL(21, 273, 3), // "lat"
-QT_MOC_LITERAL(22, 277, 20), // "setCarTwoNowPosition"
-QT_MOC_LITERAL(23, 298, 7), // "showLog"
-QT_MOC_LITERAL(24, 306, 21) // "on_pushButton_clicked"
+QT_MOC_LITERAL(13, 157, 8), // "saveFile"
+QT_MOC_LITERAL(14, 166, 20), // "on_but_getIP_clicked"
+QT_MOC_LITERAL(15, 187, 35), // "on_NetInterface_currentIndexC..."
+QT_MOC_LITERAL(16, 223, 5), // "index"
+QT_MOC_LITERAL(17, 229, 10), // "showResult"
+QT_MOC_LITERAL(18, 240, 6), // "setRsu"
+QT_MOC_LITERAL(19, 247, 9), // "timeCrash"
+QT_MOC_LITERAL(20, 257, 20), // "setCarOneNowPosition"
+QT_MOC_LITERAL(21, 278, 3), // "lon"
+QT_MOC_LITERAL(22, 282, 3), // "lat"
+QT_MOC_LITERAL(23, 286, 20), // "setCarTwoNowPosition"
+QT_MOC_LITERAL(24, 307, 7), // "showLog"
+QT_MOC_LITERAL(25, 315, 21) // "on_pushButton_clicked"
 
     },
     "MainWindow\0newMessage\0\0message\0"
     "newLogInfo\0logInfo\0on_but_start_clicked\0"
     "onUdpStopButtonClicked\0onUdpSendMessage\0"
     "onSendMessageq\0result\0onUdpAppendMessage\0"
-    "from\0on_but_getIP_clicked\0"
+    "from\0saveFile\0on_but_getIP_clicked\0"
     "on_NetInterface_currentIndexChanged\0"
     "index\0showResult\0setRsu\0timeCrash\0"
     "setCarOneNowPosition\0lon\0lat\0"
@@ -77,7 +78,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      15,   14, // methods
+      16,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -85,23 +86,24 @@ static const uint qt_meta_data_MainWindow[] = {
        2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,   89,    2, 0x06 /* Public */,
-       4,    1,   92,    2, 0x06 /* Public */,
+       1,    1,   94,    2, 0x06 /* Public */,
+       4,    1,   97,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       6,    0,   95,    2, 0x08 /* Private */,
-       7,    0,   96,    2, 0x08 /* Private */,
-       8,    0,   97,    2, 0x08 /* Private */,
-       9,    1,   98,    2, 0x08 /* Private */,
-      11,    2,  101,    2, 0x08 /* Private */,
-      13,    0,  106,    2, 0x08 /* Private */,
-      14,    1,  107,    2, 0x08 /* Private */,
-      16,    1,  110,    2, 0x08 /* Private */,
-      17,    1,  113,    2, 0x08 /* Private */,
-      19,    2,  116,    2, 0x08 /* Private */,
-      22,    2,  121,    2, 0x08 /* Private */,
-      23,    1,  126,    2, 0x08 /* Private */,
-      24,    0,  129,    2, 0x08 /* Private */,
+       6,    0,  100,    2, 0x08 /* Private */,
+       7,    0,  101,    2, 0x08 /* Private */,
+       8,    0,  102,    2, 0x08 /* Private */,
+       9,    1,  103,    2, 0x08 /* Private */,
+      11,    2,  106,    2, 0x08 /* Private */,
+      13,    1,  111,    2, 0x08 /* Private */,
+      14,    0,  114,    2, 0x08 /* Private */,
+      15,    1,  115,    2, 0x08 /* Private */,
+      17,    1,  118,    2, 0x08 /* Private */,
+      18,    1,  121,    2, 0x08 /* Private */,
+      20,    2,  124,    2, 0x08 /* Private */,
+      23,    2,  129,    2, 0x08 /* Private */,
+      24,    1,  134,    2, 0x08 /* Private */,
+      25,    0,  137,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QJsonObject,    3,
@@ -113,12 +115,13 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QJsonObject,   10,
     QMetaType::Void, QMetaType::QString, QMetaType::QJsonObject,   12,    3,
+    QMetaType::Void, QMetaType::QJsonObject,    3,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   15,
+    QMetaType::Void, QMetaType::Int,   16,
     QMetaType::Void, QMetaType::QJsonObject,   10,
-    QMetaType::Void, QMetaType::Double,   18,
-    QMetaType::Void, QMetaType::Double, QMetaType::Double,   20,   21,
-    QMetaType::Void, QMetaType::Double, QMetaType::Double,   20,   21,
+    QMetaType::Void, QMetaType::Double,   19,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double,   21,   22,
+    QMetaType::Void, QMetaType::Double, QMetaType::Double,   21,   22,
     QMetaType::Void, QMetaType::QString,    5,
     QMetaType::Void,
 
@@ -138,14 +141,15 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 4: _t->onUdpSendMessage(); break;
         case 5: _t->onSendMessageq((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
         case 6: _t->onUdpAppendMessage((*reinterpret_cast< const QString(*)>(_a[1])),(*reinterpret_cast< const QJsonObject(*)>(_a[2]))); break;
-        case 7: _t->on_but_getIP_clicked(); break;
-        case 8: _t->on_NetInterface_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 9: _t->showResult((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
-        case 10: _t->setRsu((*reinterpret_cast< const double(*)>(_a[1]))); break;
-        case 11: _t->setCarOneNowPosition((*reinterpret_cast< const double(*)>(_a[1])),(*reinterpret_cast< const double(*)>(_a[2]))); break;
-        case 12: _t->setCarTwoNowPosition((*reinterpret_cast< const double(*)>(_a[1])),(*reinterpret_cast< const double(*)>(_a[2]))); break;
-        case 13: _t->showLog((*reinterpret_cast< const QString(*)>(_a[1]))); break;
-        case 14: _t->on_pushButton_clicked(); break;
+        case 7: _t->saveFile((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
+        case 8: _t->on_but_getIP_clicked(); break;
+        case 9: _t->on_NetInterface_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->showResult((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
+        case 11: _t->setRsu((*reinterpret_cast< const double(*)>(_a[1]))); break;
+        case 12: _t->setCarOneNowPosition((*reinterpret_cast< const double(*)>(_a[1])),(*reinterpret_cast< const double(*)>(_a[2]))); break;
+        case 13: _t->setCarTwoNowPosition((*reinterpret_cast< const double(*)>(_a[1])),(*reinterpret_cast< const double(*)>(_a[2]))); break;
+        case 14: _t->showLog((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 15: _t->on_pushButton_clicked(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -192,13 +196,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 15)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 15;
+        _id -= 16;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 15)
+        if (_id < 16)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 15;
+        _id -= 16;
     }
     return _id;
 }
