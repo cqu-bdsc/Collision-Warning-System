@@ -36,7 +36,7 @@ void MainWindow::initUI(){
     ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
     ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
     ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
-    QString webstr=QString("file:///C:/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    QString webstr=QString("file:///C:/Users/near/Documents/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
     ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
 
     ui->textLog->setText("显示LOG信息");
@@ -267,17 +267,17 @@ void MainWindow::onSendMessageq(const QJsonObject &result){
 //    udpTargetPort = ui->editSendPort->text().toInt();
     bool warning = result.find("warning").value().toBool();
     if(warning){
-        udpTargetAddr.setAddress("192.168.1.80");
+//        udpTargetAddr.setAddress("192.168.1.80");
+//        udpTargetPort = 4040;
+//        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+
+        udpTargetAddr.setAddress("192.168.1.175");
         udpTargetPort = 4040;
         myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 
-//        udpTargetAddr.setAddress("192.168.43.111");
-//        udpTargetPort = 4040;
-//        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-
-//        udpTargetAddr.setAddress("192.168.43.14");
-//        udpTargetPort = 4040;
-//        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+        udpTargetAddr.setAddress("192.168.1.111");
+        udpTargetPort = 4040;
+        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 
     }
 }
