@@ -7,7 +7,9 @@
 #include <QTimer>
 #include <QQueue>
 #include <QList>
+#include <QSqlQuery>
 #include <qmath.h>
+#include <QDateTime>
 
 class DataProcessThread : public QThread
 {
@@ -44,15 +46,19 @@ private slots:
      */
     void setRsuLocation(const QJsonObject &rsuLocation);  //设置RSU位置
     bool addMessage(const QJsonObject &message);          //将信息添加到队列中
+    bool addMessageToDB(const QJsonObject &message);      //将信息添加到数据库中
+
 //    void ComputerResult(const QList<QJsonObject> &messages);
     void computerResult(const QList<QJsonObject> &messages);
-    void computerResultByLinearRegression(const QList<QJsonObject> &messages); //使用线性回归的方法
-    void computerResultByAverageFeatures(const QList<QJsonObject> &messages); //使用平均的特征以及物理特性
+    void computerResultByAverageFeatures(const QList<QJsonObject> &message); //使用平均的特征以及物理特性
+    void computerResultByLinearRegression(const QList<QJsonObject> &location); //使用线性回归的方法
+
 
 
 signals:
 
-    void newComputable(const QList<QJsonObject> &fourMessages);     //可以计算时，调用ComputerResult
+    void newComputableByAverageFeatures(const QList<QJsonObject> &fourMessages);     //可以计算时，调用ComputerResult
+    void newComputableByLinearRegression(const QList<QJsonObject> &location);
     void sendResult(const QJsonObject &result);             //有计算结果时，先将结果发送的UI
     void newLogInfo(const QString &logInfo);
     void newVehicleOne(const double &lon, const double &lat);

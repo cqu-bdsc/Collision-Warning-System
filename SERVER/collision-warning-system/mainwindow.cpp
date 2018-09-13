@@ -309,13 +309,14 @@ void MainWindow::setRsu(const double &timeCrash){
         processThread->start();
         emit newLogInfo("processThread is started.");
         connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
-        connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(computerResultByAverageFeatures(QList<QJsonObject>)));
+        connect(processThread, SIGNAL(newComputableByAverageFeatures(QList<QJsonObject>)), processThread, SLOT(computerResultByAverageFeatures(QList<QJsonObject>)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(saveFile(QJsonObject)));
         connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
         connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
-//        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
-//        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
+        /***在地图上标点*******/
+        //connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+        //connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
     }
 
 }
@@ -342,8 +343,8 @@ void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
 }
 
 void MainWindow::on_pushButton_clicked(){
-    double timeCrash = ui->timeEdit->text().toDouble();
-    setRsu(timeCrash);
+//    double timeCrash = ui->timeEdit->text().toDouble();
+//    setRsu(timeCrash);
 }
 
 void MainWindow::showResult(const QJsonObject &result){

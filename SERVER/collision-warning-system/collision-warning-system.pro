@@ -9,6 +9,8 @@ QT       += core gui
 QT       += network
 # 添加显示网页控件
 QT       += axcontainer
+# 添加数据库
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
