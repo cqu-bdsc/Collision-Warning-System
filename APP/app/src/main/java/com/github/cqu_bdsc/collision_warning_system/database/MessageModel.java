@@ -1,33 +1,49 @@
-package com.github.cqu_bdsc.collision_warning_system.DAO;
+package com.github.cqu_bdsc.collision_warning_system.database;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.raizlabs.android.dbflow.annotation.Column;
+import com.raizlabs.android.dbflow.annotation.PrimaryKey;
+import com.raizlabs.android.dbflow.annotation.Table;
+import com.raizlabs.android.dbflow.structure.BaseModel;
 
-import java.io.Serializable;
+@Table(database = AppDataBase.class)
+public class MessageModel extends BaseModel {
 
-public class Message implements Serializable {
-    public static int ERROR_VALUE = -666;
+    @PrimaryKey(autoincrement = true)
+    private int messageID;
+
+    @Column
     private int id;
-    private long timeStamp;
-    private float speed;
-    private float direction;
-    private double lat;
-    private double lon;
-    private double ace;
-    private String mac;
-    private int type;  // type=1 为时间同步消息
-    //type = 0 为普通消息
 
-   public   Message(){
-        type = ERROR_VALUE;
-        id = ERROR_VALUE;
-        timeStamp = ERROR_VALUE;
-        speed = ERROR_VALUE;
-        direction = ERROR_VALUE;
-        lat = ERROR_VALUE;
-        lon = ERROR_VALUE;
-        ace = ERROR_VALUE;
-        mac = "666";
+    @Column
+    private long timeStamp;
+
+    @Column
+    private float speed;
+
+    @Column
+    private float direction;
+
+    @Column
+    private double lat;
+
+    @Column
+    private double lon;
+
+    @Column
+    private double ace;
+
+    @Column
+    private String mac;
+
+    @Column
+    private int type;
+
+    public void setMessageID(int messageID) {
+        this.messageID = messageID;
+    }
+
+    public int getMessageID() {
+        return messageID;
     }
 
     public void setType(int type) {
@@ -100,24 +116,5 @@ public class Message implements Serializable {
 
     public void setMac(String mac) {
         this.mac = mac;
-    }
-
-    public JSONObject toJSON(){
-
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("id", String.valueOf(getId()));
-            jsonObject.put("type", String.valueOf(getType()));
-            jsonObject.put("timeStamp",String.valueOf(getTimeStamp()));
-            jsonObject.put("speed",String.valueOf(getSpeed()));
-            jsonObject.put("direction",String.valueOf(getDirection()));
-            jsonObject.put("lat",String.valueOf(getLat()));
-            jsonObject.put("lon",String.valueOf(getLon()));
-            jsonObject.put("acc",String.valueOf(getAce()));
-            return jsonObject;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

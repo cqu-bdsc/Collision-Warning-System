@@ -45,7 +45,7 @@
         </activity>
 
         <service android:name=".udp.SendService" />
-
+        <service android:name=".database.DBTool"/>
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"> </service>
 
     </application>
