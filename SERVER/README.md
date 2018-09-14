@@ -48,6 +48,13 @@
 4. ~~方案四：使用高像素图片？~~\
    不太现实。
 
+### Debug
+
+野指针异常，请注意。
+```
+onecoreuap\inetcore\urlmon\zones\zoneidentifier.cxx(359)\urlmon.dll!6F02FA50: (caller: 6F02F768) ReturnHr(6) tid(a28) 80070002 系统找不到指定的文件。
+```
+
 ### 接口说明
 
 #### UDP模块

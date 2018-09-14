@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDateTime>
+#include <QSqlError>
 #include<QFile>
 #include<QTextStream>
 #include "myudp.h"
@@ -40,10 +41,21 @@ private slots:
     void onUdpSendMessage();
     void onSendMessageq(const QJsonObject &result);
     void onUdpAppendMessage(const QString &from, const QJsonObject &message);
-    void saveFile(const QJsonObject &message);
+    void on_pushButton_Stop_clicked();
+//    void saveFile(const QJsonObject &message);
+//    void saveFile(const QString &message);
+
+    bool addMessageToDB(const QJsonObject &message);      //将信息添加到数据库中
+
+
+
+    /***********************************
+     * 获得本机时间戳
+     * *****************************/
+    long long getTimeStamp();
 
     //获取本机IP地址
-    void on_but_getIP_clicked();
+    //void on_but_getIP_clicked();
 
     void on_NetInterface_currentIndexChanged(int index);
 
@@ -61,7 +73,7 @@ private slots:
      * setCarOneNowPosition         设置第一辆车当前位置，形成轨迹
      * setCarTwoNowPosition         设置第二辆车当前位置，形成轨迹
      * *********************************/
-    void setRsu(const double &timeCrash);
+    void setRsu(const double &THRESHOLD, const double &DISTANCE_THRESHOLD);
     void setCarOneNowPosition(const double &lon, const double &lat);
     void setCarTwoNowPosition(const double &lon, const double &lat);
 //    void setCarOneFutureTrace();
@@ -92,7 +104,7 @@ private:
     QList<QNetworkInterface> interfaceList; //保存网卡接口的链表
 
     QHostAddress localAddr;     //本地IP地址
-    quint16 udpListenPort;      //本地接收端的监听端口
+    quint16 udpListenPort  = 4040;      //本地接收端的监听端口
     QHostAddress udpTargetAddr; //目标接收端的IP地址
     quint16 udpTargetPort;      //目标接收端的监听端口
 

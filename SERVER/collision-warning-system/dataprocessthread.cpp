@@ -3,6 +3,8 @@
 DataProcessThread::DataProcessThread(const QJsonObject &rsulocation)
 {
     this->setRsuLocation(rsulocation);
+    this->THRESHOLD = rsuLocation.find("THRESHOLD").value().toString().toDouble();
+    this->DISTANCE_THRESHOLD = rsulocation.find("DISTANCE_THRESHOLD").value().toString().toDouble();
 }
 
 DataProcessThread::~DataProcessThread(){
@@ -100,31 +102,13 @@ bool DataProcessThread::addMessage(const QJsonObject &message){
     return isSuccess;
 }
 
-bool DataProcessThread::addMessageToDB(const QJsonObject &message){
-    int messageId = message.find("id").value().toString().toInt();
-    long long timeStamp = message.find("timeStamp").value().toString().toLongLong();
-    float speed = message.find("speed").value().toString().toFloat();
-    float direction = message.find("direction").value().toString().toFloat();
-    double acc = message.find("acc").value().toString().toDouble();
-    double lon = message.find("lon").value().toString().toDouble();
-    double lat = message.find("lat").value().toString().toDouble();
-
-    QSqlQuery query;
-    query.prepare("INSERT INTO message(messageID, speed, direction, acc, lon, lat, timeStamp)" "VALUES(:messageID, :speed, :direction, :acc, :lon, :lat, :timeStamp)");
-    query.bindValue(":messageID", messageId);
-    query.bindValue(":timeStamp", timeStamp);
-    query.bindValue(":speed", speed);
-    query.bindValue(":direction", direction);
-    query.bindValue(":acc", acc);
-    query.bindValue(":lon", lon);
-    query.bindValue(":lat", lat);
-    if(!query.exec()){
-        return false;
-    } else {
-        return true;
-    }
-
+long long DataProcessThread::getTimeStamp(){
+       QDateTime time = QDateTime::currentDateTime();   //获取当前时间
+       long long timeStamp = time.toMSecsSinceEpoch();
+       return timeStamp;
 }
+
+
 
 /**
  * 返回是否可以计算, 如果可以，返回包含四个QJsonObject的List
@@ -151,33 +135,33 @@ QList<QJsonObject> DataProcessThread::isComputed(){
     return jsonArray;
 }
 
-QList<QList<double>> Trajectory(double t, double v, double a, double rlat, double rlon, double vlat, double vlon){
-    double l,h,d;//小三角形斜边长,高，底边长
-    double L,H,D;//大三角形斜边长，高，底边长
-    const double lat_THRESHOLD = 0.001;//经度的精度
-    const double lon_THRESHOLD = 0.001;//纬度的精度
-    QList<double> array;
-    QList<QList<double>> Tra;
-    L=sqrt(pow(rlat-vlat,2)+pow(rlon-vlon,2));
-    H=rlon-vlon;
-    D=rlat-vlat;
-    int t0=t;
-    while (abs(rlat-vlat)>lat_THRESHOLD && abs(rlon-vlon)>lon_THRESHOLD) {
-        l=v*t+1/2*a*pow(t,2);    //计算斜边长
-        h=l/L*H;                 //计算高
-        d=l/L*D;                 //计算底边
-        vlat=vlat+d;             //计算下t时间后的经度
-        vlon=vlon+h;             //计算下t时间后的纬度
-        //将当前经纬度保存进QList
-        array[0]=vlat;
-        array[1]=vlon;
-        //保存轨迹
-        Tra.append(array);
-        //更新时间，求下一时间点的经纬度
-        t=t+t0;
-    }
-    return Tra;
-}
+//QList<QList<double>> Trajectory(double t, double v, double a, double rlat, double rlon, double vlat, double vlon){
+//    double l,h,d;//小三角形斜边长,高，底边长
+//    double L,H,D;//大三角形斜边长，高，底边长
+//    const double lat_THRESHOLD = 0.001;//经度的精度
+//    const double lon_THRESHOLD = 0.001;//纬度的精度
+//    QList<double> array;
+//    QList<QList<double>> Tra;
+//    L=sqrt(pow(rlat-vlat,2)+pow(rlon-vlon,2));
+//    H=rlon-vlon;
+//    D=rlat-vlat;
+//    int t0=t;
+//    while (abs(rlat-vlat)>lat_THRESHOLD && abs(rlon-vlon)>lon_THRESHOLD) {
+//        l=v*t+1/2*a*pow(t,2);    //计算斜边长
+//        h=l/L*H;                 //计算高
+//        d=l/L*D;                 //计算底边
+//        vlat=vlat+d;             //计算下t时间后的经度
+//        vlon=vlon+h;             //计算下t时间后的纬度
+//        //将当前经纬度保存进QList
+//        array[0]=vlat;
+//        array[1]=vlon;
+//        //保存轨迹
+//        Tra.append(array);
+//        //更新时间，求下一时间点的经纬度
+//        t=t+t0;
+//    }
+//    return Tra;
+//}
 
 
 
@@ -193,28 +177,34 @@ void DataProcessThread::timeOutSlot(){
         emit newComputableByAverageFeatures(jsonArray);
     }
 
-    /**********************
-     * 先得到当前时间戳
-     * 根据时间戳从数据库中查询从此时前向的20内的Message
-     * *********************/
-//    QDateTime time = QDateTime::currentDateTime();   //获取当前时间
-//    long long timeEnd = time.toMSecsSinceEpoch();
-//    emit newLogInfo(QString::number(timeEnd));
-//    long long timeStart = timeEnd - 20 * 1000;
+}
 
-//    QSqlQuery query;
-//    query.prepare("SELECT * FROM message WHERE timeStamp >= timeStart AND timeStamp <= timeEnd");
-//    query.bindValue(":timeStart", timeStart);
-//    query.bindValue(":timeEnd", timeEnd);
-//    if(!query.exec()){
-//        return false;
-//    } else {
-//        return true;
-//    }
-
-
-
-
+double DataProcessThread::getDistanceDouble(double lon1, double lat1, double lon2, double lat2){
+    static double DEF_PI = 3.14159265359; // PI
+    static double DEF_2PI= 6.28318530712; // 2*PI
+    static double DEF_PI180= 0.01745329252; // PI/180.0
+    static double DEF_R =6370693.5; // radius of earth
+    //适用于近距离
+    double ew1, ns1, ew2, ns2;
+    double dx, dy, dew;
+    double distance, angle;
+    // 角度转换为弧度
+    ew1 = lon1 * DEF_PI180;
+    ns1 = lat1 * DEF_PI180;
+    ew2 = lon2 * DEF_PI180;
+    ns2 = lat2 * DEF_PI180;
+    //经度差
+    dew = ew1 - ew2;
+    // 若跨东经和西经180 度，进行调整
+    if (dew > DEF_PI)
+        dew = DEF_2PI - dew;
+    else if (dew < -DEF_PI)
+        dew = DEF_2PI + dew;
+    dx = DEF_R * cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
+    dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
+    // 勾股定理求斜边长
+    distance = sqrt(dx * dx + dy * dy);
+    return distance;
 }
 
 QJsonObject DataProcessThread::getDistance(double lon1, double lat1, double lon2, double lat2){
@@ -360,8 +350,8 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
 //    printf("time2 = %s\n",QString::number(time2).toStdString().data());
 //    printf("time1-time2 = %s\n",QString::number(abs(time1-time2)).toStdString().data());
 
-    //double timeCrash = this->rsuLocation.find("time").value().toString().toDouble();
-    double timeCrash = 10000;
+    double timeCrash = this->rsuLocation.find("THRESHOLD").value().toString().toDouble();
+    //double timeCrash = 10000;
 
     bool isCrash = false;
 
@@ -593,11 +583,13 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     }
 
     RVehicleOne.insert("id",id1);
+    RVehicleOne.insert("type",2);
     RVehicleOne.insert("warning",isCrash);
     RVehicleOne.insert("time",t1);
     RVehicleOne.insert("distance",dist1);
 
     RVehicleTwo.insert("id",id2);
+    RVehicleTwo.insert("type",2);
     RVehicleTwo.insert("warning",isCrash);
     RVehicleTwo.insert("time",t2);
     RVehicleTwo.insert("distance",dist2);
@@ -608,6 +600,251 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
 
     emit sendResult(RVehicleOne);
     emit sendResult(RVehicleTwo);
+}
+
+/**************************
+ * 方案二
+ * 使用离散点来预测
+ * *********************/
+void DataProcessThread::computerResultByDiscretePoints(const QList<QJsonObject> &messages){
+    QList<QJsonObject> result;
+    QJsonObject RVehicleOne,RVehicleTwo;
+    QList<QJsonObject> tra1,tra2;
+    bool flag = true;
+
+    //提取两辆车的id
+    int id1=messages.at(0).find("id").value().toString().toInt();
+    int id12=messages.at(1).find("id").value().toString().toInt();
+    int id2=messages.at(2).find("id").value().toString().toInt();
+    int id22=messages.at(3).find("id").value().toString().toInt();
+
+    //提取两辆车的速度
+    float v11=messages.at(0).find("speed").value().toString().toFloat();
+    float v12=messages.at(1).find("speed").value().toString().toFloat();
+    float v21=messages.at(2).find("speed").value().toString().toFloat();
+    float v22=messages.at(3).find("speed").value().toString().toFloat();
+    //求两辆车的平均速度
+    float v1=(v11+v12)/2/3.6;  //传过来的速度为KM/H
+    float v2=(v21+v22)/2/3.6;
+
+    //提取两辆车的方向
+    /***************
+     * 0为正北，90正东，-90正西，180或-180正南
+     */
+    float d11=messages.at(0).find("direction").value().toString().toFloat();
+    float d12=messages.at(1).find("direction").value().toString().toFloat();
+    float d21=messages.at(2).find("direction").value().toString().toFloat();
+    float d22=messages.at(3).find("direction").value().toString().toFloat();
+
+    //求两辆车的平均方向
+    float d1=(d11+d12)/2;
+    float d2=(d21+d22)/2;
+    if(d1 < 0){
+        d1 = d1 + 360;
+    }
+    if(d2 <0){
+        d2 = d2 + 360;
+    }
+
+    //提取两辆车的加速度
+    double acc11=messages.at(0).find("acc").value().toString().toDouble();
+    double acc12=messages.at(1).find("acc").value().toString().toDouble();
+    double acc21=messages.at(2).find("acc").value().toString().toDouble();
+    double acc22=messages.at(3).find("acc").value().toString().toDouble();
+    //求两辆车的平均加速度
+    double acc1=(acc11+acc12)/2;
+    double acc2=(acc21+acc22)/2;
+
+    //提取两辆车的lat
+    double lat11=messages.at(0).find("lat").value().toString().toDouble();
+    double lat12=messages.at(1).find("lat").value().toString().toDouble();
+    double lat21=messages.at(2).find("lat").value().toString().toDouble();
+    double lat22=messages.at(3).find("lat").value().toString().toDouble();
+
+    //求两辆车的平均lat（NTU)
+    double lat1=(lat11+lat12)/2;
+    double lat1_NTU=lat1*100000;
+    double lat2=(lat21+lat22)/2;
+    double lat2_NTU=lat2*100000;
+
+    //提取两辆车的lon
+    double lon11=messages.at(0).find("lon").value().toString().toDouble();
+    double lon12=messages.at(1).find("lon").value().toString().toDouble();
+    double lon21=messages.at(2).find("lon").value().toString().toDouble();
+    double lon22=messages.at(3).find("lon").value().toString().toDouble();
+
+    //求两辆车的平均lon（NTU)
+    double lon1=(lon11+lon12)/2;
+    double lon1_NTU=lon1*100000;
+    double lon2=(lon21+lon22)/2;
+    double lon2_NTU=lon2*100000;
+
+//    //提取两辆车message的时间戳
+//    long long time11 = messages.at(0).find("timeStamp").value().toString().toLongLong();
+//    long long time12 = messages.at(1).find("timeStamp").value().toString().toLongLong();
+//    long long time21 = messages.at(2).find("timeStamp").value().toString().toLongLong();
+//    long long time22 = messages.at(3).find("timeStamp").value().toString().toLongLong();
+//    //求平均时间戳
+//    long long time1 = (time11+time12)/2;
+//    long long time2 = (time21+time22)/2;
+    double dist=sqrt(pow(lat1_NTU-lat2_NTU,2)+pow(lon1_NTU-lon2_NTU,2));
+
+
+    //判断输入数据是否出错
+    if ((id1 != id12) || (id2 != id22)){//两组数据id不同
+        flag=false;
+    }
+
+    if (abs(v11-v12)>Velocity || abs(v21-v22)>Velocity){//两组数据速度相差太大
+        flag=false;
+    }
+
+    if (abs(acc11-acc12)>Acceleration || abs(acc21-acc22)>Acceleration){//两组数据加速度相差太大
+        flag=false;
+    }
+
+    if (abs(lat11-lat12)>LAT || abs(lat21-lat22)>LAT){//两组数据纬度相差太大
+        flag=false;
+    }
+
+    if (abs(lon11-lon12)>LON || abs(lon21-lon22)>LON){//两组数据经度相差太大
+        flag=false;
+    }
+
+    //输入数据正确，求轨迹并判断是否碰撞
+    if (flag==true){
+        d1=d1/180*3.14;
+        d2=d2/180*3.14;
+        tra1=Trajectory(v1,acc1,d1,lat1,lon1);
+        tra2=Trajectory(v2,acc2,d2,lat2,lon2);
+
+        result=Judgment(id1,id2,lat1,lon1,lat2,lon2,tra1,tra2); //判断是否相撞
+        emit sendResult(result.at(0));
+        emit sendResult(result.at(1));
+        addResultToDB(result.at(0));
+        addResultToDB(result.at(1));
+    }
+    else{//输入数据有误
+//        RVehicleOne.insert("id",id1);
+//        RVehicleOne.insert("error",flag);
+
+//        RVehicleTwo.insert("id",id2);
+//        RVehicleTwo.insert("error",flag);
+
+//        result.append(RVehicleOne);
+//        result.append(RVehicleTwo);
+    }
+
+    //return result;
+
+
+}
+
+QList<QJsonObject> DataProcessThread::Trajectory(double v, double a, double dir, double vlat, double vlon){
+    double l,h,d,lon,lat;    //小三角形斜边长,高，底边长，当前所在经纬度
+    QJsonObject array;       //每个时间节点的经纬度
+    QList<QJsonObject> Tra;  //行驶轨迹
+
+    int t0=UNITTIME;       //时间间隔
+    while (t0<= THRESHOLD) {//求一段时间内的轨迹坐标
+        l=(v*t0+1/2*a*pow(t0,2))/100000;    //计算斜边长
+        h=l*cos(dir);            //计算纬度差
+        d=l*sin(dir);            //计算经度差
+        lat=vlat+h;             //计算间隔t0后的纬度
+        lon=vlon+d;             //计算间隔t0后的经度
+
+        //将当前经纬度保存进QJsonObject
+        array.insert("vlat",lat);
+        array.insert("vlon",lon);
+
+        //保存轨迹
+        Tra.append(array);
+
+        //更新时间，求下一时间点的经纬度
+        t0=t0+UNITTIME;
+
+    }
+    return Tra;
+}
+
+QList<QJsonObject> DataProcessThread::Judgment(int id1, int id2, double lat1,double lon1,double lat2,double lon2,QList<QJsonObject> tra1,QList<QJsonObject> tra2){
+    QList<QJsonObject> result;
+    QJsonObject RVehicleOne,RVehicleTwo;
+    double vlat1,vlon1,vlat2,vlon2;    //纬度、经度
+    RVehicleOne.insert("id",id1);
+    RVehicleTwo.insert("id",id2);
+    QJsonArray vtra1;
+    QJsonArray vtra2;
+    //jsonArray.add(0, "this is a jsonArray value");
+    //jsonArray.add(1, "another jsonArray value");
+    //jsonObject.element("jsonArray", jsonArray);
+
+    bool flag=false;
+    int t0=UNITTIME;       //时间间隔
+    int i=0;    //计数器
+    while(flag==false && t0<= THRESHOLD){
+        vlat1=tra1.at(i).find("vlat").value().toDouble();
+        vlon1=tra1.at(i).find("vlon").value().toDouble();
+        vlat2=tra2.at(i).find("vlat").value().toDouble();
+        vlon2=tra2.at(i).find("vlon").value().toDouble();
+        vtra1.insert(i,tra1.at(i));
+        vtra2.insert(i,tra2.at(i));
+
+//        if (fabs(vlat1-vlat2)<lat_THRESHOLD && fabs(vlon1-vlon2)<lon_THRESHOLD){
+//            flag=true;
+
+//            RVehicleOne.insert("id",id1);
+//            RVehicleOne.insert("warning",flag);
+//            RVehicleOne.insert("time",t0);
+//            double dist1=sqrt(pow(lat1-vlat1,2)+pow(lon1-vlon1,2))*100000;
+//            RVehicleOne.insert("distance",dist1);
+//            RVehicleOne.insert("type",2);
+//        //    RVehicleOne.insert("trajectory",vtra1);
+
+
+//            RVehicleTwo.insert("id",id2);
+//            RVehicleTwo.insert("warning",flag);
+//            RVehicleTwo.insert("time",t0);
+//            double dist2=sqrt(pow(lat2-vlat2,2)+pow(lon2-vlon2,2))*100000;
+//            RVehicleTwo.insert("distance",dist2);
+//            RVehicleTwo.insert("type",2);
+//        //    RVehicleTwo.insert("trajectory",vtra2);
+
+//        }
+
+
+        if (getDistanceDouble(vlon1,vlat1,vlon2,vlat2) < DISTANCE_THRESHOLD || sqrt(pow(vlat1*100000-vlat2*100000,2)+pow(vlon1*100000-vlon2*100000,2)) < DISTANCE_THRESHOLD){
+            flag=true;
+
+            RVehicleOne.insert("id",id1);
+            RVehicleOne.insert("warning",flag);
+            RVehicleOne.insert("time",t0);
+            double dist1=sqrt(pow(lat1-vlat1,2)+pow(lon1-vlon1,2))*100000;
+            RVehicleOne.insert("distance",dist1);
+            RVehicleOne.insert("type",2);
+        //    RVehicleOne.insert("trajectory",vtra1);
+
+
+            RVehicleTwo.insert("id",id2);
+            RVehicleTwo.insert("warning",flag);
+            RVehicleTwo.insert("time",t0);
+            double dist2=sqrt(pow(lat2-vlat2,2)+pow(lon2-vlon2,2))*100000;
+            RVehicleTwo.insert("distance",dist2);
+            RVehicleTwo.insert("type",2);
+        //    RVehicleTwo.insert("trajectory",vtra2);
+
+        }
+        t0=t0+UNITTIME;
+        i=i+1;
+    }
+
+    if (flag==false){
+        RVehicleOne.insert("warning",flag);
+        RVehicleTwo.insert("warning",flag);
+    }
+    result.append(RVehicleOne);
+    result.append(RVehicleTwo);
+    return result;
 }
 
 
@@ -640,4 +877,27 @@ bool DataProcessThread::solveTime(double a, double b, double c){
         printf("t = %lf\n", time);
     }
     return time;
+}
+
+bool DataProcessThread::addResultToDB(const QJsonObject &result){
+    int resultID = result.find("id").value().toInt();
+    int time = result.find("time").value().toInt();
+    double distance = result.find("distance").value().toDouble();
+    bool warning = result.find("warning").value().toBool();
+    long long sendStamp = getTimeStamp();
+
+    QSqlQuery query;
+    query.prepare("INSERT INTO result(resultID, time, distance, warning, sendStamp)" "VALUES(:resultID, :time, :distance, :warning, :sendStamp)");
+    query.bindValue(":resultID", resultID);
+    query.bindValue(":time", time);
+    query.bindValue(":distance", distance);
+    query.bindValue(":warning", warning);
+    query.bindValue(":sendStamp", sendStamp);
+    if(!query.exec()){
+        emit newLogInfo("插入Result表失败"+ query.lastError().text());
+        return false;
+    } else {
+        emit newLogInfo("插入Result表成功");
+        return true;
+    }
 }

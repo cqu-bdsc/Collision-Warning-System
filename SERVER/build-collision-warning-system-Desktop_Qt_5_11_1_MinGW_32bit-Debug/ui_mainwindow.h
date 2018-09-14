@@ -47,10 +47,9 @@ public:
     QWidget *horizontalLayoutWidget_4;
     QHBoxLayout *horizontalLayout_4;
     QComboBox *NetInterface;
+    QSpacerItem *horizontalSpacer_2;
     QLabel *label_local;
     QLabel *label_locIP;
-    QSpacerItem *horizontalSpacer_2;
-    QPushButton *but_getIP;
     QGroupBox *UDP;
     QGroupBox *groupSend;
     QWidget *horizontalLayoutWidget;
@@ -121,6 +120,9 @@ public:
     QLabel *label_12;
     QLineEdit *timeEdit;
     QSpacerItem *horizontalSpacer_8;
+    QLabel *label_14;
+    QLineEdit *distanceEdit;
+    QSpacerItem *horizontalSpacer_9;
     QPushButton *pushButton;
     QGroupBox *Map;
     QGridLayout *gridLayout;
@@ -232,6 +234,10 @@ public:
 
         horizontalLayout_4->addWidget(NetInterface);
 
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_4->addItem(horizontalSpacer_2);
+
         label_local = new QLabel(horizontalLayoutWidget_4);
         label_local->setObjectName(QStringLiteral("label_local"));
 
@@ -241,15 +247,6 @@ public:
         label_locIP->setObjectName(QStringLiteral("label_locIP"));
 
         horizontalLayout_4->addWidget(label_locIP);
-
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_4->addItem(horizontalSpacer_2);
-
-        but_getIP = new QPushButton(horizontalLayoutWidget_4);
-        but_getIP->setObjectName(QStringLiteral("but_getIP"));
-
-        horizontalLayout_4->addWidget(but_getIP);
 
 
         verticalLayout->addWidget(NetworkInterface);
@@ -582,6 +579,20 @@ public:
 
         horizontalLayout_12->addItem(horizontalSpacer_8);
 
+        label_14 = new QLabel(horizontalLayoutWidget_12);
+        label_14->setObjectName(QStringLiteral("label_14"));
+
+        horizontalLayout_12->addWidget(label_14);
+
+        distanceEdit = new QLineEdit(horizontalLayoutWidget_12);
+        distanceEdit->setObjectName(QStringLiteral("distanceEdit"));
+
+        horizontalLayout_12->addWidget(distanceEdit);
+
+        horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_12->addItem(horizontalSpacer_9);
+
         pushButton = new QPushButton(horizontalLayoutWidget_12);
         pushButton->setObjectName(QStringLiteral("pushButton"));
 
@@ -633,7 +644,6 @@ public:
         NetworkInterface->setTitle(QApplication::translate("MainWindow", "\347\275\221\347\273\234\346\216\245\345\217\243\351\200\211\346\213\251", nullptr));
         label_local->setText(QApplication::translate("MainWindow", "\346\234\254\345\234\260IP:", nullptr));
         label_locIP->setText(QApplication::translate("MainWindow", "255.255.255.255", nullptr));
-        but_getIP->setText(QApplication::translate("MainWindow", "Refresh", nullptr));
         UDP->setTitle(QApplication::translate("MainWindow", "UDP\351\200\232\344\277\241\346\265\213\350\257\225\346\250\241\345\235\227", nullptr));
         groupSend->setTitle(QApplication::translate("MainWindow", "\345\217\221\351\200\201\346\266\210\346\201\257", nullptr));
         label_ip->setText(QApplication::translate("MainWindow", "IP", nullptr));
@@ -665,8 +675,9 @@ public:
         label_textTimeStamp->setText(QApplication::translate("MainWindow", "\346\227\266\351\227\264\346\210\263", nullptr));
         label_timeStamp->setText(QApplication::translate("MainWindow", "00000000000000", nullptr));
         Log->setTitle(QApplication::translate("MainWindow", "Log", nullptr));
-        groupBox->setTitle(QApplication::translate("MainWindow", "\347\242\260\346\222\236\346\227\266\351\227\264\351\230\210\345\200\274\350\256\276\345\256\232", nullptr));
-        label_12->setText(QApplication::translate("MainWindow", "\346\227\266\351\227\264\357\274\232", nullptr));
+        groupBox->setTitle(QApplication::translate("MainWindow", "\347\242\260\346\222\236\345\217\202\346\225\260\350\256\276\345\256\232", nullptr));
+        label_12->setText(QApplication::translate("MainWindow", "\347\242\260\346\222\236\346\227\266\351\227\264\351\230\210\345\200\274\357\274\232", nullptr));
+        label_14->setText(QApplication::translate("MainWindow", "\347\242\260\346\222\236\345\214\272\345\237\237\345\244\247\345\260\217\357\274\232", nullptr));
         pushButton->setText(QApplication::translate("MainWindow", "Confirm", nullptr));
         Map->setTitle(QApplication::translate("MainWindow", "Map", nullptr));
     } // retranslateUi

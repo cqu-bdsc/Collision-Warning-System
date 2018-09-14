@@ -8,6 +8,7 @@
 #include <QQueue>
 #include <QList>
 #include <QSqlQuery>
+#include <QSqlError>
 #include <qmath.h>
 #include <QDateTime>
 
@@ -33,8 +34,13 @@ public:
      * @return
      */
     QJsonObject getDistance(double lon1, double lat1, double lon2, double lat2);
+    double getDistanceDouble(double lon1, double lat1, double lon2, double lat2);
     bool isSolved(double a, double b, double c);
     bool solveTime(double a, double b, double c);
+    QList<QJsonObject> Trajectory(double v, double a, double dir, double vlat, double vlon);
+    QList<QJsonObject> Judgment(int id1, int id2, double lat1,double lon1,double lat2,double lon2,QList<QJsonObject> tra1,QList<QJsonObject> tra2);
+    long long getTimeStamp();
+    bool addResultToDB(const QJsonObject &result);      //将信息添加到数据库中
     void run();
 
 private slots:
@@ -46,11 +52,11 @@ private slots:
      */
     void setRsuLocation(const QJsonObject &rsuLocation);  //设置RSU位置
     bool addMessage(const QJsonObject &message);          //将信息添加到队列中
-    bool addMessageToDB(const QJsonObject &message);      //将信息添加到数据库中
 
 //    void ComputerResult(const QList<QJsonObject> &messages);
     void computerResult(const QList<QJsonObject> &messages);
     void computerResultByAverageFeatures(const QList<QJsonObject> &message); //使用平均的特征以及物理特性
+    void computerResultByDiscretePoints(const QList<QJsonObject> &message);  //使用离散点
     void computerResultByLinearRegression(const QList<QJsonObject> &location); //使用线性回归的方法
 
 
@@ -71,9 +77,26 @@ private:
     QQueue<QJsonObject> queueVehicleOne;
     QQueue<QJsonObject> queueVehicleTwo;
 
-    const int FREQUENCY = 1000;   // timer的时间频率
-    const int THRESHOLD = 1000;  // 碰撞时间的阈值
-    const int UNITTIME = 10;     // 求轨迹的单位时间
+//    const int FREQUENCY = 1000;   // timer的时间频率
+//    const int THRESHOLD = 1000;  // 碰撞时间的阈值
+//    const int UNITTIME = 10;     // 求轨迹的单位时间
+
+    /************************************
+     *  方案二中的默认参数
+     * *****************************/
+    const int FREQUENCY = 200;    //timer的时间频率（单位：毫秒）
+    double THRESHOLD = 100;   //碰撞时间的阈值（单位：毫秒）
+    double DISTANCE_THRESHOLD = 5; //碰撞区域的直径（单位：米）
+    const int UNITTIME = 1;     //轨迹的单位间隔时间（单位：毫秒）
+    const double DIR = 10;        //方向的阈值（单位：度）
+    const double Velocity = 10;   //速度的阈值（单位：m/ms）
+    const double Distance = 10;   //距离的阈值（单位：m）
+    const double VTIME = 200;     //行驶时间的阈值（单位：毫秒）
+    const double Acceleration = 10; //加速度的阈值（单位：毫秒）
+    const double LAT= 0.0000001; //纬度阈值（单位：度）
+    const double LON= 0.0000001; //经度阈值（单位：度）
+    const double lat_THRESHOLD = 0.001;//纬度的精度
+    const double lon_THRESHOLD = 0.01;//经度的精度
 
 };
 

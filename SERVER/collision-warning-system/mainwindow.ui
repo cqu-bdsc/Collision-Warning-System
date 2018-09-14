@@ -167,20 +167,6 @@
            <widget class="QComboBox" name="NetInterface"/>
           </item>
           <item>
-           <widget class="QLabel" name="label_local">
-            <property name="text">
-             <string>本地IP:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_locIP">
-            <property name="text">
-             <string>255.255.255.255</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -194,9 +180,16 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="but_getIP">
+           <widget class="QLabel" name="label_local">
             <property name="text">
-             <string>Refresh</string>
+             <string>本地IP:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_locIP">
+            <property name="text">
+             <string>255.255.255.255</string>
             </property>
            </widget>
           </item>
@@ -735,7 +728,7 @@
          </size>
         </property>
         <property name="title">
-         <string>碰撞时间阈值设定</string>
+         <string>碰撞参数设定</string>
         </property>
         <widget class="QWidget" name="horizontalLayoutWidget_12">
          <property name="geometry">
@@ -750,7 +743,7 @@
           <item>
            <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>时间：</string>
+             <string>碰撞时间阈值：</string>
             </property>
            </widget>
           </item>
@@ -759,6 +752,29 @@
           </item>
           <item>
            <spacer name="horizontalSpacer_8">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>碰撞区域大小：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="distanceEdit"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_9">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>

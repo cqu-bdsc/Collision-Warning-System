@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_DataProcessThread_t {
     QByteArrayData data[25];
-    char stringdata0[358];
+    char stringdata0[374];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -52,11 +52,11 @@ QT_MOC_LITERAL(16, 208, 14), // "setRsuLocation"
 QT_MOC_LITERAL(17, 223, 11), // "rsuLocation"
 QT_MOC_LITERAL(18, 235, 10), // "addMessage"
 QT_MOC_LITERAL(19, 246, 7), // "message"
-QT_MOC_LITERAL(20, 254, 14), // "addMessageToDB"
-QT_MOC_LITERAL(21, 269, 14), // "computerResult"
-QT_MOC_LITERAL(22, 284, 8), // "messages"
-QT_MOC_LITERAL(23, 293, 31), // "computerResultByAverageFeatures"
-QT_MOC_LITERAL(24, 325, 32) // "computerResultByLinearRegression"
+QT_MOC_LITERAL(20, 254, 14), // "computerResult"
+QT_MOC_LITERAL(21, 269, 8), // "messages"
+QT_MOC_LITERAL(22, 278, 31), // "computerResultByAverageFeatures"
+QT_MOC_LITERAL(23, 310, 30), // "computerResultByDiscretePoints"
+QT_MOC_LITERAL(24, 341, 32) // "computerResultByLinearRegression"
 
     },
     "DataProcessThread\0newComputableByAverageFeatures\0"
@@ -66,8 +66,9 @@ QT_MOC_LITERAL(24, 325, 32) // "computerResultByLinearRegression"
     "logInfo\0newVehicleOne\0lon\0lat\0"
     "newVehicleTwo\0timeOutSlot\0setRsuLocation\0"
     "rsuLocation\0addMessage\0message\0"
-    "addMessageToDB\0computerResult\0messages\0"
+    "computerResult\0messages\0"
     "computerResultByAverageFeatures\0"
+    "computerResultByDiscretePoints\0"
     "computerResultByLinearRegression"
 };
 #undef QT_MOC_LITERAL
@@ -98,7 +99,7 @@ static const uint qt_meta_data_DataProcessThread[] = {
       16,    1,  102,    2, 0x08 /* Private */,
       18,    1,  105,    2, 0x08 /* Private */,
       20,    1,  108,    2, 0x08 /* Private */,
-      21,    1,  111,    2, 0x08 /* Private */,
+      22,    1,  111,    2, 0x08 /* Private */,
       23,    1,  114,    2, 0x08 /* Private */,
       24,    1,  117,    2, 0x08 /* Private */,
 
@@ -114,8 +115,8 @@ static const uint qt_meta_data_DataProcessThread[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QJsonObject,   17,
     QMetaType::Bool, QMetaType::QJsonObject,   19,
-    QMetaType::Bool, QMetaType::QJsonObject,   19,
-    QMetaType::Void, 0x80000000 | 3,   22,
+    QMetaType::Void, 0x80000000 | 3,   21,
+    QMetaType::Void, 0x80000000 | 3,   19,
     QMetaType::Void, 0x80000000 | 3,   19,
     QMetaType::Void, 0x80000000 | 3,    6,
 
@@ -138,10 +139,9 @@ void DataProcessThread::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
         case 7: _t->setRsuLocation((*reinterpret_cast< const QJsonObject(*)>(_a[1]))); break;
         case 8: { bool _r = _t->addMessage((*reinterpret_cast< const QJsonObject(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 9: { bool _r = _t->addMessageToDB((*reinterpret_cast< const QJsonObject(*)>(_a[1])));
-            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 10: _t->computerResult((*reinterpret_cast< const QList<QJsonObject>(*)>(_a[1]))); break;
-        case 11: _t->computerResultByAverageFeatures((*reinterpret_cast< const QList<QJsonObject>(*)>(_a[1]))); break;
+        case 9: _t->computerResult((*reinterpret_cast< const QList<QJsonObject>(*)>(_a[1]))); break;
+        case 10: _t->computerResultByAverageFeatures((*reinterpret_cast< const QList<QJsonObject>(*)>(_a[1]))); break;
+        case 11: _t->computerResultByDiscretePoints((*reinterpret_cast< const QList<QJsonObject>(*)>(_a[1]))); break;
         case 12: _t->computerResultByLinearRegression((*reinterpret_cast< const QList<QJsonObject>(*)>(_a[1]))); break;
         default: ;
         }
@@ -156,6 +156,13 @@ void DataProcessThread::qt_static_metacall(QObject *_o, QMetaObject::Call _c, in
             }
             break;
         case 1:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<int*>(_a[0]) = -1; break;
+            case 0:
+                *reinterpret_cast<int*>(_a[0]) = qRegisterMetaType< QList<QJsonObject> >(); break;
+            }
+            break;
+        case 9:
             switch (*reinterpret_cast<int*>(_a[1])) {
             default: *reinterpret_cast<int*>(_a[0]) = -1; break;
             case 0:
