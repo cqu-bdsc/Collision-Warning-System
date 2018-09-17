@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class Message implements Serializable {
+    public static final String TYPE_MESSAGE = "TYPE_MESSAGE";
+    public static final String TYPE_TIME_SYNC_MESSAGE = "TYPE_TIME_SYNC_MESSAGE";
     public static int ERROR_VALUE = -666;
     private int id;
     private long timeStamp;
@@ -15,11 +17,10 @@ public class Message implements Serializable {
     private double lon;
     private double ace;
     private String mac;
-    private int type;  // type=1 为时间同步消息
-    //type = 0 为普通消息
+    private String type;
 
    public   Message(){
-        type = ERROR_VALUE;
+        type = "666";
         id = ERROR_VALUE;
         timeStamp = ERROR_VALUE;
         speed = ERROR_VALUE;
@@ -30,11 +31,11 @@ public class Message implements Serializable {
         mac = "666";
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
@@ -107,7 +108,7 @@ public class Message implements Serializable {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("id", String.valueOf(getId()));
-            jsonObject.put("type", String.valueOf(getType()));
+            jsonObject.put("type", getType());
             jsonObject.put("timeStamp",String.valueOf(getTimeStamp()));
             jsonObject.put("speed",String.valueOf(getSpeed()));
             jsonObject.put("direction",String.valueOf(getDirection()));

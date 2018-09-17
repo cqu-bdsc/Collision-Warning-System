@@ -24,19 +24,13 @@ public class ResultModel extends BaseModel {
     private  boolean warning;
 
     @Column
-    private int type ;
-
-    @Column
-    private long timeStamp1;
-
-    @Column
     private long receiverTimeStamp;
 
     @Column
     private long sendTimeStamp;
 
     @Column
-    private long timeStamp2;
+    private long delay;
 
     public int getResultID() {
         return resultID;
@@ -44,22 +38,6 @@ public class ResultModel extends BaseModel {
 
     public void setResultID(int resultID) {
         this.resultID = resultID;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public long getTimeStamp1() {
-        return timeStamp1;
-    }
-
-    public void setTimeStamp1(long timeStamp1) {
-        this.timeStamp1 = timeStamp1;
     }
 
     public long getReceiverTimeStamp() {
@@ -110,11 +88,11 @@ public class ResultModel extends BaseModel {
         this.warning = warning;
     }
 
-    public void setTimeStamp2(long timeStamp2) {
-        this.timeStamp2 = timeStamp2;
+    public long getDelay() {
+        return delay;
     }
 
-    public long getTimeStamp2() {
-        return timeStamp2;
+    public void setDelay(long delay) {
+        this.delay = delay;
     }
 }

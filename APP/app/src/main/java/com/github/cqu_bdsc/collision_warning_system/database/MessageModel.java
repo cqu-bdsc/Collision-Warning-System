@@ -35,23 +35,12 @@ public class MessageModel extends BaseModel {
     @Column
     private String mac;
 
-    @Column
-    private int type;
-
     public void setMessageID(int messageID) {
         this.messageID = messageID;
     }
 
     public int getMessageID() {
         return messageID;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public int getType() {
-        return type;
     }
 
     public void setId(int id) {

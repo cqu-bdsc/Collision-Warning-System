@@ -264,10 +264,17 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/table_showtest"
             android:text="QUERY"/>
+        <Button
+            android:id="@+id/btn_backup"
+            android:text="Backup"
+            android:layout_below="@+id/table_showtest"
+            android:layout_toEndOf="@id/btn_query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/tv_sql"
             android:layout_below="@id/table_showtest"
-            android:layout_toEndOf="@+id/btn_query"
+            android:layout_toEndOf="@+id/btn_backup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

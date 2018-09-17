@@ -46,10 +46,12 @@ MainActivity extends AppCompatActivity {
 
     private InfoThread infoThread;
     private ReceiveThread receiveThread;
+    private SendThread sendThread;
     /*************************************
      *  时间同步后，发送的时间戳：
      *  timeStamp = currentTimeStamp - baseStamp + serverStamp;
      *  offsetStamp =  currentTimeStamp - baseStamp
+     *  详细信息请参见Result 类
      */
     private long baseStamp = 0;
     private long serverStamp = 0;
@@ -74,6 +76,7 @@ MainActivity extends AppCompatActivity {
     private Button      btnStart;
     private Button      btnStop;
     private Button      btnQuery;
+    private Button      btnBackup;
 
     private EditText    etIp;
     private TextView    tvPingResult;
@@ -172,6 +175,7 @@ MainActivity extends AppCompatActivity {
         btnStart    = (Button)   findViewById(R.id.btn_start);
         btnStop     = (Button)   findViewById(R.id.btn_stop);
         btnQuery    = (Button)   findViewById(R.id.btn_query);
+        btnBackup   = (Button)   findViewById(R.id.btn_backup);
 
         btnPing.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,24 +204,32 @@ MainActivity extends AppCompatActivity {
             }
         });
 
+        btnBackup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, DBTool.class);
+                intent.setAction(DBTool.ACTION_COPY);
+                startService(intent);
+            }
+        });
+
         /***********************************************
          * 现为时间同步按钮
          */
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {//只要一点发送，就有数据的录入，获取，转换，以及数据json格式的转化过程
-
               sendTimeStampMessage();
-
             }
         });
 
 
         /**
-         * 运行接收线程
+         * 注册接收线程、发送线程
          */
-        ReceiveThread receiveThread = new ReceiveThread(MainActivity.this, getServer_Add());
-        receiveThread.start();
+        receiveThread = new ReceiveThread(MainActivity.this, getServer_Add());
+        infoThread = new InfoThread(MainActivity.this);
+        sendThread = new SendThread();
 
         /**
          * 百度定位
@@ -272,10 +284,17 @@ MainActivity extends AppCompatActivity {
         //需将配置好的LocationClientOption对象，通过setLocOption方法传递给LocationClient对象使用
         //更多LocationClientOption的配置，请参照类参考中LocationClientOption类的详细说明
 
+        /*************
+         * 开启应用时启动线程
+         */
+        mLocationClient.start();
+        receiveThread.start();
+        infoThread.start();
+
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getStart();
+                sendThread.start();
                 sendLog("开始线程......");
             }
         });
@@ -283,7 +302,7 @@ MainActivity extends AppCompatActivity {
         btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getStop();
+                sendThread.stopMe();
                 sendLog("停止线程......");
             }
         });
@@ -298,32 +317,6 @@ MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //mLocationClient为第二步初始化过的LocationClient对象
-        //调用LocationClient的start()方法，便可发起定位请求
-
-//        infoThread = new InfoThread(MainActivity.this);
-//        infoThread.start();
-
-    }
-
-    public void getStart(){
-        mLocationClient.start();
-        /**
-         * 运行接收线程
-         */
-        receiveThread = new ReceiveThread(MainActivity.this, getServer_Add());
-        receiveThread.start();
-
-        infoThread = new InfoThread(MainActivity.this);
-        infoThread.start();
-
-    }
-
-    public void getStop(){
-        infoThread.stopMe();
-        mLocationClient.stop();
-        receiveThread.stopMe();
     }
 
     public boolean isConnectedServer(String ip) {
@@ -389,18 +382,20 @@ MainActivity extends AppCompatActivity {
             message.setLon(longitude);
             message.setSpeed(speed);
 
-            if (61 != errorCode){
-                message.setLat(29.5699345275);
-                message.setLon(106.4775258188);
-                message.setSpeed(1);
-            }
+            /********************************
+             *    注意注释
+             ***************************/
+//            if (61 != errorCode){
+//                message.setLat(29.5699345275);
+//                message.setLon(106.4775258188);
+//                message.setSpeed(1);
+//            }
 
             Intent intent = new Intent();
             intent.setAction(InfoThread.ACTION_INFORMATION);//告诉android将要执行什么功能
             intent.putExtra(InfoThread.EXTRAR_INFORMATION, message);//信息
             getApplicationContext().sendBroadcast(intent);//广播信息
 
-            //sendLog(String.valueOf(errorCode));
             tv_gps.setText(String.valueOf(errorCode));
 
         }
@@ -430,61 +425,47 @@ MainActivity extends AppCompatActivity {
                     break;
                 case ReceiveThread.ACTION_JSON:
                     Result result = (Result) Objects.requireNonNull(intent.getExtras()).get(ReceiveThread.JSON_CONTEXT);
-                    long timeStamp2 = System.currentTimeMillis();
+                    long nowTimwStamp = System.currentTimeMillis();
                     if (result != null){
-                        int type = result.getType();
-                        if (2 == type){   // 普通碰撞消息返回的结果
-                            addResultToDB(result.getId(), result.getTime(),result.getDistance(), result.isWarning(), result.getType(), result.getReceiverTimeStamp(),
-                                    result.getReceiverTimeStamp(), result.getSendTimeStamp(), timeStamp2);
-                            tvPingResult.setText("TYPE_ZERO");
-                            if (String.valueOf(result.getId()).equals(et_id.getEditableText().toString())){
-                                tv_showid.setText(String.valueOf(result.getId()));
-                                tv_warning.setText(String.valueOf(result.isWarning()));
-                                tv_distance.setText(String.valueOf(result.getDistance()));
-                                tv_time.setText(String.valueOf(result.getTime()));
+                        int id = result.getId();
+                        if (String.valueOf(id).equals(et_id.getEditableText().toString())){
+                            String type = result.getType();
+                            switch (type){
+                                case Result.TYPE_RESULT:
+                                    boolean warning = result.isWarning();
+                                    double distance = result.getDistance();
+                                    int time = result.getTime();
+                                    tvPingResult.setText("TYPE_RESULT");
+                                    tv_showid.setText(String.valueOf(id));
+                                    tv_warning.setText(String.valueOf(warning));
+                                    tv_distance.setText(String.valueOf(distance));
+                                    tv_time.setText(String.valueOf(time));
+                                    if (warning){
+                                        getWarning();
+                                    } else {
+                                        getSafe();
+                                    }
 
-                                if (result.isWarning()){
-                                    getWarning();
-                                } else {
-                                    getSafe();
-                                }
-                            } else {
-                                tv_showid.setText("");
-                                tv_warning.setText("");
-                                tv_distance.setText("");
-                                tv_time.setText("");
-                            }
-                        } else if (3 == type){
-                            addResultToDB(result.getId(), result.getTime(),result.getDistance(), result.isWarning(), result.getType(), result.getReceiverTimeStamp(),
-                                    result.getReceiverTimeStamp(), result.getSendTimeStamp(), timeStamp2);
-                            tvPingResult.setText("TYPE_ONE");
-                            if (String.valueOf(result.getId()).equals(et_id.getEditableText().toString())){   //ID匹配
-
-                                long timeStamp1 = result.getTimeStamp1();
-                                long sendTimeStamp =  result.getSendTimeStamp();
-                                long receiverTimeStamp = result.getReceiverTimeStamp();
-
-                                long delay = ((timeStamp2 - timeStamp1) - (sendTimeStamp - receiverTimeStamp)) / 2;
-
-                                long serverTimeStamp = sendTimeStamp + delay;
-
-                                setBaseStamp(timeStamp2);
-                                setServerStamp(serverTimeStamp);
-
-                                tvPingResult.setText("Time Sync success");
+                                    break;
+                                case Result.TYPE_TIME_SYNC_RESULT:
+                                    tvPingResult.setText("TYPE_TIME_SYNC_RESULT");
+                                    long timeStamp = result.getTimeStamp();
+                                    long sendTimeStamp =  result.getSendTimeStamp();
+                                    long receiverTimeStamp = result.getReceiverTimeStamp();
+                                    long delay = ((nowTimwStamp - timeStamp) - (sendTimeStamp - receiverTimeStamp)) / 2;
+                                    long serverTimeStamp = sendTimeStamp + delay;
+                                    setBaseStamp(nowTimwStamp);
+                                    setServerStamp(serverTimeStamp);
+                                    tvPingResult.setText("Time Sync success");
+                                    break;
+                                default:
+                                    break;
                             }
                         } else {
-                            tvPingResult.setText("TYPE_ELSE"+ String.valueOf(type));
+                            tvPingResult.setText("Result is from else id:"+String.valueOf(result.getId()));
                         }
-
-
-
                     } else {
-                        tv_showid.setText("");
-                        tv_warning.setText("");
-                        tv_distance.setText("");
-                        tv_time.setText("");
-                        tvPingResult.setText("ELSE");
+                        tvPingResult.setText("Result is null");
                     }
                     break;
                 case InfoThread.ACTION_INFORMATION:
@@ -519,9 +500,6 @@ MainActivity extends AppCompatActivity {
                     if (!intentMessage.getMac().equals("666")){
                         tv_mac.setText(intentMessage.getMac());
                     }
-                    sendMessage();
-                    addMessageToDB(intentMessage.getId(), intentMessage.getTimeStamp(), intentMessage.getSpeed(), intentMessage.getDirection(),
-                            intentMessage.getLat(), intentMessage.getLon(), intentMessage.getAce(), intentMessage.getMac(), 0);
                     break;
                 case MainActivity.ACTION_SEND_MESSAGE:
 
@@ -532,7 +510,7 @@ MainActivity extends AppCompatActivity {
         }
     }
 
-    private  void addResultToDB(int id, int time, double distance, boolean warning, int type, long timeStamp1, long receiverTimeStamp, long sendTimeStamp, long timeStamp2){
+    private  void addResultToDB(int id, int time, double distance, boolean warning, long receiverTimeStamp, long sendTimeStamp){
         Intent intent = new Intent(MainActivity.this, DBTool.class);
         intent.setAction(DBTool.ACTION_ADD);
         intent.putExtra(DBTool.TABLE_NAME, DBTool.TABLE_RESULT);
@@ -540,27 +518,32 @@ MainActivity extends AppCompatActivity {
         intent.putExtra(DBTool.RESULT_TIME, time);
         intent.putExtra(DBTool.RESULT_DISTANCE, distance);
         intent.putExtra(DBTool.RESULT_WARNING, warning);
-        intent.putExtra(DBTool.RESULT_TYPE, type);
-        intent.putExtra(DBTool.RESULT_TIMESTAMP1, timeStamp1);
         intent.putExtra(DBTool.RESULT_RECEIVERTIMESTAMP, receiverTimeStamp);
         intent.putExtra(DBTool.RESULT_SENDTIMESTAMP, sendTimeStamp);
-        intent.putExtra(DBTool.RESULT_TIMESTAMP2, timeStamp2);
         startService(intent);
     }
 
-    private void addMessageToDB(int id, long timeStamp, float speed, float direction, double lat, double lon, double ace, String mac, int type){
+    private void addMessageToDB(){
+        String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
+        String timeStamp = et_timeStamp.getEditableText().toString();
+        String speed = et_speed.getEditableText().toString();
+        String direction = et_direction.getEditableText().toString();
+        String lat = et_lat.getEditableText().toString();
+        String lon = et_lon.getEditableText().toString();
+        String ace = et_ace.getEditableText().toString();
+        String mac = tv_mac.getEditableText().toString();
+
         Intent intent = new Intent(MainActivity.this, DBTool.class);
         intent.setAction(DBTool.ACTION_ADD);
         intent.putExtra(DBTool.TABLE_NAME, DBTool.TABLE_MESSAGE);
-        intent.putExtra(DBTool.MESSAGE_ID, id);
-        intent.putExtra(DBTool.MESSAGE_TIMESTAMP, timeStamp);
-        intent.putExtra(DBTool.MESSAGE_SPEED, speed);
-        intent.putExtra(DBTool.MESSAGE_DIRECTION, direction);
-        intent.putExtra(DBTool.MESSAGE_LAT, lat);
-        intent.putExtra(DBTool.MESSAGE_LON, lon);
-        intent.putExtra(DBTool.MESSAGE_ACE, ace);
+        intent.putExtra(DBTool.MESSAGE_ID, Integer.parseInt(id));
+        intent.putExtra(DBTool.MESSAGE_TIMESTAMP, Long.parseLong(timeStamp));
+        intent.putExtra(DBTool.MESSAGE_SPEED, Float.parseFloat(speed));
+        intent.putExtra(DBTool.MESSAGE_DIRECTION, Float.parseFloat(direction));
+        intent.putExtra(DBTool.MESSAGE_LAT, Double.parseDouble(lat));
+        intent.putExtra(DBTool.MESSAGE_LON, Double.parseDouble(lon));
+        intent.putExtra(DBTool.MESSAGE_ACE, Double.parseDouble(ace));
         intent.putExtra(DBTool.MESSAGE_MAC, mac);
-        intent.putExtra(DBTool.MESSAGE_TYPE, type);
         startService(intent);
     }
 
@@ -591,7 +574,7 @@ MainActivity extends AppCompatActivity {
         if (!ace.equals("")){
             message.setAce(Double.valueOf(ace));
         }
-        message.setType(0);   //普通消息
+        message.setType(Message.TYPE_MESSAGE);   //普通消息
         //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
 
         Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
@@ -637,7 +620,7 @@ MainActivity extends AppCompatActivity {
         if (!ace.equals("")){
             message.setAce(Double.valueOf(ace));
         }
-        message.setType(1);   //时间同步消息
+        message.setType(Message.TYPE_TIME_SYNC_MESSAGE);   //时间同步消息
         //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
 
         Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
@@ -661,6 +644,32 @@ MainActivity extends AppCompatActivity {
 
     public void getSafe(){
         img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_safe));
+    }
+
+
+    /****************************************
+     *   发送消息线程
+     */
+    private class SendThread extends Thread {
+        private final static int FREQUENCY = 1000;
+        private boolean stop;
+        public void stopMe(){
+            this.stop = true;
+        }
+        @Override
+        public void run() {
+            super.run();
+            stop = false;
+            while (!stop){
+                try {
+                    sendMessage();
+                    addMessageToDB();
+                    sleep(FREQUENCY);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
