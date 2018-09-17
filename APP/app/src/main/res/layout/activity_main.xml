@@ -16,9 +16,19 @@
 
         <ImageView
             android:id="@+id/img_warning"
-            android:layout_centerHorizontal="true"
             android:layout_width="199dp"
             android:layout_height="199dp" />
+
+        <TextView
+            android:id="@+id/textLog"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            android:maxLines="10"
+            android:ellipsize="end"
+            android:layout_toEndOf="@+id/img_warning"
+            android:text="Log" />
 
         <EditText
             android:id="@+id/et_ipAdd"
@@ -35,12 +45,20 @@
             android:layout_toEndOf="@+id/et_ipAdd"
             android:text="Ping" />
 
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/img_warning"
+            android:layout_toEndOf="@+id/btn_testPing"
+            android:text="Time Sync" />
+
         <TextView
             android:id="@+id/tvPingResult"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/img_warning"
-            android:layout_toEndOf="@+id/btn_testPing"
+            android:layout_toEndOf="@+id/btn_send"
             android:hint="测试结果" />
 
         <TableLayout
@@ -61,6 +79,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="本机IP"/>
+
+                <Button
+                    android:id="@+id/btn_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start"/>
+
+                <Button
+                    android:id="@+id/btn_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stop"/>
 
             </TableRow>
 
@@ -141,6 +171,12 @@
                     android:layout_height="wrap_content"
                     android:hint="send_lat" />
 
+                <TextView
+                    android:id="@+id/tv_gps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="百度地图错误码"/>
+
             </TableRow>
 
             <TableRow>
@@ -175,42 +211,44 @@
         </TableLayout>
 
 
-        <Button
-            android:id="@+id/btn_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/table_layout"
-            android:text="Send" />
-
         <TableLayout
             android:id="@+id/table_showtest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_send">
+            android:layout_below="@+id/table_layout">
 
             <TableRow>
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ID"/>
                 <TextView
                     android:id="@+id/tv_showid"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="id" />
-
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Warning" />
                 <TextView
                     android:id="@+id/tv_warning"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="warning" />
-            </TableRow>
-
-            <TableRow>
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time"/>
                 <TextView
                     android:id="@+id/tv_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:hint="time" />
-
+                <TextView
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="Distance"/>
                 <TextView
                     android:id="@+id/tv_distance"
                     android:layout_width="wrap_content"
@@ -220,12 +258,26 @@
 
         </TableLayout>
 
-        <TextView
-            android:id="@+id/textLog"
+        <Button
+            android:id="@+id/btn_query"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/table_showtest"
-            android:text="TextView" />
+            android:text="QUERY"/>
+        <Button
+            android:id="@+id/btn_backup"
+            android:text="Backup"
+            android:layout_below="@+id/table_showtest"
+            android:layout_toEndOf="@id/btn_query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_sql"
+            android:layout_below="@id/table_showtest"
+            android:layout_toEndOf="@+id/btn_backup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
 
     </RelativeLayout>
 </HorizontalScrollView>

@@ -18,6 +18,8 @@ public class ReceiveThread extends Thread {
 
     private Context context;
 
+    private boolean stop = false;
+
     public static final String ACTION_STRING = "ACTION_STRING";
     public static final String ACTION_JSON     = "ACTION_JSON";
 
@@ -51,7 +53,7 @@ public class ReceiveThread extends Thread {
             byte[] buff = new byte[SendService.BUFF_SIZE];//发送过来的数据的长度范围
 
             String dataType = null;//先不限定数据的类型
-            while (true){
+            while (!stop){
                 reveivePacket = new DatagramPacket(buff, buff.length);
 
                 try {//try和catch合作，如果出错可以马上看到是哪个地方的错误
@@ -77,6 +79,10 @@ public class ReceiveThread extends Thread {
         }
 
 
+    }
+
+    public void stopMe(){
+        this.stop = true;
     }
 
     private void HandleData(JSONObject jsonObject){//处理数据函数
