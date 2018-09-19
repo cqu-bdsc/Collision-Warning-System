@@ -13,8 +13,14 @@ MainWindow::MainWindow(QWidget *parent) :
     if(myudp == nullptr){
         myudp = new MyUDP;
     }
+
+    warningStatusOne = false;
+    warningStatusTwo = false;
+    idOne = ERROR_VALUE;
+    idTwo = ERROR_VALUE;
+
     //绑定发送UDP报文事件
-    connect(ui->but_send, SIGNAL(clicked()), this, SLOT(onUdpSendMessage()));
+    //connect(ui->but_send, SIGNAL(clicked()), this, SLOT(onUdpSendMessage()));
 
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
     //connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
@@ -22,6 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
 
     connect(this, SIGNAL(newMessage(QJsonObject)), this, SLOT(addMessageToDB(QJsonObject)));
+
+    /***在地图上标点*******/
+    connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+    connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
 
 }
 
@@ -39,7 +49,7 @@ void MainWindow::initUI(){
     ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
     ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
     ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
-    QString webstr=QString("file:///C:/Users/near/Documents/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    QString webstr=QString("file:///D:/near/Documents/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
     ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
 
     ui->textLog->setText("显示LOG信息");
@@ -64,6 +74,12 @@ void MainWindow::initUI(){
      * @brief findLocalIP
      */
     findLocalIP();
+
+    /***********************
+     *  请勿注释，当调用JS时需要使用
+     * ***********************/
+    document = this->ui->axWidget->querySubObject("Document");
+    parentWindow = document->querySubObject("parentWindow");
 
 }
 
@@ -143,26 +159,55 @@ void MainWindow::findLocalIP()
  */
 void MainWindow::on_but_start_clicked()
 {
-    //but_start 按钮单击事件与本槽函数解除绑定
-    disconnect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
-
-    //开始监听
-    if(setupConnection()){
-        ui->textLog->append(messageUDP + "listerning to "
-                            + localAddr.toString()+ ":"+ QString::number(udpListenPort));
-        //重新绑定槽函数
-        connect(ui->but_start, SIGNAL(clicked()),this,SLOT(onUdpStopButtonClicked()));
-        ui->but_start->setText("Stop");
-
-        //绑定接收到消息的槽函数
-        connect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
+    if(udpStart){
+        emit newLogInfo("UDP线程已启动。");
     } else{
-        ui->textLog->append(messageUDP + "Failed to listen to:"
-                            + localAddr.toString()+ ":"+ QString::number(udpListenPort));
+        //but_start 按钮单击事件与本槽函数解除绑定
+        disconnect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
+
+        //开始监听
+        if(setupConnection()){
+            ui->textLog->append(messageUDP + "listerning to "
+                                + localAddr.toString()+ ":"+ QString::number(udpListenPort));
+            addLogToDB(messageUDP + "listerning to "
+                       + localAddr.toString()+ ":"+ QString::number(udpListenPort));
+            //重新绑定槽函数
+            connect(ui->but_start, SIGNAL(clicked()),this,SLOT(onUdpStopButtonClicked()));
+            ui->but_start->setText("Stop");
+
+            //绑定接收到消息的槽函数
+            connect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
+        } else{
+            ui->textLog->append(messageUDP + "Failed to listen to:"
+                                + localAddr.toString()+ ":"+ QString::number(udpListenPort));
+            connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
+        }
+        udpStart = true;
+    }
+}
+
+/**
+ * 开始监听后，开始按钮变成停止按钮，停止按钮点击事件槽函数
+ * @brief MainWindow::onUdpStopButtonClicked
+ */
+void MainWindow::onUdpStopButtonClicked(){
+    if (udpStart){
+        disconnect(ui->but_start, SIGNAL(clicked()), this, SLOT(onUdpStopButtonClicked()));
+        ui->textLog->append(messageUDP+ "Stoped.");
+        addLogToDB(messageUDP+ "Stoped.");
+        //解除槽函数绑定
+        disconnect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
+        ui->but_start->setText("Start");
+        myudp->unbindPort();
+        //重新绑定槽函数
         connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
+        udpStart = false;
+    } else{
+        emit newLogInfo("UDP线程已停止。");
     }
 
 }
+
 
 /**
  * 绑定端口号
@@ -181,20 +226,74 @@ bool MainWindow::setupConnection(){
     return isSuccess;
 }
 
-/**
- * 开始监听后，开始按钮变成停止按钮，停止按钮点击事件槽函数
- * @brief MainWindow::onUdpStopButtonClicked
- */
-void MainWindow::onUdpStopButtonClicked(){
-    disconnect(ui->but_start, SIGNAL(clicked()), this, SLOT(onUdpStopButtonClicked()));
-    ui->textLog->append(messageUDP+ "Stoped.");
-    //解除槽函数绑定
-    disconnect(myudp, SIGNAL(newMessage(QString, QJsonObject)), this, SLOT(onUdpAppendMessage(QString, QJsonObject)));
-    ui->but_start->setText("Start");
-    myudp->unbindPort();
-    //重新绑定槽函数
-    connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
+/********************************
+ * 处理的线程的启动按钮与结束按钮
+ * *****************************/
+void MainWindow::on_pushButton_clicked(){
+    if (threadStart){
+        emit newLogInfo("处理线程已启动。");
+    } else{
+
+        disconnect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
+        double THRESHOLD = ui->timeEdit->text().toDouble();
+        double DISTANCE_THRESHOLD = ui->distanceEdit->text().toDouble();
+        setRsu(THRESHOLD, DISTANCE_THRESHOLD);
+        ui->pushButton->setText("Stop");
+        connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_Stop_clicked()));
+        threadStart = true;
+    }
+
 }
+
+void MainWindow::on_pushButton_Stop_clicked(){
+    if (threadStart){
+        disconnect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_Stop_clicked()));
+        if(processThread != nullptr){
+            processThread->exit();
+            processThread = nullptr;
+            ui->textLog->append(messageThread+"stoped.");
+            addLogToDB(messageThread +"stoped.");
+            disconnect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
+            disconnect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(computerResult(QList<QJsonObject>)));
+            disconnect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
+            disconnect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessage(QJsonObject)));
+        }
+        ui->pushButton->setText("Confirm");
+
+        connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
+
+
+
+        threadStart = false;
+    } else {
+       emit newLogInfo("处理线程已停止。");
+    }
+
+
+}
+
+void MainWindow::setRsu(const double &THRESHOLD, const double &DISTANCE_THRESHOLD){
+    /************
+     * 启动处理线程
+     * *********/
+    QJsonObject rsuLocation;
+    rsuLocation.insert("THRESHOLD", QString::number(THRESHOLD));
+    rsuLocation.insert("DISTANCE_THRESHOLD", QString::number(DISTANCE_THRESHOLD));
+    if(processThread == nullptr){
+        processThread = new DataProcessThread(rsuLocation);
+        processThread->start();
+        ui->textLog->append(messageThread+"processThread is started.");
+        addLogToDB(messageThread+"started.");
+        connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
+        connect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(computerResult(QList<QJsonObject>)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
+        connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessage(QJsonObject)));
+
+    }
+
+}
+
+
 
 /***********************************
  * 收到消息记录时间戳
@@ -206,8 +305,11 @@ void MainWindow::onUdpStopButtonClicked(){
  */
 void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &message){
 
-    int type = message.find("type").value().toString().toInt();
-    if (0 == type){
+    QString type = message.find("type").value().toString();
+    /*****************
+     * QString.compare 当字符串相等时返回0
+     * ****************/
+    if (type.compare(TYPE_MESSAGE) == 0){
         int         id               = message.find("id").value().toString().toInt();
         emit newLogInfo(message.find("id").value().toString()+"发来一条普通消息");
         long long   timeStamp        = message.find("timeStamp").value().toString().toLongLong();
@@ -226,23 +328,25 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
         ui->label_lon->setText(QString::number(lon,10,10));
         ui->label_acc->setText(QString::number(acc,10,10));
 
-        //this->saveFile(message);
-
         emit newMessage(message);
 
-    } else if (1 == type){
+    } else if (type.compare(TYPE_TIME_SYNC_MESSAGE) == 0){
         long long  receiverTimeStamp = getTimeStamp();
         int         id               = message.find("id").value().toString().toInt();
         emit newLogInfo(message.find("id").value().toString()+"发来了时间同步请求");
-        long long  timeStamp1        = message.find("timeStamp").value().toString().toLongLong();
+        long long  timeStamp        = message.find("timeStamp").value().toString().toLongLong();
 
         QJsonObject result;
         result.insert("id", id);
-        result.insert("type",3);
-        result.insert("timeStamp1", timeStamp1);
+        result.insert("type",TYPE_TIME_SYNC_RESULT);
+        result.insert("timeStamp", timeStamp);
         result.insert("receiverTimeStamp", receiverTimeStamp);
         long long sendTimeStamp = getTimeStamp();
         result.insert("sendTimeStamp", sendTimeStamp);
+        result.insert("time",ERROR_VALUE);
+        result.insert("distance",ERROR_VALUE);
+        result.insert("warning", false);
+
         udpTargetAddr.setAddress("192.168.1.80");
         udpTargetPort = 4040;
         myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
@@ -255,92 +359,56 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
 
 }
 
-/**
- * 通过udp发送消息槽函数
- * @brief MainWindow::onUdpSendMessage
- */
-void MainWindow::onUdpSendMessage(){
-
-    QString id = ui->editID->text();
-    if(id.isEmpty()){
-        id = "22233";
-    }
-    QString time = ui->editTime->text();
-    if(time.isEmpty()){
-        time = "22233";
-    }
-    QString distance = ui->editDistance->text();
-    if(distance.isEmpty()){
-        distance = "22233";
-    }
-    QString warning = ui->editWarning->text();
-    if(warning.isEmpty()){
-        warning = "";
-    }
-
-    QJsonObject message;
-    message.insert("id", id);
-    message.insert("time", time);
-    message.insert("distance", distance);
-    message.insert("warning", true);
-
-    udpTargetAddr.setAddress(ui->editSendIP->text());
-    udpTargetPort = ui->editSendPort->text().toInt();
-    myudp->sendMessage(udpTargetAddr, udpTargetPort, message);
-
-    ui->textLog->append("ME send:" + QString(QJsonDocument(message).toJson()));
-    ui->editID->clear();
-    ui->editTime->clear();
-    ui->editDistance->clear();
-    ui->editWarning->clear();
-
-}
 
 /**
  * 通过UDP发送QJsonObject result
  * @brief MainWindow::onUdpSendMessage
  * @param result
  */
-void MainWindow::onSendMessageq(const QJsonObject &result){
-//    udpTargetAddr.setAddress(ui->editSendIP->text());
-//    udpTargetPort = ui->editSendPort->text().toInt();
-    bool warning = result.find("warning").value().toBool();
-    if(warning){
-        udpTargetAddr.setAddress("192.168.1.80");
-        udpTargetPort = 4040;
-        myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-
+void MainWindow::onSendMessage(const QJsonObject &result){
+    bool isWarning = result.find("warning").value().toBool();
+    int id = result.find("id").value().toInt();
+    if(idOne == ERROR_VALUE){
+        idOne = id;
+        if(warningStatusOne ^ isWarning){
+            warningStatusOne = isWarning;
+            udpTargetAddr.setAddress("192.168.1.80");
+            udpTargetPort = 4040;
+            myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+            addResultToDB(result, true);
+        }
+    } else{ //idOne != ERROR_VALUE
+        if(idOne == id){   //id = idOne
+            if(warningStatusOne ^ isWarning){
+                warningStatusOne = isWarning;
+                udpTargetAddr.setAddress("192.168.1.80");
+                udpTargetPort = 4040;
+                myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+                addResultToDB(result, true);
+            }
+        }else{             //id != idOne and idOne != 666
+            if(idTwo == ERROR_VALUE){
+                idTwo = id;
+                if(warningStatusTwo ^ isWarning){
+                    warningStatusTwo = isWarning;
+                    udpTargetAddr.setAddress("192.168.1.80");
+                    udpTargetPort = 4040;
+                    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+                    addResultToDB(result, true);
+                }
+            }else if(idTwo == id){
+                if(warningStatusTwo ^ isWarning){
+                    warningStatusTwo = isWarning;
+                    udpTargetAddr.setAddress("192.168.1.80");
+                    udpTargetPort = 4040;
+                    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+                    addResultToDB(result, true);
+                }
+            } else{
+                emit newLogInfo("onSendMessage ERROR");
+            }
+        }
     }
-}
-
-void MainWindow::on_pushButton_clicked(){
-    disconnect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
-    double THRESHOLD = ui->timeEdit->text().toDouble();
-    double DISTANCE_THRESHOLD = ui->distanceEdit->text().toDouble();
-    setRsu(THRESHOLD, DISTANCE_THRESHOLD);
-    ui->pushButton->setText("Stop");
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_Stop_clicked()));
-}
-
-void MainWindow::on_pushButton_Stop_clicked(){
-    disconnect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_Stop_clicked()));
-
-    if(processThread != nullptr){
-        processThread->exit();
-        processThread = nullptr;
-        emit newLogInfo("processThread is stoped.");
-        disconnect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
-        disconnect(processThread, SIGNAL(newComputableByAverageFeatures(QList<QJsonObject>)), processThread, SLOT(computerResultByDiscretePoints(QList<QJsonObject>)));
-        disconnect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
-        disconnect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
-        disconnect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
-        /***在地图上标点*******/
-        disconnect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
-        disconnect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
-    }
-    ui->pushButton->setText("Confirm");
-
-    connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
 
 }
 
@@ -349,38 +417,10 @@ void MainWindow::on_pushButton_Stop_clicked(){
  * QT与JS进行通信的模块
  * **************************************/
 
-void MainWindow::setRsu(const double &THRESHOLD, const double &DISTANCE_THRESHOLD){
-    /***********************
-     *  请勿注释，当调用JS时需要使用
-     * ***********************/
-    document = this->ui->axWidget->querySubObject("Document");
-    parentWindow = document->querySubObject("parentWindow");
-    /************
-     * 启动处理线程
-     * *********/
-    QJsonObject rsuLocation;
-    rsuLocation.insert("THRESHOLD", QString::number(THRESHOLD));
-    rsuLocation.insert("DISTANCE_THRESHOLD", QString::number(DISTANCE_THRESHOLD));
-    if(processThread == nullptr){
-        processThread = new DataProcessThread(rsuLocation);
-        processThread->start();
-        emit newLogInfo("processThread is started.");
-        connect(this, SIGNAL(newMessage(QJsonObject)), processThread, SLOT(addMessage(QJsonObject)));
-        //connect(processThread, SIGNAL(newComputableByAverageFeatures(QList<QJsonObject>)), processThread, SLOT(computerResultByAverageFeatures(QList<QJsonObject>)));
-        connect(processThread, SIGNAL(newComputableByAverageFeatures(QList<QJsonObject>)), processThread, SLOT(computerResultByDiscretePoints(QList<QJsonObject>)));
-        connect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
-        //connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(saveFile(QJsonObject)));
-        connect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessageq(QJsonObject)));
-        connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
-        /***在地图上标点*******/
-        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
-        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
-    }
 
-}
 
 void MainWindow::setCarOneNowPosition(const double &lon, const double &lat){
-    QString demand = "addGreendPoint(";
+    QString demand = "addGreenPoint(";
     demand.append("new BMap.Point(");
     demand.append(QString::number(lon));
     demand.append(", ");
@@ -400,6 +440,30 @@ void MainWindow::setCarTwoNowPosition(const double &lon, const double &lat){
     parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
 }
 
+/**
+ * 显示轨迹槽函数
+ * @brief MainWindow::on_btn_show_tar_clicked
+ */
+void MainWindow::on_btn_show_tar_clicked()
+{
+    QString demand = "showGreenTrance(); showBlueTrance();";
+    parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
+}
+
+/**
+ * 清除轨迹槽函数
+ * @brief MainWindow::on_btn_clear_tar_clicked
+ */
+void MainWindow::on_btn_clear_tar_clicked()
+{
+    QString demand = "removeGreenTrance(); removeBlueTrance();";
+    parentWindow->dynamicCall("execScript(QString,QString)", demand,"JavaScript");
+}
+
+
+/*****************************
+ * UI显示部分
+ * *************************/
 void MainWindow::showResult(const QJsonObject &result){
     ui->editID->setText(QString::number(result.find("id").value().toInt()));
     ui->editDistance->setText(QString::number(result.find("distance").value().toDouble()));
@@ -416,6 +480,16 @@ void MainWindow::showLog(const QString &logInfo){
     ui->textLog->append(message);
 }
 
+
+/*****************************
+ * 数据库存入部分
+ * ***************************/
+/**
+ * 向数据库存入Message
+ * @brief MainWindow::addMessageToDB
+ * @param message
+ * @return
+ */
 bool MainWindow::addMessageToDB(const QJsonObject &message){
     int messageId = message.find("id").value().toString().toInt();
     long long timeStamp = message.find("timeStamp").value().toString().toLongLong();
@@ -449,74 +523,61 @@ bool MainWindow::addMessageToDB(const QJsonObject &message){
     }
 }
 
-//void MainWindow::saveFile(const QJsonObject &message){
-//    QDateTime currentDateTime = QDateTime::currentDateTime();
-//    QString time = currentDateTime.toString();
-//    QFile file("C:/User/near/Documents/Collision-Warning-System/mess.txt");
-//    QDateTime datetime;
-//    QString timestr=datetime.currentDateTime().toString("yyyyMMddHHmmss");
-//    QString fileName = "D:/log.txt";//假设指定文件夹路径为D盘根目录
-//   // QString fileName = "D:/" + timestr + ".txt";//假设指定文件夹路径为D盘根目录
-//    QFile file(fileName);
-//    file.open(QIODevice::WriteOnly | QIODevice::Text );
-//    QTextStream out(&file);
-//    QJsonDocument document;
-//    document.setObject(message);
-//    QByteArray byteArray = document.toJson(QJsonDocument::Compact);
-//    QString jsonStr(byteArray);
+/**
+ * 将Result保存到数据库中，发送一个保存一个
+ * @brief MainWindow::addResultToDB
+ * @param result
+ * @param sended
+ * @return
+ */
+bool MainWindow::addResultToDB(const QJsonObject &result, bool sended){
+    int resultID = result.find("id").value().toInt();
+    int time = result.find("time").value().toInt();
+    double distance = result.find("distance").value().toDouble();
+    bool warning = result.find("warning").value().toBool();
+    long long sendStamp = getTimeStamp();
 
-//     out<<time<<"  "<<jsonStr<<endl;//转化成纯文本
-//     file.close();
-//    if(file.exists())
-//    {
-//        bool ok = file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text );
-//        if(ok)
-//        {
-//            QTextStream out(&file);
-//            QJsonDocument document;
-//            document.setObject(message);
-//            QByteArray byteArray = document.toJson(QJsonDocument::Compact);
-//            QString jsonStr(byteArray);
+    QSqlQuery query;
+    query.prepare("INSERT INTO result(resultID, time, distance, warning, sendStamp, sended)" "VALUES(:resultID, :time, :distance, :warning, :sendStamp, :sended)");
+    query.bindValue(":resultID", resultID);
+    query.bindValue(":time", time);
+    query.bindValue(":distance", distance);
+    query.bindValue(":warning", warning);
+    query.bindValue(":sendStamp", sendStamp);
+    query.bindValue(":sended", sended);
+    if(!query.exec()){
+        emit newLogInfo("插入Result表失败"+ query.lastError().text());
+        return false;
+    } else {
+        emit newLogInfo("插入Result表成功");
+        return true;
+    }
+}
 
-//            out<<time<<"  "<<jsonStr<<endl;//转化成纯文本
-//            file.close();
-//        }
-//        else
-//        {
-//            printf("file fail to save");
-//        }
-//    }else
-//    {
-//            //存在打开，不存在创建
-//            file.open(QIODevice::ReadWrite | QIODevice::Text);
-//            //写入内容,这里需要转码，否则报错。
-//            QTextStream out(&file);
-//            QJsonDocument document;
-//            document.setObject(message);
-//            QByteArray byteArray = document.toJson(QJsonDocument::Compact);
-//            QString jsonStr(byteArray);
+/**
+ * 向数据库存入Log信息
+ * @brief MainWindow::addLogToDB
+ * @param logInfo
+ * @return
+ */
+bool MainWindow::addLogToDB(const QString &logInfo){
+    long long timeStamp = getTimeStamp();
+    QString data = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss:zzz");
+    QSqlQuery query;
+    query.prepare("INSERT INTO log(timeStamp, data, context)" "VALUES(:timeStamp, :data, :context)");
+    query.bindValue(":timeStamp", timeStamp);
+    query.bindValue(":data", data);
+    query.bindValue(":context",logInfo);
+    if(!query.exec()){
+        emit newLogInfo("插入Log表失败"+ query.lastError().text());
+        return false;
+    } else {
+        emit newLogInfo("插入Log表成功");
+        return true;
+    }
+}
 
-//            out<<time<<"  "<<jsonStr<<endl;//转化成纯文本
-//            file.close();
-//     }
 
-//}
-//void MainWindow::saveFile(const QString &message){
-//    QDateTime currentDateTime = QDateTime::currentDateTime();
-//    QString time = currentDateTime.toString();
-//    QFile file("C:/User/near/Documents/Collision-Warning-System/mess.txt");
-//    bool ok = file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text );
-//    if(ok)
-//    {
-//        QTextStream out(&file);
-//        QByteArray byteArray = message.toLatin1();
-//        QString jsonStr(byteArray);
 
-//        out<<time<<"  "<<jsonStr<<endl;//转化成纯文本
-//        file.close();
-//    }
-//    else
-//    {
-//        printf("file fail to save");
-//    }
-//}
+
+

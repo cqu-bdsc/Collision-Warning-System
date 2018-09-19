@@ -39,6 +39,9 @@ public:
     QWidget *horizontalLayoutWidget_13;
     QHBoxLayout *horizontalLayout_13;
     QLabel *label_11;
+    QSpacerItem *horizontalSpacer_10;
+    QPushButton *btn_show_tar;
+    QPushButton *btn_clear_tar;
     QLabel *label_logo;
     QLabel *label;
     QLabel *label_2;
@@ -164,7 +167,7 @@ public:
 
         horizontalLayoutWidget_13 = new QWidget(groupInfo);
         horizontalLayoutWidget_13->setObjectName(QStringLiteral("horizontalLayoutWidget_13"));
-        horizontalLayoutWidget_13->setGeometry(QRect(10, 40, 731, 20));
+        horizontalLayoutWidget_13->setGeometry(QRect(10, 40, 731, 25));
         horizontalLayout_13 = new QHBoxLayout(horizontalLayoutWidget_13);
         horizontalLayout_13->setSpacing(6);
         horizontalLayout_13->setContentsMargins(11, 11, 11, 11);
@@ -174,6 +177,20 @@ public:
         label_11->setObjectName(QStringLiteral("label_11"));
 
         horizontalLayout_13->addWidget(label_11);
+
+        horizontalSpacer_10 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_13->addItem(horizontalSpacer_10);
+
+        btn_show_tar = new QPushButton(horizontalLayoutWidget_13);
+        btn_show_tar->setObjectName(QStringLiteral("btn_show_tar"));
+
+        horizontalLayout_13->addWidget(btn_show_tar);
+
+        btn_clear_tar = new QPushButton(horizontalLayoutWidget_13);
+        btn_clear_tar->setObjectName(QStringLiteral("btn_clear_tar"));
+
+        horizontalLayout_13->addWidget(btn_clear_tar);
 
 
         gridLayout_2->addWidget(groupInfo, 0, 2, 2, 2);
@@ -638,6 +655,8 @@ public:
         groupInfo->setTitle(QApplication::translate("MainWindow", "Info", nullptr));
         label_10->setText(QApplication::translate("MainWindow", "\345\234\260\345\233\276\344\277\241\346\201\257\346\224\257\346\214\201\357\274\232\347\231\276\345\272\246\345\234\260\345\233\276", nullptr));
         label_11->setText(QApplication::translate("MainWindow", "All rights reserved. Big Data and Smart Computing Lab of CQU.", nullptr));
+        btn_show_tar->setText(QApplication::translate("MainWindow", "Show Trajectory", nullptr));
+        btn_clear_tar->setText(QApplication::translate("MainWindow", "Clear Trajectory", nullptr));
         label_logo->setText(QApplication::translate("MainWindow", "TextLabel", nullptr));
         label->setText(QApplication::translate("MainWindow", "\351\207\215\345\272\206\345\244\247\345\255\246BDSC\345\256\236\351\252\214\345\256\244\350\275\246\350\276\206\347\242\260\346\222\236\351\242\204\350\255\246\347\263\273\347\273\237", nullptr));
         label_2->setText(QApplication::translate("MainWindow", "2018-7-18 \347\211\210\346\234\254\357\274\2321.0", nullptr));

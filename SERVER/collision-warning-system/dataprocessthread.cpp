@@ -29,7 +29,7 @@ void DataProcessThread::run(){
 }
 
 /**
- * 设置RSU的位置
+ * 设置阈值参数
  * @brief DataProcessThread::setRsuLocation
  * @param rsuLocation
  */
@@ -41,6 +41,17 @@ void DataProcessThread::setRsuLocation(const QJsonObject &rsuLocation){
     } else{
         this->rsuLocation = rsuLocation;
     }
+}
+
+/**
+ * 得到当前时间戳
+ * @brief DataProcessThread::getTimeStamp
+ * @return
+ */
+long long DataProcessThread::getTimeStamp(){
+       QDateTime time = QDateTime::currentDateTime();   //获取当前时间
+       long long timeStamp = time.toMSecsSinceEpoch();
+       return timeStamp;
 }
 
 /**
@@ -102,66 +113,50 @@ bool DataProcessThread::addMessage(const QJsonObject &message){
     return isSuccess;
 }
 
-long long DataProcessThread::getTimeStamp(){
-       QDateTime time = QDateTime::currentDateTime();   //获取当前时间
-       long long timeStamp = time.toMSecsSinceEpoch();
-       return timeStamp;
-}
 
-
-
+/***********************************************
+ * 队列出队
+ * ********************************************/
 /**
  * 返回是否可以计算, 如果可以，返回包含四个QJsonObject的List
  * @brief DataProcessThread::isComputed
  * @return
  */
+//QList<QJsonObject> DataProcessThread::isComputed(){
+//    QList<QJsonObject> jsonArray;
+//    int sizeOne = queueVehicleOne.size();
+//    int sizeTwo = queueVehicleTwo.size();
+//    if(sizeOne >= 2 && sizeTwo >= 2){
+//        emit newLogInfo("队列各出队两个");
+//        //车辆一的队列出队两个
+//        jsonArray.append(queueVehicleOne.dequeue());
+//        jsonArray.append(queueVehicleOne.dequeue());
+//        //车辆二的队列出队两个
+//        jsonArray.append(queueVehicleTwo.dequeue());
+//        jsonArray.append(queueVehicleTwo.dequeue());
+//        emit newLogInfo(QString(QJsonDocument(jsonArray.at(0)).toJson()));
+//        emit newLogInfo(QString(QJsonDocument(jsonArray.at(1)).toJson()));
+//        emit newLogInfo(QString(QJsonDocument(jsonArray.at(2)).toJson()));
+//        emit newLogInfo(QString(QJsonDocument(jsonArray.at(3)).toJson()));
+//    }
+//    return jsonArray;
+//}
+
 QList<QJsonObject> DataProcessThread::isComputed(){
     QList<QJsonObject> jsonArray;
     int sizeOne = queueVehicleOne.size();
     int sizeTwo = queueVehicleTwo.size();
-    if(sizeOne >= 2 && sizeTwo >= 2){
-        emit newLogInfo("队列各出队两个");
-        //车辆一的队列出队两个
+    if(sizeOne >= 1 && sizeTwo >= 1){
+        emit newLogInfo("队列各出队一个");
+        //车辆一的队列出队1个
         jsonArray.append(queueVehicleOne.dequeue());
-        jsonArray.append(queueVehicleOne.dequeue());
-        //车辆二的队列出队两个
-        jsonArray.append(queueVehicleTwo.dequeue());
+        //车辆二的队列出队1个
         jsonArray.append(queueVehicleTwo.dequeue());
         emit newLogInfo(QString(QJsonDocument(jsonArray.at(0)).toJson()));
         emit newLogInfo(QString(QJsonDocument(jsonArray.at(1)).toJson()));
-        emit newLogInfo(QString(QJsonDocument(jsonArray.at(2)).toJson()));
-        emit newLogInfo(QString(QJsonDocument(jsonArray.at(3)).toJson()));
     }
     return jsonArray;
 }
-
-//QList<QList<double>> Trajectory(double t, double v, double a, double rlat, double rlon, double vlat, double vlon){
-//    double l,h,d;//小三角形斜边长,高，底边长
-//    double L,H,D;//大三角形斜边长，高，底边长
-//    const double lat_THRESHOLD = 0.001;//经度的精度
-//    const double lon_THRESHOLD = 0.001;//纬度的精度
-//    QList<double> array;
-//    QList<QList<double>> Tra;
-//    L=sqrt(pow(rlat-vlat,2)+pow(rlon-vlon,2));
-//    H=rlon-vlon;
-//    D=rlat-vlat;
-//    int t0=t;
-//    while (abs(rlat-vlat)>lat_THRESHOLD && abs(rlon-vlon)>lon_THRESHOLD) {
-//        l=v*t+1/2*a*pow(t,2);    //计算斜边长
-//        h=l/L*H;                 //计算高
-//        d=l/L*D;                 //计算底边
-//        vlat=vlat+d;             //计算下t时间后的经度
-//        vlon=vlon+h;             //计算下t时间后的纬度
-//        //将当前经纬度保存进QList
-//        array[0]=vlat;
-//        array[1]=vlon;
-//        //保存轨迹
-//        Tra.append(array);
-//        //更新时间，求下一时间点的经纬度
-//        t=t+t0;
-//    }
-//    return Tra;
-//}
 
 
 
@@ -173,93 +168,16 @@ void DataProcessThread::timeOutSlot(){
     QString message = "队列中的个数：";
     message.append(QString::number(jsonArray.size()));
     emit newLogInfo(message);
-    if(4 == jsonArray.size()){
-        emit newComputableByAverageFeatures(jsonArray);
+    if(2 == jsonArray.size()){
+        emit newComputable(jsonArray);
     }
 
 }
 
-double DataProcessThread::getDistanceDouble(double lon1, double lat1, double lon2, double lat2){
-    static double DEF_PI = 3.14159265359; // PI
-    static double DEF_2PI= 6.28318530712; // 2*PI
-    static double DEF_PI180= 0.01745329252; // PI/180.0
-    static double DEF_R =6370693.5; // radius of earth
-    //适用于近距离
-    double ew1, ns1, ew2, ns2;
-    double dx, dy, dew;
-    double distance, angle;
-    // 角度转换为弧度
-    ew1 = lon1 * DEF_PI180;
-    ns1 = lat1 * DEF_PI180;
-    ew2 = lon2 * DEF_PI180;
-    ns2 = lat2 * DEF_PI180;
-    //经度差
-    dew = ew1 - ew2;
-    // 若跨东经和西经180 度，进行调整
-    if (dew > DEF_PI)
-        dew = DEF_2PI - dew;
-    else if (dew < -DEF_PI)
-        dew = DEF_2PI + dew;
-    dx = DEF_R * cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
-    dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
-    // 勾股定理求斜边长
-    distance = sqrt(dx * dx + dy * dy);
-    return distance;
-}
 
-QJsonObject DataProcessThread::getDistance(double lon1, double lat1, double lon2, double lat2){
-    static double DEF_PI = 3.14159265359; // PI
-    static double DEF_2PI= 6.28318530712; // 2*PI
-    static double DEF_PI180= 0.01745329252; // PI/180.0
-    static double DEF_R =6370693.5; // radius of earth
-    //适用于近距离
-    double ew1, ns1, ew2, ns2;
-    double dx, dy, dew;
-    double distance, angle;
-    // 角度转换为弧度
-    ew1 = lon1 * DEF_PI180;
-    ns1 = lat1 * DEF_PI180;
-    ew2 = lon2 * DEF_PI180;
-    ns2 = lat2 * DEF_PI180;
-    //经度差
-    dew = ew1 - ew2;
-    // 若跨东经和西经180 度，进行调整
-    if (dew > DEF_PI)
-        dew = DEF_2PI - dew;
-    else if (dew < -DEF_PI)
-        dew = DEF_2PI + dew;
-    dx = DEF_R * cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
-    dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
-    // 勾股定理求斜边长
-    distance = sqrt(dx * dx + dy * dy);
-    // 根据dx与dy求点二相对于点一以正北为0度的方位角
-    if (dx >= 0){
-        if (dy >= 0){  //dx与dy均为正数，点二在以点一为原点的坐标系的第三象限
-            angle = atan2(dy, dx)/DEF_PI*180;
-            angle = 270 - angle;  //angle为以正北为0度顺时针的角度
-        } else{        //dx大于0， dy小于0， 点二在以点一为原点的坐标系的第四象限
-            angle = atan2(-dy, dx)/DEF_PI*180;
-            angle = 270 + angle;
-        }
-    } else{
-        if (dy >= 0){  //dx小于0， dy大于0，点二在以点一为原点的坐标系的第二象限
-            angle = atan2(dy, -dx)/DEF_PI*180;
-            angle = 90 + angle;
-        } else{  //dx与dy均小于0，点二在以点一为原点的坐标系的第一象限
-            angle = atan2(-dy, -dx)/DEF_PI*180;
-            angle = 90 - angle;
-        }
-    }
-    dx = -dx;
-    dy = -dy;
-    QJsonObject jsonObject;
-    jsonObject.insert("distance", distance);
-    jsonObject.insert("angle", angle);
-    jsonObject.insert("dx", dx);  //横坐标距离
-    jsonObject.insert("dy", dy);  //纵坐标距离
-    return jsonObject;
-}
-
+/*******************************************
+ * 实验实际使用算法
+ * ************************************/
 /**
  * 根据车辆发送的信息进行车辆轨迹预测
  *
@@ -267,8 +185,129 @@ QJsonObject DataProcessThread::getDistance(double lon1, double lat1, double lon2
  * @param messages
  */
 void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
+    /****************************************
+     *  提取数据
+     * *************************************/
+    //提取两辆车的id
+    int id1 = messages.at(0).find("id").value().toString().toInt();
+    int id2 = messages.at(1).find("id").value().toString().toInt();
+    //提取两辆车的速度
+    double v1 = messages.at(0).find("speed").value().toString().toDouble()/3.6;
+    double v2 = messages.at(1).find("speed").value().toString().toDouble()/3.6;
+
+    //求两辆车的加速度
+    double acc1 = messages.at(0).find("acc").value().toString().toDouble();
+    double acc2 = messages.at(1).find("acc").value().toString().toDouble();
+
+    //提取两辆车的lat
+    double lat1 = messages.at(0).find("lat").value().toString().toDouble();
+    double lat2 = messages.at(1).find("lat").value().toString().toDouble();
+
+    //提取两辆车的lon
+    double lon1 = messages.at(0).find("lon").value().toString().toDouble();
+    double lon2 = messages.at(1).find("lon").value().toString().toDouble();
+
+    //提取两辆车的方向
+    double dir1 = messages.at(0).find("direction").value().toString().toDouble();
+    double dir2 = messages.at(1).find("direction").value().toString().toDouble();
+
+    dir1=dir1/180*3.14;
+    dir2=dir2/180*3.14;
+
+    /*************************************
+     * 预测第i秒点的位置并进行评估
+     * ***********************************/
+    emit newLogInfo("预测开始");
+    QJsonObject nodeOne, nodeTwo;
+    QJsonObject resultOne, resultTwo;
+
+    resultOne.insert("id", id1);
+    resultOne.insert("type",TYPE_RESULT);
+    resultOne.insert("timeStamp",ERROR_VALUE);
+    resultOne.insert("receiverTimeStamp", ERROR_VALUE);
+
+    resultTwo.insert("id", id2);
+    resultTwo.insert("type",TYPE_RESULT);
+    resultTwo.insert("timeStamp",ERROR_VALUE);
+    resultTwo.insert("receiverTimeStamp", ERROR_VALUE);
+
+    double distance;
+    for(int i = 1; i <= THRESHOLD; i++){
+        nodeOne = Trajectory(i,v1,acc1,dir1,lat1,lon1);
+        nodeTwo = Trajectory(i,v2,acc2,dir2,lat2,lon2);
+        distance = getDistance(nodeOne, nodeTwo);
+        if (distance <= DISTANCE_THRESHOLD){
+
+            resultOne.insert("warning", true);
+            resultOne.insert("distance", distance);
+            resultOne.insert("time", i);
+            resultOne.insert("sendTimeStamp", getTimeStamp());
+
+            resultTwo.insert("warning", true);
+            resultTwo.insert("distance", distance);
+            resultTwo.insert("time", i);
+            resultTwo.insert("sendTimeStamp", getTimeStamp());
+
+            emit sendResult(resultOne);
+            emit sendResult(resultTwo);
+            addResultToDB(resultOne, false);
+            addResultToDB(resultTwo, false);
+
+            emit newLogInfo("预测结束：会碰撞");
+            return;
+
+        }
+    }
+    resultOne.insert("warning", false);
+    resultOne.insert("distance", ERROR_VALUE);
+    resultOne.insert("time", ERROR_VALUE);
+    resultOne.insert("sendTimeStamp", getTimeStamp());
+
+    resultTwo.insert("warning", false);
+    resultTwo.insert("distance", ERROR_VALUE);
+    resultTwo.insert("time", ERROR_VALUE);
+    resultTwo.insert("sendTimeStamp", getTimeStamp());
+
+    emit sendResult(resultOne);
+    emit sendResult(resultTwo);
+    addResultToDB(resultOne, false);
+    addResultToDB(resultTwo, false);
+
+    emit newLogInfo("预测结束：不会碰撞");
 
 }
+
+QJsonObject DataProcessThread::Trajectory(double unittime, double v, double a, double dir, double vlat, double vlon){//车辆的速度、加速度、方向、纬度、经度
+    double l,h,d,lon,lat;    //小三角形斜边长,高，底边长，当前所在经纬度
+    QJsonObject array;       //每个时间节点的经纬度
+
+    int t0 = unittime;       //时间间隔
+    l=(v*t0+1/2*a*pow(t0,2))/100000;    //计算斜边长
+    h=l*cos(dir);            //计算纬度差
+    d=l*sin(dir);            //计算经度差
+    lat=vlat+h;             //计算间隔t0后的纬度
+    lon=vlon+d;             //计算间隔t0后的经度
+
+    //将当前经纬度保存进QJsonObject
+    array.insert("lat",lat);
+    array.insert("lon",lon);
+
+    emit newLogInfo(QJsonDocument(array).toJson()+ "\n");
+    return array;
+
+}
+
+double DataProcessThread::getDistance(QJsonObject nodeOne, QJsonObject nodeTwo){
+    double latOne = nodeOne.find("lat").value().toDouble();
+    double lonOne = nodeOne.find("lon").value().toDouble();
+
+    double latTwo = nodeTwo.find("lat").value().toDouble();
+    double lonTwo = nodeTwo.find("lon").value().toDouble();
+
+    double distance = sqrt( pow(latOne * 100000 - latTwo * 100000 , 2) + pow(lonOne * 100000 - lonTwo * 100000, 2));
+    return distance;
+}
+
 
 
 
@@ -602,6 +641,82 @@ void DataProcessThread::computerResultByAverageFeatures(const QList<QJsonObject>
     emit sendResult(RVehicleTwo);
 }
 
+bool DataProcessThread::isSolved(double a, double b, double c){
+    double delta = pow(b,2) - 4*a*c;
+//    printf("delta = %lf\n", delta);
+    if(delta < 0){
+        return false;
+    } else{
+        return true;
+    }
+}
+
+QJsonObject DataProcessThread::getDistance(double lon1, double lat1, double lon2, double lat2){
+    static double DEF_PI = 3.14159265359; // PI
+    static double DEF_2PI= 6.28318530712; // 2*PI
+    static double DEF_PI180= 0.01745329252; // PI/180.0
+    static double DEF_R =6370693.5; // radius of earth
+    //适用于近距离
+    double ew1, ns1, ew2, ns2;
+    double dx, dy, dew;
+    double distance, angle;
+    // 角度转换为弧度
+    ew1 = lon1 * DEF_PI180;
+    ns1 = lat1 * DEF_PI180;
+    ew2 = lon2 * DEF_PI180;
+    ns2 = lat2 * DEF_PI180;
+    //经度差
+    dew = ew1 - ew2;
+    // 若跨东经和西经180 度，进行调整
+    if (dew > DEF_PI)
+        dew = DEF_2PI - dew;
+    else if (dew < -DEF_PI)
+        dew = DEF_2PI + dew;
+    dx = DEF_R * cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
+    dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
+    // 勾股定理求斜边长
+    distance = sqrt(dx * dx + dy * dy);
+    // 根据dx与dy求点二相对于点一以正北为0度的方位角
+    if (dx >= 0){
+        if (dy >= 0){  //dx与dy均为正数，点二在以点一为原点的坐标系的第三象限
+            angle = atan2(dy, dx)/DEF_PI*180;
+            angle = 270 - angle;  //angle为以正北为0度顺时针的角度
+        } else{        //dx大于0， dy小于0， 点二在以点一为原点的坐标系的第四象限
+            angle = atan2(-dy, dx)/DEF_PI*180;
+            angle = 270 + angle;
+        }
+    } else{
+        if (dy >= 0){  //dx小于0， dy大于0，点二在以点一为原点的坐标系的第二象限
+            angle = atan2(dy, -dx)/DEF_PI*180;
+            angle = 90 + angle;
+        } else{  //dx与dy均小于0，点二在以点一为原点的坐标系的第一象限
+            angle = atan2(-dy, -dx)/DEF_PI*180;
+            angle = 90 - angle;
+        }
+    }
+    dx = -dx;
+    dy = -dy;
+    QJsonObject jsonObject;
+    jsonObject.insert("distance", distance);
+    jsonObject.insert("angle", angle);
+    jsonObject.insert("dx", dx);  //横坐标距离
+    jsonObject.insert("dy", dy);  //纵坐标距离
+    return jsonObject;
+}
+
+
+bool DataProcessThread::solveTime(double a, double b, double c){
+    double time;
+    if(a != 0){
+        time = (-b+ sqrt(pow(b,2) - a*c))/a;
+        printf("t = %lf\n", time);
+    } else{
+        time = (-c)/(2*b);
+        printf("t = %lf\n", time);
+    }
+    return time;
+}
+
 /**************************
  * 方案二
  * 使用离散点来预测
@@ -721,8 +836,8 @@ void DataProcessThread::computerResultByDiscretePoints(const QList<QJsonObject> 
         result=Judgment(id1,id2,lat1,lon1,lat2,lon2,tra1,tra2); //判断是否相撞
         emit sendResult(result.at(0));
         emit sendResult(result.at(1));
-        addResultToDB(result.at(0));
-        addResultToDB(result.at(1));
+        addResultToDB(result.at(0), false);
+        addResultToDB(result.at(1), false);
     }
     else{//输入数据有误
 //        RVehicleOne.insert("id",id1);
@@ -765,6 +880,34 @@ QList<QJsonObject> DataProcessThread::Trajectory(double v, double a, double dir,
 
     }
     return Tra;
+}
+
+double DataProcessThread::getDistanceDouble(double lon1, double lat1, double lon2, double lat2){
+    static double DEF_PI = 3.14159265359; // PI
+    static double DEF_2PI= 6.28318530712; // 2*PI
+    static double DEF_PI180= 0.01745329252; // PI/180.0
+    static double DEF_R =6370693.5; // radius of earth
+    //适用于近距离
+    double ew1, ns1, ew2, ns2;
+    double dx, dy, dew;
+    double distance, angle;
+    // 角度转换为弧度
+    ew1 = lon1 * DEF_PI180;
+    ns1 = lat1 * DEF_PI180;
+    ew2 = lon2 * DEF_PI180;
+    ns2 = lat2 * DEF_PI180;
+    //经度差
+    dew = ew1 - ew2;
+    // 若跨东经和西经180 度，进行调整
+    if (dew > DEF_PI)
+        dew = DEF_2PI - dew;
+    else if (dew < -DEF_PI)
+        dew = DEF_2PI + dew;
+    dx = DEF_R * cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
+    dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
+    // 勾股定理求斜边长
+    distance = sqrt(dx * dx + dy * dy);
+    return distance;
 }
 
 QList<QJsonObject> DataProcessThread::Judgment(int id1, int id2, double lat1,double lon1,double lat2,double lon2,QList<QJsonObject> tra1,QList<QJsonObject> tra2){
@@ -856,30 +999,10 @@ void DataProcessThread::computerResultByLinearRegression(const QList<QJsonObject
 
 }
 
-
-bool DataProcessThread::isSolved(double a, double b, double c){
-    double delta = pow(b,2) - 4*a*c;
-//    printf("delta = %lf\n", delta);
-    if(delta < 0){
-        return false;
-    } else{
-        return true;
-    }
-}
-
-bool DataProcessThread::solveTime(double a, double b, double c){
-    double time;
-    if(a != 0){
-        time = (-b+ sqrt(pow(b,2) - a*c))/a;
-        printf("t = %lf\n", time);
-    } else{
-        time = (-c)/(2*b);
-        printf("t = %lf\n", time);
-    }
-    return time;
-}
-
-bool DataProcessThread::addResultToDB(const QJsonObject &result){
+/***************************
+ *  将Result 添加到数据库中
+ * ************************/
+bool DataProcessThread::addResultToDB(const QJsonObject &result, bool sended){
     int resultID = result.find("id").value().toInt();
     int time = result.find("time").value().toInt();
     double distance = result.find("distance").value().toDouble();
@@ -887,12 +1010,13 @@ bool DataProcessThread::addResultToDB(const QJsonObject &result){
     long long sendStamp = getTimeStamp();
 
     QSqlQuery query;
-    query.prepare("INSERT INTO result(resultID, time, distance, warning, sendStamp)" "VALUES(:resultID, :time, :distance, :warning, :sendStamp)");
+    query.prepare("INSERT INTO result(resultID, time, distance, warning, sendStamp, sended)" "VALUES(:resultID, :time, :distance, :warning, :sendStamp, :sended)");
     query.bindValue(":resultID", resultID);
     query.bindValue(":time", time);
     query.bindValue(":distance", distance);
     query.bindValue(":warning", warning);
     query.bindValue(":sendStamp", sendStamp);
+    query.bindValue(":sended", sended);
     if(!query.exec()){
         emit newLogInfo("插入Result表失败"+ query.lastError().text());
         return false;

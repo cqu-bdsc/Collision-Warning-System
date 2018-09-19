@@ -36,11 +36,19 @@ bool creatConnect()
         }
 
         QSqlQuery createResult(db);
-        if(!createResult.exec("CREATE TABLE result(id INTEGER PRIMARY KEY AUTO_INCREMENT, resultID int, time int, distance double, warning boolean , sendStamp double)"))
+        if(!createResult.exec("CREATE TABLE result(id INTEGER PRIMARY KEY AUTO_INCREMENT, resultID int, time int, distance double, warning boolean , sendStamp double, sended boolean)"))
         {
             QMessageBox::information(0,QObject::tr("Tips"), createResult.lastError().text());
         } else {
             QMessageBox::information(0,QObject::tr("Tips"), QObject::tr("创建Result表成功！！！"));
+        }
+
+        QSqlQuery createLog(db);
+        if(!createLog.exec("CREATE TABLE log(id INTEGER PRIMARY KEY AUTO_INCREMENT,  timeStamp double, data text, context text)"))
+        {
+            QMessageBox::information(0,QObject::tr("Tips"), createLog.lastError().text());
+        } else {
+            QMessageBox::information(0,QObject::tr("Tips"), QObject::tr("创建Log表成功！！！"));
         }
         return true;
     }

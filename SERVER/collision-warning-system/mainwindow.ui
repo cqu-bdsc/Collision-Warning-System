@@ -63,7 +63,7 @@
          <x>10</x>
          <y>40</y>
          <width>731</width>
-         <height>20</height>
+         <height>25</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -71,6 +71,33 @@
          <widget class="QLabel" name="label_11">
           <property name="text">
            <string>All rights reserved. Big Data and Smart Computing Lab of CQU.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_10">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_show_tar">
+          <property name="text">
+           <string>Show Trajectory</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_clear_tar">
+          <property name="text">
+           <string>Clear Trajectory</string>
           </property>
          </widget>
         </item>

@@ -38,15 +38,16 @@ private slots:
      ******************************/
     void on_but_start_clicked();
     void onUdpStopButtonClicked();
-    void onUdpSendMessage();
-    void onSendMessageq(const QJsonObject &result);
+    //void onUdpSendMessage();
+    void onSendMessage(const QJsonObject &result);
     void onUdpAppendMessage(const QString &from, const QJsonObject &message);
     void on_pushButton_Stop_clicked();
 //    void saveFile(const QJsonObject &message);
 //    void saveFile(const QString &message);
 
     bool addMessageToDB(const QJsonObject &message);      //将信息添加到数据库中
-
+    bool addLogToDB(const QString &logInfo);
+    bool addResultToDB(const QJsonObject &result, bool sended);
 
 
     /***********************************
@@ -81,6 +82,8 @@ private slots:
 
     void showLog(const QString &logInfo);
     void on_pushButton_clicked();
+    void on_btn_show_tar_clicked();
+    void on_btn_clear_tar_clicked();
 
 signals:
     void newMessage(const QJsonObject &message);            //有新的信息，添加到队列中
@@ -100,6 +103,19 @@ private:
     //获取本地IP地址
     void findLocalIP();
 
+    QString TYPE_MESSAGE = "TYPE_MESSAGE";
+    QString TYPE_TIME_SYNC_MESSAGE = "TYPE_TIME_SYNC_MESSAGE";
+
+    QString TYPE_TIME_SYNC_RESULT = "TYPE_TIME_SYNC_RESULT";
+    int ERROR_VALUE = -666;
+
+    bool udpStart = false;
+    bool threadStart = false;
+
+    int idOne;
+    int idTwo;
+    bool warningStatusOne;
+    bool warningStatusTwo;
 
     QList<QNetworkInterface> interfaceList; //保存网卡接口的链表
 
@@ -111,6 +127,7 @@ private:
     MyUDP *myudp = nullptr;   //MyUDP 对象
 
     QString messageUDP = "[UDP] ";
+    QString messageThread = "[THREAD] ";
 
     /****************************
      * 处理数据模块
