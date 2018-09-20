@@ -14,6 +14,9 @@ public class LogModel extends BaseModel {
     private long timeStamp;
 
     @Column
+    private String data;
+
+    @Column
     private String context;
 
     public int getID() {
@@ -30,6 +33,14 @@ public class LogModel extends BaseModel {
 
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getContext() {

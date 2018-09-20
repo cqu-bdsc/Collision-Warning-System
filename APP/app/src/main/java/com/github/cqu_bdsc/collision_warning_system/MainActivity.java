@@ -36,13 +36,14 @@ import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.list.IFlowCursorIterator;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class
-MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     private InfoThread infoThread;
     private ReceiveThread receiveThread;
@@ -74,7 +75,6 @@ MainActivity extends AppCompatActivity {
     private Button      btnPing;//以下是可视化程序里面的常量
     private Button      btnSend;
     private Button      btnStart;
-    private Button      btnStop;
     private Button      btnQuery;
     private Button      btnBackup;
 
@@ -98,6 +98,16 @@ MainActivity extends AppCompatActivity {
     private EditText    et_ace;
 
     private ImageView   img_warning;
+
+    boolean sendThreadStart = false;
+
+    boolean isSendThreadStart(){
+        return sendThreadStart;
+    }
+
+    void setSendThreadStart(boolean isStart){
+        this.sendThreadStart = isStart;
+    }
 
     public void setBaseStamp(long baseStamp) {
         this.baseStamp = baseStamp;
@@ -173,7 +183,6 @@ MainActivity extends AppCompatActivity {
 
         btnSend     = (Button)   findViewById(R.id.btn_send);
         btnStart    = (Button)   findViewById(R.id.btn_start);
-        btnStop     = (Button)   findViewById(R.id.btn_stop);
         btnQuery    = (Button)   findViewById(R.id.btn_query);
         btnBackup   = (Button)   findViewById(R.id.btn_backup);
 
@@ -183,8 +192,10 @@ MainActivity extends AppCompatActivity {
                 if (etIp.getEditableText().toString().equals("")){    //使用默认IP地址
                     if (isConnectedServer(SERVER_IP)){
                         tvPingResult.setText("Ping "+SERVER_IP+ "Success.");
+                        addLogToDB("Ping "+SERVER_IP+ "Success.");
                     } else {
                         tvPingResult.setText("Ping "+SERVER_IP+ "Failed.");
+                        addLogToDB("Ping "+SERVER_IP+ "Failed.");
                     }
                 } else {
                     String ipAdd = (String) etIp.getEditableText().toString();
@@ -192,11 +203,14 @@ MainActivity extends AppCompatActivity {
                         setServer_Add(ipAdd);
                         if (isConnectedServer(ipAdd)){
                             tvPingResult.setText("Ping"+ipAdd+ "Success.");
+                            addLogToDB("Ping"+ipAdd+ "Success.");
                         } else {
                             tvPingResult.setText("Ping"+ipAdd+ "Failed.");
+                            addLogToDB("Ping"+ipAdd+ "Failed.");
                         }
                     } else { //ip不匹配
                         tvPingResult.setText("请重新输入IP.");
+                        addLogToDB("请重新输入IP.");
                     }
 
                 }
@@ -207,6 +221,7 @@ MainActivity extends AppCompatActivity {
         btnBackup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addLogToDB("备份数据库");
                 Intent intent = new Intent(MainActivity.this, DBTool.class);
                 intent.setAction(DBTool.ACTION_COPY);
                 startService(intent);
@@ -220,6 +235,7 @@ MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {//只要一点发送，就有数据的录入，获取，转换，以及数据json格式的转化过程
               sendTimeStampMessage();
+              addLogToDB("发起时间同步");
             }
         });
 
@@ -291,19 +307,24 @@ MainActivity extends AppCompatActivity {
         receiveThread.start();
         infoThread.start();
 
+
+
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendThread.start();
-                sendLog("开始线程......");
-            }
-        });
-
-        btnStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendThread.stopMe();
-                sendLog("停止线程......");
+                if (isSendThreadStart()){
+                    sendThread.stopMe();
+                    sendLog("停止线程......");
+                    addLogToDB("停止线程...");
+                    setSendThreadStart(false);
+                    btnStart.setText("Start");
+                } else {
+                    sendThread.start();
+                    sendLog("开始线程......");
+                    addLogToDB("开始线程...");
+                    setSendThreadStart(true);
+                    btnStart.setText("Stop");
+                }
             }
         });
 
@@ -430,11 +451,18 @@ MainActivity extends AppCompatActivity {
                         int id = result.getId();
                         if (String.valueOf(id).equals(et_id.getEditableText().toString())){
                             String type = result.getType();
+                            boolean warning;
+                            double distance;
+                            int time;
+                            long sendTimeStamp;
+                            long timeStamp;
+                            long receiverTimeStamp;
                             switch (type){
                                 case Result.TYPE_RESULT:
-                                    boolean warning = result.isWarning();
-                                    double distance = result.getDistance();
-                                    int time = result.getTime();
+                                    warning = result.isWarning();
+                                    distance = result.getDistance();
+                                    time = result.getTime();
+                                    sendTimeStamp = result.getSendTimeStamp();
                                     tvPingResult.setText("TYPE_RESULT");
                                     tv_showid.setText(String.valueOf(id));
                                     tv_warning.setText(String.valueOf(warning));
@@ -445,14 +473,15 @@ MainActivity extends AppCompatActivity {
                                     } else {
                                         getSafe();
                                     }
-
+                                    long delay = nowTimwStamp - sendTimeStamp;
+                                    addResultToDB(id, time, distance, warning, nowTimwStamp, sendTimeStamp, delay);
                                     break;
                                 case Result.TYPE_TIME_SYNC_RESULT:
                                     tvPingResult.setText("TYPE_TIME_SYNC_RESULT");
-                                    long timeStamp = result.getTimeStamp();
-                                    long sendTimeStamp =  result.getSendTimeStamp();
-                                    long receiverTimeStamp = result.getReceiverTimeStamp();
-                                    long delay = ((nowTimwStamp - timeStamp) - (sendTimeStamp - receiverTimeStamp)) / 2;
+                                    timeStamp = result.getTimeStamp();
+                                    sendTimeStamp =  result.getSendTimeStamp();
+                                    receiverTimeStamp = result.getReceiverTimeStamp();
+                                    delay = ((nowTimwStamp - timeStamp) - (sendTimeStamp - receiverTimeStamp)) / 2;
                                     long serverTimeStamp = sendTimeStamp + delay;
                                     setBaseStamp(nowTimwStamp);
                                     setServerStamp(serverTimeStamp);
@@ -500,6 +529,24 @@ MainActivity extends AppCompatActivity {
                     if (!intentMessage.getMac().equals("666")){
                         tv_mac.setText(intentMessage.getMac());
                     }
+                    /****
+                     * NO,1
+                     */
+//                    et_id.setText("2122258474");
+//                    et_speed.setText("2.69758");
+//                    et_ace.setText("0.02787");
+//                    et_lat.setText("29.598349");
+//                    et_lon.setText("106.295225");
+//                    et_direction.setText("106.47");
+                    /****
+                     * No,2
+                     */
+//                    et_id.setText("-801736957");
+//                    et_speed.setText("1.48688");
+//                    et_ace.setText("-0.01");
+//                    et_lat.setText("29.598302");
+//                    et_lon.setText("106.295269");
+//                    et_direction.setText("-74.463");
                     break;
                 case MainActivity.ACTION_SEND_MESSAGE:
 
@@ -510,7 +557,21 @@ MainActivity extends AppCompatActivity {
         }
     }
 
-    private  void addResultToDB(int id, int time, double distance, boolean warning, long receiverTimeStamp, long sendTimeStamp){
+    private void addLogToDB(String context){
+        long timeStamp = System.currentTimeMillis();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        String data = simpleDateFormat.format(date);
+        Intent intent = new Intent(MainActivity.this, DBTool.class);
+        intent.setAction(DBTool.ACTION_ADD);
+        intent.putExtra(DBTool.TABLE_NAME, DBTool.TABLE_LOG);
+        intent.putExtra(DBTool.LOG_TIMESTAMP, timeStamp);
+        intent.putExtra(DBTool.LOG_DATA, data);
+        intent.putExtra(DBTool.LOG_CONTEXT, context);
+        startService(intent);
+    }
+
+    private  void addResultToDB(int id, int time, double distance, boolean warning, long receiverTimeStamp, long sendTimeStamp, long delay){
         Intent intent = new Intent(MainActivity.this, DBTool.class);
         intent.setAction(DBTool.ACTION_ADD);
         intent.putExtra(DBTool.TABLE_NAME, DBTool.TABLE_RESULT);
@@ -520,6 +581,7 @@ MainActivity extends AppCompatActivity {
         intent.putExtra(DBTool.RESULT_WARNING, warning);
         intent.putExtra(DBTool.RESULT_RECEIVERTIMESTAMP, receiverTimeStamp);
         intent.putExtra(DBTool.RESULT_SENDTIMESTAMP, sendTimeStamp);
+        intent.putExtra(DBTool.RESULT_DELAY, delay);
         startService(intent);
     }
 
@@ -531,19 +593,51 @@ MainActivity extends AppCompatActivity {
         String lat = et_lat.getEditableText().toString();
         String lon = et_lon.getEditableText().toString();
         String ace = et_ace.getEditableText().toString();
-        String mac = tv_mac.getEditableText().toString();
+        String mac = tv_mac.getText().toString();
 
         Intent intent = new Intent(MainActivity.this, DBTool.class);
         intent.setAction(DBTool.ACTION_ADD);
         intent.putExtra(DBTool.TABLE_NAME, DBTool.TABLE_MESSAGE);
-        intent.putExtra(DBTool.MESSAGE_ID, Integer.parseInt(id));
-        intent.putExtra(DBTool.MESSAGE_TIMESTAMP, Long.parseLong(timeStamp));
-        intent.putExtra(DBTool.MESSAGE_SPEED, Float.parseFloat(speed));
-        intent.putExtra(DBTool.MESSAGE_DIRECTION, Float.parseFloat(direction));
-        intent.putExtra(DBTool.MESSAGE_LAT, Double.parseDouble(lat));
-        intent.putExtra(DBTool.MESSAGE_LON, Double.parseDouble(lon));
-        intent.putExtra(DBTool.MESSAGE_ACE, Double.parseDouble(ace));
-        intent.putExtra(DBTool.MESSAGE_MAC, mac);
+        if (id .equals("")){
+            intent.putExtra(DBTool.MESSAGE_ID, 666);
+        } else {
+            intent.putExtra(DBTool.MESSAGE_ID, Integer.parseInt(id));
+        }
+        if (timeStamp.equals("")){
+            intent.putExtra(DBTool.MESSAGE_TIMESTAMP, 666);
+        } else {
+            intent.putExtra(DBTool.MESSAGE_TIMESTAMP, Long.parseLong(timeStamp));
+        }
+        if (speed.equals("")){
+            intent.putExtra(DBTool.MESSAGE_SPEED, 666);
+        } else{
+            intent.putExtra(DBTool.MESSAGE_SPEED, Float.parseFloat(speed));
+        }
+        if (direction.equals("")){
+            intent.putExtra(DBTool.MESSAGE_DIRECTION, 666);
+        } else {
+            intent.putExtra(DBTool.MESSAGE_DIRECTION, Float.parseFloat(direction));
+        }
+        if (lat.equals("")){
+            intent.putExtra(DBTool.MESSAGE_LAT, 666);
+        } else {
+            intent.putExtra(DBTool.MESSAGE_LON, Double.parseDouble(lat));
+        }
+        if (lon.equals("")){
+            intent.putExtra(DBTool.MESSAGE_LON, 666);
+        } else {
+            intent.putExtra(DBTool.MESSAGE_LON, Double.parseDouble(lon));
+        }
+        if (ace.equals("")){
+            intent.putExtra(DBTool.MESSAGE_ACE, 666);
+        } else {
+            intent.putExtra(DBTool.MESSAGE_ACE, Double.parseDouble(ace));
+        }
+        if (mac.equals("")){
+            intent.putExtra(DBTool.MESSAGE_MAC, "666");
+        } else {
+            intent.putExtra(DBTool.MESSAGE_MAC, mac);
+        }
         startService(intent);
     }
 
@@ -576,6 +670,7 @@ MainActivity extends AppCompatActivity {
         }
         message.setType(Message.TYPE_MESSAGE);   //普通消息
         //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+
 
         Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
         intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。

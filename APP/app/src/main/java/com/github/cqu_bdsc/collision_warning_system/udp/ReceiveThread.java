@@ -66,7 +66,7 @@ public class ReceiveThread extends Thread {
                 try {
                     JSONObject jsonObject = new JSONObject(msg);
                     HandleData(jsonObject);
-                    HandleData(jsonObject.toString());
+                    //HandleData(jsonObject.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

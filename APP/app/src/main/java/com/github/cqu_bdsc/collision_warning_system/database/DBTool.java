@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.sql.SQLTransactionRollbackException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class DBTool extends IntentService {
@@ -37,7 +39,8 @@ public class DBTool extends IntentService {
         super("DBTool");
     }
     public static final String TAG = "DBTool";
-    public static final String DATABASE_FLIE    = "/mnt/sdcard/databasebackup.db";
+    public static final String DATABASE_PATH    = "/mnt/sdcard/Downloads/";
+    public static final String DATABASE_FLIENAME = "databasebackup.db";
 
     public static final String ACTION_ADD       = "ACTION_ADD";
     public static final String ACTION_DELETE    = "ACTION_DELETE";
@@ -47,6 +50,7 @@ public class DBTool extends IntentService {
     public static final String TABLE_NAME               = "TABLE_NAME";
     public static final String TABLE_MESSAGE            = "TABLE_MESSAGE";
     public static final String TABLE_RESULT             = "TABLE_RESULT";
+    public static final String TABLE_LOG                = "TABLE_LOG";
     public static final String TABLE_ALL                = "TABLE_ALL";
 
     /*MessageModel*/
@@ -67,6 +71,12 @@ public class DBTool extends IntentService {
     public static final String RESULT_RECEIVERTIMESTAMP = "RESULT_RECEIVERTIMESTAMP";
     public static final String RESULT_SENDTIMESTAMP = "RESULT_SENDTIMESTAMP";
     public static final String RESULT_DELAY = "RESULT_DELAY";
+
+    /*LogModel*/
+    public static final String LOG_TIMESTAMP = "LOG_TIMESTAMP";
+    public static final String LOG_DATA      = "LOG_DATA";
+    public static final String LOG_CONTEXT   = "LOG_CONTEXT";
+
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -95,7 +105,12 @@ public class DBTool extends IntentService {
                 double ace = intent.getExtras().getDouble(DBTool.MESSAGE_ACE);
                 String mac = intent.getExtras().getString(DBTool.MESSAGE_MAC);
                 insertMessage(id, timeStamp, speed,  direction,  lat, lon,  ace, mac);
-            }else {
+            }else if (tableName.equals(DBTool.TABLE_LOG)){
+                long timeStamp = intent.getExtras().getLong(DBTool.LOG_TIMESTAMP);
+                String data = intent.getExtras().getString(DBTool.LOG_DATA);
+                String context = intent.getExtras().getString(DBTool.LOG_CONTEXT);
+                insertLog(timeStamp, data, context);
+            } else {
 
             }
         }
@@ -138,7 +153,9 @@ public class DBTool extends IntentService {
                 int numberMessage = messageModels.size();
                 List<ResultModel> resultModels = new Select().from(ResultModel.class).queryList();
                 int numberResult = resultModels.size();
-                sendSQL("Message表有"+String.valueOf(numberMessage)+"条记录  "+"Result表有"+String.valueOf(numberResult)+"条记录");
+                List<LogModel> logModels = new Select().from(LogModel.class).queryList();
+                int numberLog = logModels.size();
+                sendSQL("Message表有"+String.valueOf(numberMessage)+"条记录  "+"Result表有"+String.valueOf(numberResult)+"条记录  "+"Log表中有"+ String.valueOf(numberLog)+"条记录");
             }
         }
         /***********************
@@ -146,8 +163,11 @@ public class DBTool extends IntentService {
          */
         else if (action.equals(DBTool.ACTION_COPY)){
             try {
-                createFile();
-                File backupDB = new File(DATABASE_FLIE);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+                Date date = new Date(System.currentTimeMillis());
+                String filePath = DATABASE_PATH+simpleDateFormat.format(date)+DATABASE_FLIENAME;
+                createFile(filePath);
+                File backupDB = new File(filePath);
                 if (backupDB.canWrite()) {
                     String currentDBPath = "/data/data/" + getPackageName() + "/databases/"+ AppDataBase.NAME+".db";
                     File currentDB = new File(currentDBPath);
@@ -202,6 +222,15 @@ public class DBTool extends IntentService {
         sendLog("插入Result成功");
     }
 
+    private void insertLog(long timeStamp, String data, String context){
+        LogModel logModel = new LogModel();
+        logModel.setTimeStamp(timeStamp);
+        logModel.setData(data);
+        logModel.setContext(context);
+        logModel.insert();
+        sendLog("插入Log成功");
+    }
+
     public void sendLog(String log){
         Intent intent = new Intent();
         intent.setAction(ReceiveThread.ACTION_STRING);//告诉android将要执行什么功能
@@ -216,8 +245,8 @@ public class DBTool extends IntentService {
         getApplicationContext().sendBroadcast(intent);//广播信息
     }
 
-    private void createFile(){
-        File file = new File(DATABASE_FLIE);
+    private void createFile(String pathname){
+        File file = new File(pathname);
         if (!file.exists()){
             boolean isSuccess = false;
             try {
