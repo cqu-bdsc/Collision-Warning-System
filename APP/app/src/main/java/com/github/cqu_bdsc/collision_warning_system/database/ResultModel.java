@@ -95,4 +95,5 @@ public class ResultModel extends BaseModel {
     public void setDelay(long delay) {
         this.delay = delay;
     }
+
 }
