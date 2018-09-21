@@ -460,6 +460,11 @@ public class MainActivity extends AppCompatActivity {
                             switch (type){
                                 case Result.TYPE_RESULT:
                                     warning = result.isWarning();
+                                    if (warning){
+                                        getWarning();
+                                    } else {
+                                        getSafe();
+                                    }
                                     distance = result.getDistance();
                                     time = result.getTime();
                                     sendTimeStamp = result.getSendTimeStamp();
@@ -468,11 +473,6 @@ public class MainActivity extends AppCompatActivity {
                                     tv_warning.setText(String.valueOf(warning));
                                     tv_distance.setText(String.valueOf(distance));
                                     tv_time.setText(String.valueOf(time));
-                                    if (warning){
-                                        getWarning();
-                                    } else {
-                                        getSafe();
-                                    }
                                     long delay = nowTimwStamp - sendTimeStamp;
                                     addResultToDB(id, time, distance, warning, nowTimwStamp, sendTimeStamp, delay);
                                     break;
@@ -499,24 +499,24 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case InfoThread.ACTION_INFORMATION:
                     Message intentMessage = (Message) Objects.requireNonNull(intent.getExtras()).get(InfoThread.EXTRAR_INFORMATION);
-                    if (intentMessage.getId() != Message.ERROR_VALUE){
-                        et_id.setText(String.valueOf(intentMessage.getId()));
-                    }
-                    if (intentMessage.getAce() != Message.ERROR_VALUE){
-                        et_ace.setText(String.valueOf(intentMessage.getAce()));
-                    }
-                    if (intentMessage.getDirection() != Message.ERROR_VALUE){
-                        et_direction.setText(String.valueOf(intentMessage.getDirection()));
-                    }
-                    if (intentMessage.getLat() != Message.ERROR_VALUE){
-                        et_lat.setText(String.valueOf(intentMessage.getLat()));
-                    }
-                    if (intentMessage.getLon() != Message.ERROR_VALUE){
-                        et_lon.setText(String.valueOf(intentMessage.getLon()));
-                    }
-                    if (intentMessage.getSpeed() != Message.ERROR_VALUE){
-                        et_speed.setText(String.valueOf(intentMessage.getSpeed()));
-                    }
+//                    if (intentMessage.getId() != Message.ERROR_VALUE){
+//                        et_id.setText(String.valueOf(intentMessage.getId()));
+//                    }
+//                    if (intentMessage.getAce() != Message.ERROR_VALUE){
+//                        et_ace.setText(String.valueOf(intentMessage.getAce()));
+//                    }
+//                    if (intentMessage.getDirection() != Message.ERROR_VALUE){
+//                        et_direction.setText(String.valueOf(intentMessage.getDirection()));
+//                    }
+//                    if (intentMessage.getLat() != Message.ERROR_VALUE){
+//                        et_lat.setText(String.valueOf(intentMessage.getLat()));
+//                    }
+//                    if (intentMessage.getLon() != Message.ERROR_VALUE){
+//                        et_lon.setText(String.valueOf(intentMessage.getLon()));
+//                    }
+//                    if (intentMessage.getSpeed() != Message.ERROR_VALUE){
+//                        et_speed.setText(String.valueOf(intentMessage.getSpeed()));
+//                    }
                     if (intentMessage.getTimeStamp() != Message.ERROR_VALUE){
                         if (0 != getBaseStamp() && 0 != getServerStamp()){
                             tvPingResult.setText("Time synced.");
@@ -541,12 +541,12 @@ public class MainActivity extends AppCompatActivity {
                     /****
                      * No,2
                      */
-//                    et_id.setText("-801736957");
-//                    et_speed.setText("1.48688");
-//                    et_ace.setText("-0.01");
-//                    et_lat.setText("29.598302");
-//                    et_lon.setText("106.295269");
-//                    et_direction.setText("-74.463");
+                    et_id.setText("-801736957");
+                    et_speed.setText("1.48688");
+                    et_ace.setText("-0.01");
+                    et_lat.setText("28.598280");
+                    et_lon.setText("106.295269");
+                    et_direction.setText("-74.463");
                     break;
                 case MainActivity.ACTION_SEND_MESSAGE:
 
@@ -621,7 +621,7 @@ public class MainActivity extends AppCompatActivity {
         if (lat.equals("")){
             intent.putExtra(DBTool.MESSAGE_LAT, 666);
         } else {
-            intent.putExtra(DBTool.MESSAGE_LON, Double.parseDouble(lat));
+            intent.putExtra(DBTool.MESSAGE_LAT, Double.parseDouble(lat));
         }
         if (lon.equals("")){
             intent.putExtra(DBTool.MESSAGE_LON, 666);
@@ -729,7 +729,7 @@ public class MainActivity extends AppCompatActivity {
     public void getWarning(){
         img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_danger));
 
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Ringtone mRingtone = RingtoneManager.getRingtone(getApplicationContext(),uri);
         mRingtone.play();
 
