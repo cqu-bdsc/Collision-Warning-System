@@ -112,11 +112,6 @@ private:
     bool udpStart = false;
     bool threadStart = false;
 
-    int idOne;
-    int idTwo;
-    bool warningStatusOne;
-    bool warningStatusTwo;
-
     QList<QNetworkInterface> interfaceList; //保存网卡接口的链表
 
     QHostAddress localAddr;     //本地IP地址

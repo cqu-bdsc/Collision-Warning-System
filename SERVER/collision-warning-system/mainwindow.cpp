@@ -14,24 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
         myudp = new MyUDP;
     }
 
-    warningStatusOne = false;
-    warningStatusTwo = false;
-    idOne = ERROR_VALUE;
-    idTwo = ERROR_VALUE;
-
-    //绑定发送UDP报文事件
-    //connect(ui->but_send, SIGNAL(clicked()), this, SLOT(onUdpSendMessage()));
-
     connect(ui->but_start, SIGNAL(clicked()), this, SLOT(on_but_start_clicked()));
-    //connect(ui->but_getIP, SIGNAL(clicked()), this, SLOT(on_but_getIP_clicked()));
-
     connect(this, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
-
     connect(this, SIGNAL(newMessage(QJsonObject)), this, SLOT(addMessageToDB(QJsonObject)));
-
-    /***在地图上标点*******/
-    connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
-    connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
 
 }
 
@@ -49,7 +34,7 @@ void MainWindow::initUI(){
     ui->axWidget->setControl(QString::fromUtf8("{8856F961-340A-11D0-A96B-00C04FD705A2}"));//注册组件ID
     ui->axWidget->setProperty("DisplayAlerts",false);//不显示警告信息
     ui->axWidget->setProperty("DisplayScrollBars",true);//不显示滚动条
-    QString webstr=QString("file:///D:/near/Documents/QtProject/ChongqingOfflineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
+    QString webstr=QString("file:///C:/offlineMap/offlinemap_demo/demo/1_0.html");//设置要打开的网页
     ui->axWidget->dynamicCall("Navigate(const QString&)",webstr);//显示网页
 
     ui->textLog->setText("显示LOG信息");
@@ -94,15 +79,6 @@ long long MainWindow::getTimeStamp(){
  * Network Interface 模块
  * 获取本地IP地址
  ************************************************/
-
-/**
- * 刷新按钮单击事件响应槽函数
- * @brief MainWindow::on_but_getIP_clicked
- */
-//void MainWindow::on_but_getIP_clicked()
-//{
-//    findLocalIP();
-//}
 
 /**
  * 网络接口下拉框位置更改事件响应槽函数
@@ -240,6 +216,12 @@ void MainWindow::on_pushButton_clicked(){
         setRsu(THRESHOLD, DISTANCE_THRESHOLD);
         ui->pushButton->setText("Stop");
         connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_Stop_clicked()));
+
+        connect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
+        /***在地图上标点*******/
+        connect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+        connect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
+
         threadStart = true;
     }
 
@@ -257,12 +239,16 @@ void MainWindow::on_pushButton_Stop_clicked(){
             disconnect(processThread, SIGNAL(newComputable(QList<QJsonObject>)), processThread, SLOT(computerResult(QList<QJsonObject>)));
             disconnect(processThread, SIGNAL(sendResult(QJsonObject)),this, SLOT(showResult(QJsonObject)));
             disconnect(processThread, SIGNAL(sendResult(QJsonObject)), this, SLOT(onSendMessage(QJsonObject)));
+
+            disconnect(processThread, SIGNAL(newLogInfo(QString)), this, SLOT(showLog(QString)));
+
+            /***在地图上标点*******/
+            disconnect(processThread, SIGNAL(newVehicleOne(double,double)), this, SLOT(setCarOneNowPosition(double,double)));
+            disconnect(processThread, SIGNAL(newVehicleTwo(double,double)), this, SLOT(setCarTwoNowPosition(double,double)));
         }
         ui->pushButton->setText("Confirm");
 
         connect(ui->pushButton, SIGNAL(clicked()), this, SLOT(on_pushButton_clicked()));
-
-
 
         threadStart = false;
     } else {
@@ -366,49 +352,55 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
  * @param result
  */
 void MainWindow::onSendMessage(const QJsonObject &result){
-    bool isWarning = result.find("warning").value().toBool();
-    int id = result.find("id").value().toInt();
-    if(idOne == ERROR_VALUE){
-        idOne = id;
-        if(warningStatusOne ^ isWarning){
-            warningStatusOne = isWarning;
-            udpTargetAddr.setAddress("192.168.1.80");
-            udpTargetPort = 4040;
-            myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-            addResultToDB(result, true);
-        }
-    } else{ //idOne != ERROR_VALUE
-        if(idOne == id){   //id = idOne
-            if(warningStatusOne ^ isWarning){
-                warningStatusOne = isWarning;
-                udpTargetAddr.setAddress("192.168.1.80");
-                udpTargetPort = 4040;
-                myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-                addResultToDB(result, true);
-            }
-        }else{             //id != idOne and idOne != 666
-            if(idTwo == ERROR_VALUE){
-                idTwo = id;
-                if(warningStatusTwo ^ isWarning){
-                    warningStatusTwo = isWarning;
-                    udpTargetAddr.setAddress("192.168.1.80");
-                    udpTargetPort = 4040;
-                    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-                    addResultToDB(result, true);
-                }
-            }else if(idTwo == id){
-                if(warningStatusTwo ^ isWarning){
-                    warningStatusTwo = isWarning;
-                    udpTargetAddr.setAddress("192.168.1.80");
-                    udpTargetPort = 4040;
-                    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
-                    addResultToDB(result, true);
-                }
-            } else{
-                emit newLogInfo("onSendMessage ERROR");
-            }
-        }
-    }
+
+    udpTargetAddr.setAddress("192.168.1.80");
+    udpTargetPort = 4040;
+    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+    addResultToDB(result, true);
+
+//    bool isWarning = result.find("warning").value().toBool();
+//    int id = result.find("id").value().toInt();
+//    if(idOne == ERROR_VALUE){
+//        idOne = id;
+//        if(warningStatusOne ^ isWarning){
+//            warningStatusOne = isWarning;
+//            udpTargetAddr.setAddress("192.168.1.80");
+//            udpTargetPort = 4040;
+//            myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+//            addResultToDB(result, true);
+//        }
+//    } else{ //idOne != ERROR_VALUE
+//        if(idOne == id){   //id = idOne
+//            if(warningStatusOne ^ isWarning){
+//                warningStatusOne = isWarning;
+//                udpTargetAddr.setAddress("192.168.1.80");
+//                udpTargetPort = 4040;
+//                myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+//                addResultToDB(result, true);
+//            }
+//        }else{             //id != idOne and idOne != 666
+//            if(idTwo == ERROR_VALUE){
+//                idTwo = id;
+//                if(warningStatusTwo ^ isWarning){
+//                    warningStatusTwo = isWarning;
+//                    udpTargetAddr.setAddress("192.168.1.80");
+//                    udpTargetPort = 4040;
+//                    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+//                    addResultToDB(result, true);
+//                }
+//            }else if(idTwo == id){
+//                if(warningStatusTwo ^ isWarning){
+//                    warningStatusTwo = isWarning;
+//                    udpTargetAddr.setAddress("192.168.1.80");
+//                    udpTargetPort = 4040;
+//                    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+//                    addResultToDB(result, true);
+//                }
+//            } else{
+//                emit newLogInfo("onSendMessage ERROR");
+//            }
+//        }
+//    }
 
 }
 
@@ -416,7 +408,6 @@ void MainWindow::onSendMessage(const QJsonObject &result){
  * 显示地图UI界面
  * QT与JS进行通信的模块
  * **************************************/
-
 
 
 void MainWindow::setCarOneNowPosition(const double &lon, const double &lat){

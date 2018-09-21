@@ -57,6 +57,8 @@ private slots:
     void setRsuLocation(const QJsonObject &rsuLocation);  //设置RSU位置
     bool addMessage(const QJsonObject &message);          //将信息添加到队列中
 
+    void sendOrNotSend(const QJsonObject result);
+
 //    void ComputerResult(const QList<QJsonObject> &messages);
     void computerResult(const QList<QJsonObject> &messages);  //本次实验采用的算法
 
@@ -72,6 +74,7 @@ signals:
     void newComputableByAverageFeatures(const QList<QJsonObject> &fourMessages);     //可以计算时，调用ComputerResult
     void newComputableByLinearRegression(const QList<QJsonObject> &location);
     void sendResult(const QJsonObject result);             //有计算结果时，先将结果发送的UI
+    void shouldSendResult(const QJsonObject result);
     void newLogInfo(const QString &logInfo);
     void newVehicleOne(const double &lon, const double &lat);
     void newVehicleTwo(const double &lon, const double &lat);
@@ -82,6 +85,11 @@ private:
     QTimer * timer;
     QQueue<QJsonObject> queueVehicleOne;
     QQueue<QJsonObject> queueVehicleTwo;
+
+    int idOne;
+    int idTwo;
+    bool warningStatusOne;
+    bool warningStatusTwo;
 
 //    const int FREQUENCY = 1000;   // timer的时间频率
 //    const int THRESHOLD = 1000;  // 碰撞时间的阈值

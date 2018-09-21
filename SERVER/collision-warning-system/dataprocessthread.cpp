@@ -5,6 +5,13 @@ DataProcessThread::DataProcessThread(const QJsonObject &rsulocation)
     this->setRsuLocation(rsulocation);
     this->THRESHOLD = rsuLocation.find("THRESHOLD").value().toString().toDouble();
     this->DISTANCE_THRESHOLD = rsulocation.find("DISTANCE_THRESHOLD").value().toString().toDouble();
+
+    warningStatusOne = false;
+    warningStatusTwo = false;
+    idOne = ERROR_VALUE;
+    idTwo = ERROR_VALUE;
+
+    connect(this, SIGNAL(shouldSendResult(QJsonObject)), this, SLOT(sendOrNotSend(QJsonObject)));
 }
 
 DataProcessThread::~DataProcessThread(){
@@ -14,6 +21,7 @@ DataProcessThread::~DataProcessThread(){
         this->timer->destroyed();
         this->timer = nullptr;
     }
+    disconnect(this, SIGNAL(shouldSendResult(QJsonObject)), this, SLOT(sendOrNotSend(QJsonObject)));
 }
 
 /**
@@ -68,50 +76,102 @@ bool DataProcessThread::addMessage(const QJsonObject &message){
     int idMessage = message.find("id").value().toString().toInt();
     double lon = message.find("lon").value().toString().toDouble();
     double lat = message.find("lat").value().toString().toDouble();
+    long long timeStamp = message.find("timeStamp").value().toString().toLongLong();
     emit newLogInfo("idMessage:");
     emit newLogInfo(QString::number(idMessage));
     if(0 == sizeOne && 0 == sizeTwo){    //两个队列均为空
         queueVehicleOne.enqueue(message); //在队尾添加一个元素
         emit newVehicleOne(lon, lat);
+        idOne = idMessage;
         flag = 11;
     } else if(0 != sizeOne && 0 == sizeTwo){  //第二个队列为空
-        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){
-            queueVehicleOne.enqueue(message);
+        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){   //idOne message 来了两个，判断时间戳，保留较新的消息
+            if (timeStamp > queueVehicleOne.head().find("timeStamp").value().toString().toLongLong()){
+                queueVehicleOne.dequeue();
+                queueVehicleOne.enqueue(message);
+                flag = 21;
+            }
             emit newVehicleOne(lon, lat);
-            flag = 21;
         }else{
             queueVehicleTwo.enqueue(message);
+            idTwo = idMessage;
             emit newVehicleTwo(lon, lat);
             flag = 22;
         }
     } else if(0 != sizeTwo && 0 == sizeOne){   //第一个队列为空
         if(idMessage != queueVehicleTwo.head().find("id").value().toString().toInt()){
             queueVehicleOne.enqueue(message);
+            idOne = idMessage;
             emit newVehicleOne(lon, lat);
             flag = 31;
-        }else{
-            queueVehicleTwo.enqueue(message);
+        }else{                                    //idTwo 来了两个，保留较新的消息
+            if(timeStamp > queueVehicleTwo.head().find("timeStamp").value().toString().toLongLong()){
+                queueVehicleTwo.dequeue();
+                queueVehicleTwo.enqueue(message);
+                flag = 32;
+            }
             emit newVehicleTwo(lon, lat);
-            flag = 32;
         }
-    } else{                                  //两个队列均不为空
-        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){
-            queueVehicleOne.enqueue(message);
-            emit newVehicleOne(lon, lat);
-            flag = 41;
-        } else if(idMessage == queueVehicleTwo.head().find("id").value().toString().toInt()){
-            queueVehicleTwo.enqueue(message);
-            emit newVehicleTwo(lon, lat);
-            flag = 42;
-        } else{
-            isSuccess = false;
-            flag = 666;
-        }
+    } else{
+        flag = 4;
     }
     emit newLogInfo("flag：");
     emit newLogInfo(QString::number(flag));
     return isSuccess;
 }
+
+//bool DataProcessThread::addMessage(const QJsonObject &message){
+//    bool isSuccess = true;
+//    int flag = 0;
+//    int sizeOne = queueVehicleOne.size();
+//    int sizeTwo = queueVehicleTwo.size();
+//    int idMessage = message.find("id").value().toString().toInt();
+//    double lon = message.find("lon").value().toString().toDouble();
+//    double lat = message.find("lat").value().toString().toDouble();
+//    emit newLogInfo("idMessage:");
+//    emit newLogInfo(QString::number(idMessage));
+//    if(0 == sizeOne && 0 == sizeTwo){    //两个队列均为空
+//        queueVehicleOne.enqueue(message); //在队尾添加一个元素
+//        emit newVehicleOne(lon, lat);
+//        flag = 11;
+//    } else if(0 != sizeOne && 0 == sizeTwo){  //第二个队列为空
+//        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){
+//            queueVehicleOne.enqueue(message);
+//            emit newVehicleOne(lon, lat);
+//            flag = 21;
+//        }else{
+//            queueVehicleTwo.enqueue(message);
+//            emit newVehicleTwo(lon, lat);
+//            flag = 22;
+//        }
+//    } else if(0 != sizeTwo && 0 == sizeOne){   //第一个队列为空
+//        if(idMessage != queueVehicleTwo.head().find("id").value().toString().toInt()){
+//            queueVehicleOne.enqueue(message);
+//            emit newVehicleOne(lon, lat);
+//            flag = 31;
+//        }else{
+//            queueVehicleTwo.enqueue(message);
+//            emit newVehicleTwo(lon, lat);
+//            flag = 32;
+//        }
+//    } else{                                  //两个队列均不为空
+//        if(idMessage == queueVehicleOne.head().find("id").value().toString().toInt()){
+//            queueVehicleOne.enqueue(message);
+//            emit newVehicleOne(lon, lat);
+//            flag = 41;
+//        } else if(idMessage == queueVehicleTwo.head().find("id").value().toString().toInt()){
+//            queueVehicleTwo.enqueue(message);
+//            emit newVehicleTwo(lon, lat);
+//            flag = 42;
+//        } else{
+//            isSuccess = false;
+//            flag = 666;
+//        }
+//    }
+//    emit newLogInfo("flag：");
+//    emit newLogInfo(QString::number(flag));
+//    return isSuccess;
+//}
 
 
 /***********************************************
@@ -185,12 +245,51 @@ void DataProcessThread::timeOutSlot(){
  * @param messages
  */
 void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
+
+    QJsonObject nodeOne, nodeTwo;
+    QJsonObject resultOne, resultTwo;
+
+    /*************************
+     * 对初始点进行判断
+     * ***********************/
+
+    nodeOne.insert("lat", messages.at(0).find("lat").value().toString().toDouble());
+    nodeOne.insert("lon", messages.at(0).find("lon").value().toString().toDouble());
+    nodeTwo.insert("lat", messages.at(1).find("lat").value().toString().toDouble());
+    nodeTwo.insert("lon", messages.at(1).find("lon").value().toString().toDouble());
+
+    emit newLogInfo(QString(QJsonDocument(nodeOne).toJson()));
+    emit newLogInfo(QString(QJsonDocument(nodeTwo).toJson()));
+
+    double distanceStart = getDistance(nodeOne, nodeTwo);
+
+    if (distanceStart <= DISTANCE_THRESHOLD){
+        resultOne.insert("warning", true);
+        resultOne.insert("distance", distanceStart);
+        resultOne.insert("time", 0);
+        resultOne.insert("sendTimeStamp", getTimeStamp());
+
+        resultTwo.insert("warning", true);
+        resultTwo.insert("distance", distanceStart);
+        resultTwo.insert("time", 0);
+        resultTwo.insert("sendTimeStamp", getTimeStamp());
+
+        emit shouldSendResult(resultOne);
+        emit shouldSendResult(resultTwo);
+        addResultToDB(resultOne, false);
+        addResultToDB(resultTwo, false);
+
+        emit newLogInfo("预测结束：会碰撞");
+        return;
+    }
+
     /****************************************
      *  提取数据
      * *************************************/
     //提取两辆车的id
     int id1 = messages.at(0).find("id").value().toString().toInt();
     int id2 = messages.at(1).find("id").value().toString().toInt();
+
     //提取两辆车的速度
     double v1 = messages.at(0).find("speed").value().toString().toDouble()/3.6;
     double v2 = messages.at(1).find("speed").value().toString().toDouble()/3.6;
@@ -218,8 +317,6 @@ void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
      * 预测第i秒点的位置并进行评估
      * ***********************************/
     emit newLogInfo("预测开始");
-    QJsonObject nodeOne, nodeTwo;
-    QJsonObject resultOne, resultTwo;
 
     resultOne.insert("id", id1);
     resultOne.insert("type",TYPE_RESULT);
@@ -248,8 +345,8 @@ void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
             resultTwo.insert("time", i);
             resultTwo.insert("sendTimeStamp", getTimeStamp());
 
-            emit sendResult(resultOne);
-            emit sendResult(resultTwo);
+            emit shouldSendResult(resultOne);
+            emit shouldSendResult(resultTwo);
             addResultToDB(resultOne, false);
             addResultToDB(resultTwo, false);
 
@@ -268,13 +365,35 @@ void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
     resultTwo.insert("time", ERROR_VALUE);
     resultTwo.insert("sendTimeStamp", getTimeStamp());
 
-    emit sendResult(resultOne);
-    emit sendResult(resultTwo);
+    emit shouldSendResult(resultOne);
+    emit shouldSendResult(resultTwo);
     addResultToDB(resultOne, false);
     addResultToDB(resultTwo, false);
 
     emit newLogInfo("预测结束：不会碰撞");
 
+}
+
+void DataProcessThread::sendOrNotSend(const QJsonObject result){
+    bool warning = result.find("warning").value().toBool();
+    int id = result.find("id").value().toInt();
+    if(id == idOne){
+        if(warningStatusOne ^ warning){
+            warningStatusOne = warning;
+            emit sendResult(result);
+        } else{
+
+        }
+    } else if(id == idTwo){
+        if(warningStatusTwo ^ warning){
+            warningStatusTwo = warning;
+            emit sendResult(result);
+        } else{
+
+        }
+    } else {
+
+    }
 }
 
 QJsonObject DataProcessThread::Trajectory(double unittime, double v, double a, double dir, double vlat, double vlon){//车辆的速度、加速度、方向、纬度、经度
@@ -305,6 +424,7 @@ double DataProcessThread::getDistance(QJsonObject nodeOne, QJsonObject nodeTwo){
     double lonTwo = nodeTwo.find("lon").value().toDouble();
 
     double distance = sqrt( pow(latOne * 100000 - latTwo * 100000 , 2) + pow(lonOne * 100000 - lonTwo * 100000, 2));
+    emit newLogInfo("Distance is "+ QString::number(distance));
     return distance;
 }
 
