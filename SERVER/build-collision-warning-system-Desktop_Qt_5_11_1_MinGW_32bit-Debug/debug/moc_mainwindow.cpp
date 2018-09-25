@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[32];
-    char stringdata0[444];
+    QByteArrayData data[33];
+    char stringdata0[469];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -62,7 +62,8 @@ QT_MOC_LITERAL(27, 344, 20), // "setCarTwoNowPosition"
 QT_MOC_LITERAL(28, 365, 7), // "showLog"
 QT_MOC_LITERAL(29, 373, 21), // "on_pushButton_clicked"
 QT_MOC_LITERAL(30, 395, 23), // "on_btn_show_tar_clicked"
-QT_MOC_LITERAL(31, 419, 24) // "on_btn_clear_tar_clicked"
+QT_MOC_LITERAL(31, 419, 24), // "on_btn_clear_tar_clicked"
+QT_MOC_LITERAL(32, 444, 24) // "on_btn_time_sync_clicked"
 
     },
     "MainWindow\0newMessage\0\0message\0"
@@ -76,7 +77,8 @@ QT_MOC_LITERAL(31, 419, 24) // "on_btn_clear_tar_clicked"
     "DISTANCE_THRESHOLD\0setCarOneNowPosition\0"
     "lon\0lat\0setCarTwoNowPosition\0showLog\0"
     "on_pushButton_clicked\0on_btn_show_tar_clicked\0"
-    "on_btn_clear_tar_clicked"
+    "on_btn_clear_tar_clicked\0"
+    "on_btn_time_sync_clicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -86,7 +88,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      20,   14, // methods
+      21,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -94,28 +96,29 @@ static const uint qt_meta_data_MainWindow[] = {
        2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags
-       1,    1,  114,    2, 0x06 /* Public */,
-       4,    1,  117,    2, 0x06 /* Public */,
+       1,    1,  119,    2, 0x06 /* Public */,
+       4,    1,  122,    2, 0x06 /* Public */,
 
  // slots: name, argc, parameters, tag, flags
-       6,    0,  120,    2, 0x08 /* Private */,
-       7,    0,  121,    2, 0x08 /* Private */,
-       8,    1,  122,    2, 0x08 /* Private */,
-      10,    2,  125,    2, 0x08 /* Private */,
-      12,    0,  130,    2, 0x08 /* Private */,
-      13,    1,  131,    2, 0x08 /* Private */,
-      14,    1,  134,    2, 0x08 /* Private */,
-      15,    2,  137,    2, 0x08 /* Private */,
-      17,    0,  142,    2, 0x08 /* Private */,
-      18,    1,  143,    2, 0x08 /* Private */,
-      20,    1,  146,    2, 0x08 /* Private */,
-      21,    2,  149,    2, 0x08 /* Private */,
-      24,    2,  154,    2, 0x08 /* Private */,
-      27,    2,  159,    2, 0x08 /* Private */,
-      28,    1,  164,    2, 0x08 /* Private */,
-      29,    0,  167,    2, 0x08 /* Private */,
-      30,    0,  168,    2, 0x08 /* Private */,
-      31,    0,  169,    2, 0x08 /* Private */,
+       6,    0,  125,    2, 0x08 /* Private */,
+       7,    0,  126,    2, 0x08 /* Private */,
+       8,    1,  127,    2, 0x08 /* Private */,
+      10,    2,  130,    2, 0x08 /* Private */,
+      12,    0,  135,    2, 0x08 /* Private */,
+      13,    1,  136,    2, 0x08 /* Private */,
+      14,    1,  139,    2, 0x08 /* Private */,
+      15,    2,  142,    2, 0x08 /* Private */,
+      17,    0,  147,    2, 0x08 /* Private */,
+      18,    1,  148,    2, 0x08 /* Private */,
+      20,    1,  151,    2, 0x08 /* Private */,
+      21,    2,  154,    2, 0x08 /* Private */,
+      24,    2,  159,    2, 0x08 /* Private */,
+      27,    2,  164,    2, 0x08 /* Private */,
+      28,    1,  169,    2, 0x08 /* Private */,
+      29,    0,  172,    2, 0x08 /* Private */,
+      30,    0,  173,    2, 0x08 /* Private */,
+      31,    0,  174,    2, 0x08 /* Private */,
+      32,    0,  175,    2, 0x08 /* Private */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::QJsonObject,    3,
@@ -137,6 +140,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void, QMetaType::Double, QMetaType::Double,   25,   26,
     QMetaType::Void, QMetaType::Double, QMetaType::Double,   25,   26,
     QMetaType::Void, QMetaType::QString,    5,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -174,6 +178,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 17: _t->on_pushButton_clicked(); break;
         case 18: _t->on_btn_show_tar_clicked(); break;
         case 19: _t->on_btn_clear_tar_clicked(); break;
+        case 20: _t->on_btn_time_sync_clicked(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -220,13 +225,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 20)
+        if (_id < 21)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 20;
+        _id -= 21;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 20)
+        if (_id < 21)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 20;
+        _id -= 21;
     }
     return _id;
 }

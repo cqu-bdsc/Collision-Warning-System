@@ -337,6 +337,63 @@ void MainWindow::onUdpAppendMessage(const QString &from, const QJsonObject &mess
         udpTargetPort = 4040;
         myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
 
+    } else if(type.compare(TYPE_WIFI_TIME_SYNC_RESULT) == 0){
+        long long sendTimeStamp = message.find("timeStamp").value().toString().toLongLong();
+        long long timeStamp = message.find("acc").value().toString().toDouble();
+        long long nowTimeStamp = getTimeStamp();
+        long long delay = (nowTimeStamp - timeStamp) / 2;
+        long long serverTimeStamp = sendTimeStamp + delay;
+        this->baseTimeStamp = nowTimeStamp;
+        this->serverTimeStamp = serverTimeStamp;
+        emit newLogInfo("TIME_SYNC_SUCCESS");
+        emit newLogInfo("sendTimeStamp: "+QString::number(sendTimeStamp));
+        emit newLogInfo("TimeStamp: "+QString::number(timeStamp));
+
+    } else if(type.compare(TYPE_WIFI_MESSAGE) == 0){
+        int         messageId        = message.find("id").value().toString().toInt();
+        emit newLogInfo(message.find("id").value().toString()+"发来一条WiFi消息");
+        long long   timeStamp        = message.find("timeStamp").value().toString().toLongLong();
+        float       direction        = message.find("direction").value().toString().toFloat();
+        double      lat              = message.find("lat").value().toString().toDouble();
+        double      lon              = message.find("lon").value().toString().toDouble();
+        float       speed            = message.find("speed").value().toString().toFloat();
+        double      acc              = message.find("acc").value().toString().toDouble();
+        ui->label_from->setText(from);
+        ui->label_id->setText(QString::number(messageId));
+        ui->label_timeStamp->setText(QString::number(timeStamp));
+        ui->label_speed->setText(QString::number(speed,10,10));
+        ui->label_direction->setText(QString::number(direction));
+        ui->label_Lat->setText(QString::number(lat,10,10));
+        ui->label_lon->setText(QString::number(lon,10,10));
+        ui->label_acc->setText(QString::number(acc,10,10));
+
+        long long receiverStamp = getTimeStamp();
+
+        if(this->baseTimeStamp != ERROR_VALUE && this->serverTimeStamp != ERROR_VALUE){
+            receiverStamp = serverTimeStamp + receiverStamp  - baseTimeStamp;
+            emit newLogInfo("Time Synced");
+        }
+
+        long long delay = receiverStamp - timeStamp;
+
+        QSqlQuery query;
+        query.prepare("INSERT INTO message(messageID, speed, direction, acc, lon, lat, timeStamp, receiverStamp, delay)" "VALUES(:messageID, :speed, :direction, :acc, :lon, :lat, :timeStamp, :receiverStamp, :delay)");
+        query.bindValue(":messageID", messageId);
+        query.bindValue(":timeStamp", timeStamp);
+        query.bindValue(":speed", speed);
+        query.bindValue(":direction", direction);
+        query.bindValue(":acc", acc);
+        query.bindValue(":lon", lon);
+        query.bindValue(":lat", lat);
+        query.bindValue(":receiverStamp", receiverStamp);
+        query.bindValue(":delay", delay);
+        if(!query.exec()){
+            emit newLogInfo("插入Message表失败"+ query.lastError().text());
+        } else {
+            emit newLogInfo("插入Message表成功");
+        }
+
+
     } else{
         emit newLogInfo("消息类型出错");
     }
@@ -489,7 +546,9 @@ bool MainWindow::addMessageToDB(const QJsonObject &message){
     double acc = message.find("acc").value().toString().toDouble();
     double lon = message.find("lon").value().toString().toDouble();
     double lat = message.find("lat").value().toString().toDouble();
+
     long long receiverStamp = getTimeStamp();
+
     long long delay = receiverStamp - timeStamp;
 
     emit newLogInfo("delay ="+ QString::number(delay));
@@ -568,7 +627,26 @@ bool MainWindow::addLogToDB(const QString &logInfo){
     }
 }
 
+/*************************************************
+ *
+ * 此函数为连接AP的PC端与Android进行同步
+ * 将发送同步请求
+ *
+ * *************************************************/
+void MainWindow::on_btn_time_sync_clicked()
+{
+    QJsonObject result;
+    result.insert("id", ERROR_VALUE);
+    result.insert("type","TYPE_WIFI_TIME_SYNC");
+    result.insert("warning", false);
+    result.insert("timeStamp",ERROR_VALUE);
+    result.insert("receiverTimeStamp", ERROR_VALUE);
+    result.insert("distance", ERROR_VALUE);
+    result.insert("time", ERROR_VALUE);
+    result.insert("sendTimeStamp", getTimeStamp());
 
-
-
-
+    udpTargetAddr.setAddress("192.168.1.83");
+    udpTargetPort = 4040;
+    myudp->sendMessage(udpTargetAddr, udpTargetPort, result);
+    addResultToDB(result, true);
+}

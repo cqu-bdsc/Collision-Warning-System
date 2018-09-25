@@ -53,6 +53,8 @@ public:
     QSpacerItem *horizontalSpacer_2;
     QLabel *label_local;
     QLabel *label_locIP;
+    QSpacerItem *horizontalSpacer_11;
+    QPushButton *btn_time_sync;
     QGroupBox *UDP;
     QGroupBox *groupSend;
     QWidget *horizontalLayoutWidget;
@@ -264,6 +266,15 @@ public:
         label_locIP->setObjectName(QStringLiteral("label_locIP"));
 
         horizontalLayout_4->addWidget(label_locIP);
+
+        horizontalSpacer_11 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_4->addItem(horizontalSpacer_11);
+
+        btn_time_sync = new QPushButton(horizontalLayoutWidget_4);
+        btn_time_sync->setObjectName(QStringLiteral("btn_time_sync"));
+
+        horizontalLayout_4->addWidget(btn_time_sync);
 
 
         verticalLayout->addWidget(NetworkInterface);
@@ -663,6 +674,7 @@ public:
         NetworkInterface->setTitle(QApplication::translate("MainWindow", "\347\275\221\347\273\234\346\216\245\345\217\243\351\200\211\346\213\251", nullptr));
         label_local->setText(QApplication::translate("MainWindow", "\346\234\254\345\234\260IP:", nullptr));
         label_locIP->setText(QApplication::translate("MainWindow", "255.255.255.255", nullptr));
+        btn_time_sync->setText(QApplication::translate("MainWindow", "Time Sync", nullptr));
         UDP->setTitle(QApplication::translate("MainWindow", "UDP\351\200\232\344\277\241\346\265\213\350\257\225\346\250\241\345\235\227", nullptr));
         groupSend->setTitle(QApplication::translate("MainWindow", "\345\217\221\351\200\201\346\266\210\346\201\257", nullptr));
         label_ip->setText(QApplication::translate("MainWindow", "IP", nullptr));

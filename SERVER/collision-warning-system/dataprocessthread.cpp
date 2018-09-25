@@ -249,40 +249,6 @@ void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
     QJsonObject nodeOne, nodeTwo;
     QJsonObject resultOne, resultTwo;
 
-    /*************************
-     * 对初始点进行判断
-     * ***********************/
-
-    nodeOne.insert("lat", messages.at(0).find("lat").value().toString().toDouble());
-    nodeOne.insert("lon", messages.at(0).find("lon").value().toString().toDouble());
-    nodeTwo.insert("lat", messages.at(1).find("lat").value().toString().toDouble());
-    nodeTwo.insert("lon", messages.at(1).find("lon").value().toString().toDouble());
-
-    emit newLogInfo(QString(QJsonDocument(nodeOne).toJson()));
-    emit newLogInfo(QString(QJsonDocument(nodeTwo).toJson()));
-
-    double distanceStart = getDistance(nodeOne, nodeTwo);
-
-    if (distanceStart <= DISTANCE_THRESHOLD){
-        resultOne.insert("warning", true);
-        resultOne.insert("distance", distanceStart);
-        resultOne.insert("time", 0);
-        resultOne.insert("sendTimeStamp", getTimeStamp());
-
-        resultTwo.insert("warning", true);
-        resultTwo.insert("distance", distanceStart);
-        resultTwo.insert("time", 0);
-        resultTwo.insert("sendTimeStamp", getTimeStamp());
-
-        emit shouldSendResult(resultOne);
-        emit shouldSendResult(resultTwo);
-        addResultToDB(resultOne, false);
-        addResultToDB(resultTwo, false);
-
-        emit newLogInfo("预测结束：会碰撞");
-        return;
-    }
-
     /****************************************
      *  提取数据
      * *************************************/
@@ -327,6 +293,41 @@ void DataProcessThread::computerResult(const QList<QJsonObject> &messages){
     resultTwo.insert("type",TYPE_RESULT);
     resultTwo.insert("timeStamp",ERROR_VALUE);
     resultTwo.insert("receiverTimeStamp", ERROR_VALUE);
+
+
+    /*************************
+     * 对初始点进行判断
+     * ***********************/
+
+    nodeOne.insert("lat", messages.at(0).find("lat").value().toString().toDouble());
+    nodeOne.insert("lon", messages.at(0).find("lon").value().toString().toDouble());
+    nodeTwo.insert("lat", messages.at(1).find("lat").value().toString().toDouble());
+    nodeTwo.insert("lon", messages.at(1).find("lon").value().toString().toDouble());
+
+    emit newLogInfo(QString(QJsonDocument(nodeOne).toJson()));
+    emit newLogInfo(QString(QJsonDocument(nodeTwo).toJson()));
+
+    double distanceStart = getDistance(nodeOne, nodeTwo);
+
+    if (distanceStart <= DISTANCE_THRESHOLD){
+        resultOne.insert("warning", true);
+        resultOne.insert("distance", distanceStart);
+        resultOne.insert("time", 0);
+        resultOne.insert("sendTimeStamp", getTimeStamp());
+
+        resultTwo.insert("warning", true);
+        resultTwo.insert("distance", distanceStart);
+        resultTwo.insert("time", 0);
+        resultTwo.insert("sendTimeStamp", getTimeStamp());
+
+        emit shouldSendResult(resultOne);
+        emit shouldSendResult(resultTwo);
+        addResultToDB(resultOne, false);
+        addResultToDB(resultTwo, false);
+
+        emit newLogInfo("预测结束：会碰撞");
+        return;
+    }
 
     double distance;
     for(int i = 1; i <= THRESHOLD; i++){

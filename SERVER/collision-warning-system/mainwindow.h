@@ -85,6 +85,8 @@ private slots:
     void on_btn_show_tar_clicked();
     void on_btn_clear_tar_clicked();
 
+    void on_btn_time_sync_clicked();
+
 signals:
     void newMessage(const QJsonObject &message);            //有新的信息，添加到队列中
     void newLogInfo(const QString &logInfo);            //发送一些调试信息
@@ -105,7 +107,11 @@ private:
 
     QString TYPE_MESSAGE = "TYPE_MESSAGE";
     QString TYPE_TIME_SYNC_MESSAGE = "TYPE_TIME_SYNC_MESSAGE";
+    QString TYPE_WIFI_TIME_SYNC_RESULT = "TYPE_WIFI_TIME_SYNC_RESULT";
+    QString TYPE_WIFI_MESSAGE = "TYPE_WIFI_MESSAGE";
 
+    long long baseTimeStamp = -666;
+    long long serverTimeStamp = -666;
     QString TYPE_TIME_SYNC_RESULT = "TYPE_TIME_SYNC_RESULT";
     int ERROR_VALUE = -666;
 
