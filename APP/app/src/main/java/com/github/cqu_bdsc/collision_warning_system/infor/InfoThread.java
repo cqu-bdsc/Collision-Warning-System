@@ -35,6 +35,10 @@ public class InfoThread extends Thread {
         }
     }
 
+    public void stopMe(){
+        this.stop = true;
+    }
+
     public void sendIntentMessage(Message message){
         Intent intent = new Intent();
         intent.setAction(InfoThread.ACTION_INFORMATION);//告诉android将要执行什么功能
