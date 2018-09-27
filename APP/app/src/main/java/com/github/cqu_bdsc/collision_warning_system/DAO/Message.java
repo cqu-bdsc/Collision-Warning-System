@@ -8,6 +8,8 @@ import java.io.Serializable;
 public class Message implements Serializable {
     public static final String TYPE_MESSAGE = "TYPE_MESSAGE";
     public static final String TYPE_TIME_SYNC_MESSAGE = "TYPE_TIME_SYNC_MESSAGE";
+    public static final String TYPE_WIFI_TIME_SYNC_RESULT = "TYPE_WIFI_TIME_SYNC_RESULT";
+    public static final String TYPE_WIFI_MESSAGE = "TYPE_WIFI_MESSAGE";
     public static int ERROR_VALUE = -666;
     private int id;
     private long timeStamp;

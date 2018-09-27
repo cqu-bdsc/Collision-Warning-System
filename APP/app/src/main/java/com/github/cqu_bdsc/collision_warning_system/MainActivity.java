@@ -36,9 +36,13 @@ import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.list.IFlowCursorIterator;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.SyncFailedException;
+import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String ACTION_SEND_MESSAGE = "ACTION_SEND_MESSAGE";
     public static final String ACTION_SQL = "ACTION_SQL";
+    public static final String ACTION_LTE_TIME_SYNC = "ACTION_LTE_TIME_SYNC";
+
     private static final String SERVER_IP = "192.168.1.80";
     private static final String SERVER_PORT = "4040";
 
@@ -152,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(InfoThread.ACTION_INFORMATION);
         intentFilter.addAction(MainActivity.ACTION_SEND_MESSAGE);
         intentFilter.addAction(MainActivity.ACTION_SQL);
-
+        intentFilter.addAction(MainActivity.ACTION_LTE_TIME_SYNC);
 
         etIp        = (EditText) findViewById(R.id.et_ipAdd);
         btnPing     = (Button)   findViewById(R.id.btn_testPing);
@@ -177,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
         tv_gps = (TextView) findViewById(R.id.tv_gps);
         tv_sql = (TextView) findViewById(R.id.tv_sql);
 
-
         img_warning = (ImageView) findViewById(R.id.img_warning);
         img_warning.setImageDrawable(getResources().getDrawable(R.mipmap.ic_safe));
 
@@ -185,60 +190,6 @@ public class MainActivity extends AppCompatActivity {
         btnStart    = (Button)   findViewById(R.id.btn_start);
         btnQuery    = (Button)   findViewById(R.id.btn_query);
         btnBackup   = (Button)   findViewById(R.id.btn_backup);
-
-        btnPing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (etIp.getEditableText().toString().equals("")){    //使用默认IP地址
-                    if (isConnectedServer(SERVER_IP)){
-                        tvPingResult.setText("Ping "+SERVER_IP+ "Success.");
-                        addLogToDB("Ping "+SERVER_IP+ "Success.");
-                    } else {
-                        tvPingResult.setText("Ping "+SERVER_IP+ "Failed.");
-                        addLogToDB("Ping "+SERVER_IP+ "Failed.");
-                    }
-                } else {
-                    String ipAdd = (String) etIp.getEditableText().toString();
-                    if (isIp(ipAdd)){  //ip匹配
-                        setServer_Add(ipAdd);
-                        if (isConnectedServer(ipAdd)){
-                            tvPingResult.setText("Ping"+ipAdd+ "Success.");
-                            addLogToDB("Ping"+ipAdd+ "Success.");
-                        } else {
-                            tvPingResult.setText("Ping"+ipAdd+ "Failed.");
-                            addLogToDB("Ping"+ipAdd+ "Failed.");
-                        }
-                    } else { //ip不匹配
-                        tvPingResult.setText("请重新输入IP.");
-                        addLogToDB("请重新输入IP.");
-                    }
-
-                }
-
-            }
-        });
-
-        btnBackup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addLogToDB("备份数据库");
-                Intent intent = new Intent(MainActivity.this, DBTool.class);
-                intent.setAction(DBTool.ACTION_COPY);
-                startService(intent);
-            }
-        });
-
-        /***********************************************
-         * 现为时间同步按钮
-         */
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {//只要一点发送，就有数据的录入，获取，转换，以及数据json格式的转化过程
-              sendTimeStampMessage();
-              addLogToDB("发起时间同步");
-            }
-        });
-
 
         /**
          * 注册接收线程、发送线程
@@ -308,6 +259,58 @@ public class MainActivity extends AppCompatActivity {
         infoThread.start();
 
 
+        btnPing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (etIp.getEditableText().toString().equals("")){    //使用默认IP地址
+                    if (isConnectedServer(SERVER_IP)){
+                        tvPingResult.setText("Ping "+SERVER_IP+ "Success.");
+                        addLogToDB("Ping "+SERVER_IP+ "Success.");
+                    } else {
+                        tvPingResult.setText("Ping "+SERVER_IP+ "Failed.");
+                        addLogToDB("Ping "+SERVER_IP+ "Failed.");
+                    }
+                } else {
+                    String ipAdd = (String) etIp.getEditableText().toString();
+                    if (isIp(ipAdd)){  //ip匹配
+                        setServer_Add(ipAdd);
+                        if (isConnectedServer(ipAdd)){
+                            tvPingResult.setText("Ping"+ipAdd+ "Success.");
+                            addLogToDB("Ping"+ipAdd+ "Success.");
+                        } else {
+                            tvPingResult.setText("Ping"+ipAdd+ "Failed.");
+                            addLogToDB("Ping"+ipAdd+ "Failed.");
+                        }
+                    } else { //ip不匹配
+                        tvPingResult.setText("请重新输入IP.");
+                        addLogToDB("请重新输入IP.");
+                    }
+
+                }
+
+            }
+        });
+
+        btnBackup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addLogToDB("备份数据库");
+                Intent intent = new Intent(MainActivity.this, DBTool.class);
+                intent.setAction(DBTool.ACTION_COPY);
+                startService(intent);
+            }
+        });
+
+        /***********************************************
+         * 现为时间同步按钮
+         */
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {//只要一点发送，就有数据的录入，获取，转换，以及数据json格式的转化过程
+                sendTimeStampMessage();
+                addLogToDB("发起时间同步");
+            }
+        });
 
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -341,7 +344,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isConnectedServer(String ip) {
-
         Runtime runtime = Runtime.getRuntime();
         try
         {
@@ -490,6 +492,32 @@ public class MainActivity extends AppCompatActivity {
                                 default:
                                     break;
                             }
+                        } else if (String.valueOf(id).equals("-666")){
+                            String type = result.getType();
+                            long sendTimeStamp = result.getSendTimeStamp();
+                            long timeStamp = System.currentTimeMillis();
+                            if (type.equals(Result.TYPE_WIFI_TIME_SYNC)){
+                                Message messageWifiTimeSync = new Message();
+                                messageWifiTimeSync.setId(Message.ERROR_VALUE);
+                                messageWifiTimeSync.setType(Message.TYPE_WIFI_TIME_SYNC_RESULT);
+                                messageWifiTimeSync.setLat(Message.ERROR_VALUE);
+                                messageWifiTimeSync.setLon(Message.ERROR_VALUE);
+                                messageWifiTimeSync.setAce(sendTimeStamp);
+                                messageWifiTimeSync.setDirection(Message.ERROR_VALUE);
+                                messageWifiTimeSync.setSpeed(Message.ERROR_VALUE);
+                               // messageWifiTimeSync.setMac(String.valueOf(sendTimeStamp));
+                                messageWifiTimeSync.setTimeStamp(timeStamp);
+                                tvPingResult.setText("Type wifi time sync");
+                                Intent sendIntent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
+                                sendIntent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
+                                sendIntent.putExtra(SendService.EXTRAS_HOST,"192.168.1.85");//将执行服务活动的限制，IP地址，端口号，还有
+                                sendIntent.putExtra(SendService.EXTRAS_PORT,"4040");
+                                sendIntent.putExtra(SendService.EXTRAS_JSON,messageWifiTimeSync);
+                                startService(sendIntent);//现在真正执行服务
+
+                            }else {
+                                tvPingResult.setText("Result is from else id:"+String.valueOf(result.getId())+"  "+type);
+                            }
                         } else {
                             tvPingResult.setText("Result is from else id:"+String.valueOf(result.getId()));
                         }
@@ -547,6 +575,16 @@ public class MainActivity extends AppCompatActivity {
                     et_lat.setText("28.598280");
                     et_lon.setText("106.295269");
                     et_direction.setText("-74.463");
+                    break;
+                case MainActivity.ACTION_LTE_TIME_SYNC:
+                    long sendTimeStamp = intent.getExtras().getLong("sendTimeStamp");
+                    long receiverTimeStamp = intent.getExtras().getLong("receiverTimeStamp");
+                    long timeStamp = intent.getExtras().getLong("timeStamp");
+                    long delay = (sendTimeStamp - receiverTimeStamp) /2;
+                    long serverTimeStamp = timeStamp + delay;
+                    setServerStamp(serverTimeStamp);
+                    setBaseStamp(receiverTimeStamp);
+                    tvPingResult.setText("Time Sync success");
                     break;
                 case MainActivity.ACTION_SEND_MESSAGE:
 
@@ -641,6 +679,12 @@ public class MainActivity extends AppCompatActivity {
         startService(intent);
     }
 
+
+    /************************************
+     *
+     *   发送Message, 给RSU, 给云服务器，给连接AP的PC
+     *
+     ********************************/
     private void sendMessage(){
         String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
         String timeStamp = et_timeStamp.getEditableText().toString();
@@ -676,6 +720,127 @@ public class MainActivity extends AppCompatActivity {
         intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
         intent.putExtra(SendService.EXTRAS_HOST,getServer_Add());//将执行服务活动的限制，IP地址，端口号，还有
         intent.putExtra(SendService.EXTRAS_PORT,SERVER_PORT);
+        intent.putExtra(SendService.EXTRAS_JSON,message);
+        startService(intent);//现在真正执行服务
+
+    }
+    private void sendMessageToLTE(){
+        String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
+        String timeStamp = et_timeStamp.getEditableText().toString();
+        String speed = et_speed.getEditableText().toString();
+        String direction = et_direction.getEditableText().toString();
+        String lat = et_lat.getEditableText().toString();
+        String lon = et_lon.getEditableText().toString();
+        String ace = et_ace.getEditableText().toString();
+
+        Message message = new Message();
+        message.setId(Integer.valueOf(id));//将上面得到的字符串类型的数据转化为具体相对应的类型
+        message.setTimeStamp(Long.valueOf(timeStamp));
+        if (!speed.equals("")){
+            message.setSpeed(Float.valueOf(speed));
+        }
+        if (!direction.equals("")){
+            message.setDirection(Float.valueOf(direction));
+        }
+        if (!lat.equals("")){
+            message.setLat(Double.valueOf(lat));
+        }
+        if (!lon.equals("")){
+            message.setLon(Double.valueOf(lon));
+        }
+        if (!ace.equals("")){
+            message.setAce(Double.valueOf(ace));
+        }
+        message.setType(Message.TYPE_MESSAGE);   //普通消息
+        //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+
+
+        Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
+        intent.setAction(SendService.ACTION_SEND_TCP);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
+        intent.putExtra(SendService.EXTRAS_HOST,"120.78.167.211");//将执行服务活动的限制，IP地址，端口号，还有
+        //intent.putExtra(SendService.EXTRAS_HOST,"192.168.123.186");//将执行服务活动的限制，IP地址，端口号，还有
+        intent.putExtra(SendService.EXTRAS_PORT,"4040");
+        intent.putExtra(SendService.EXTRAS_JSON,message);
+        startService(intent);//现在真正执行服务
+
+    }
+
+    private void sendMessageToLTETimeSync(){
+        String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
+        String timeStamp = et_timeStamp.getEditableText().toString();
+        String speed = et_speed.getEditableText().toString();
+        String direction = et_direction.getEditableText().toString();
+        String lat = et_lat.getEditableText().toString();
+        String lon = et_lon.getEditableText().toString();
+        String ace = et_ace.getEditableText().toString();
+
+        Message message = new Message();
+        message.setId(Integer.valueOf(id));//将上面得到的字符串类型的数据转化为具体相对应的类型
+        message.setTimeStamp(Long.valueOf(timeStamp));
+        if (!speed.equals("")){
+            message.setSpeed(Float.valueOf(speed));
+        }
+        if (!direction.equals("")){
+            message.setDirection(Float.valueOf(direction));
+        }
+        if (!lat.equals("")){
+            message.setLat(Double.valueOf(lat));
+        }
+        if (!lon.equals("")){
+            message.setLon(Double.valueOf(lon));
+        }
+        if (!ace.equals("")){
+            message.setAce(Double.valueOf(ace));
+        }
+        message.setType(Message.TYPE_TIME_SYNC_MESSAGE);   //普通消息
+        //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+
+
+        Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
+        intent.setAction(SendService.ACTION_SEND_TCP);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
+        intent.putExtra(SendService.EXTRAS_HOST,"120.78.167.211");//将执行服务活动的限制，IP地址，端口号，还有
+        //intent.putExtra(SendService.EXTRAS_HOST,"192.168.123.186");//将执行服务活动的限制，IP地址，端口号，还有
+        intent.putExtra(SendService.EXTRAS_PORT,"4040");
+        intent.putExtra(SendService.EXTRAS_JSON,message);
+        startService(intent);//现在真正执行服务
+
+    }
+
+    private void sendMessageToWIFI(){
+        String id = et_id.getEditableText().toString();//将输入的格式统一化为string型
+        String timeStamp = String.valueOf(System.currentTimeMillis());
+        String speed = et_speed.getEditableText().toString();
+        String direction = et_direction.getEditableText().toString();
+        String lat = et_lat.getEditableText().toString();
+        String lon = et_lon.getEditableText().toString();
+        String ace = et_ace.getEditableText().toString();
+
+        Message message = new Message();
+        message.setId(Integer.valueOf(id));//将上面得到的字符串类型的数据转化为具体相对应的类型
+        message.setTimeStamp(Long.valueOf(timeStamp));
+        if (!speed.equals("")){
+            message.setSpeed(Float.valueOf(speed));
+        }
+        if (!direction.equals("")){
+            message.setDirection(Float.valueOf(direction));
+        }
+        if (!lat.equals("")){
+            message.setLat(Double.valueOf(lat));
+        }
+        if (!lon.equals("")){
+            message.setLon(Double.valueOf(lon));
+        }
+        if (!ace.equals("")){
+            message.setAce(Double.valueOf(ace));
+        }
+        message.setType(Message.TYPE_WIFI_MESSAGE);   //普通消息
+        //现在Message里面已经有对应格式的数据，接下来是将数据转化为json格式。
+
+
+        Intent intent = new Intent(MainActivity.this, SendService.class);//跳转到SendService活动
+        intent.setAction(SendService.ACTION_SEND_JSON);//将执行服务的活动，现在并不执行，只是告诉android，我们要调用哪个功能。
+        intent.putExtra(SendService.EXTRAS_HOST,"192.168.1.85");//将执行服务活动的限制，IP地址，端口号，还有
+        intent.putExtra(SendService.EXTRAS_PORT,"4040");
         intent.putExtra(SendService.EXTRAS_JSON,message);
         startService(intent);//现在真正执行服务
 
@@ -757,7 +922,9 @@ public class MainActivity extends AppCompatActivity {
             stop = false;
             while (!stop){
                 try {
-                    sendMessage();
+ //                   sendMessage();
+ //                   sendMessageToWIFI();
+                    sendMessageToLTETimeSync();
                     addMessageToDB();
                     sleep(FREQUENCY);
                 } catch (InterruptedException e) {
