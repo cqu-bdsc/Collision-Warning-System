@@ -39,6 +39,7 @@ public class Result implements Serializable {
 
     public static final String TYPE_RESULT = "TYPE_RESULT";
     public static final String TYPE_TIME_SYNC_RESULT = "TYPE_TIME_SYNC_RESULT";
+    public static final String TYPE_WIFI_TIME_SYNC = "TYPE_WIFI_TIME_SYNC";
     public static int ERROR_VALUE = -666;
     private int id;
     private int time;

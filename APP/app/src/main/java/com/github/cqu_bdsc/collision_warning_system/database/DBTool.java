@@ -39,7 +39,7 @@ public class DBTool extends IntentService {
         super("DBTool");
     }
     public static final String TAG = "DBTool";
-    public static final String DATABASE_PATH    = "/mnt/sdcard/Downloads/";
+    public static final String DATABASE_PATH    = "/mnt/sdcard/Download/";
     public static final String DATABASE_FLIENAME = "databasebackup.db";
 
     public static final String ACTION_ADD       = "ACTION_ADD";
